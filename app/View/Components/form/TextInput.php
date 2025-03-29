@@ -1,6 +1,6 @@
 <?php
 
-namespace App\View\Components\ui;
+namespace App\View\Components\form;
 
 use Closure;
 use Illuminate\Contracts\View\View;
@@ -35,6 +35,6 @@ class TextInput extends Component
      */
     public function render(): View|Closure|string
     {
-        return view('components..ui.text-input');
+        return view('components.form.text-input');
     }
 }
