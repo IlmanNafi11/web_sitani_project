@@ -1,4 +1,4 @@
-<div class="text-input-container w-full h-24">
+<div class="text-input-container w-full h-24 relative">
 
     @php
         $Typemode = [
@@ -8,6 +8,8 @@
         ];
 
     @endphp
+
+    {{ $slot }}
 
     <label for="{{ $inputName }}"
         class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ $textLabel }}</label>
