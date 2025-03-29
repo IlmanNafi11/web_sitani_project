@@ -13,6 +13,7 @@ class Button extends Component
     public $contentStyle;
     public $titleStyle;
     public $width;
+    public $type;
 
     /**
      * Initial property
@@ -21,13 +22,14 @@ class Button extends Component
      * @param string $color Warna button
      * @param string $contentStyle Style konten button
      */
-    public function __construct($title, $color, $contentStyle, $titleStyle, $width)
+    public function __construct($title, $color, $contentStyle, $titleStyle, $width, $type)
     {
         $this->title = $title;
         $this->color = $color;
         $this->contentStyle = $contentStyle;
         $this->titleStyle = $titleStyle;
         $this->width = $width;
+        $this->type = $type;
     }
 
     /**
