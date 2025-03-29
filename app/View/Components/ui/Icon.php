@@ -10,13 +10,15 @@ class Icon extends Component
 {
     public $size;
     public $color;
+    public $position;
     /**
      * Create a new component instance.
      */
-    public function __construct($size, $color)
+    public function __construct($size, $color, $position)
     {
         $this->size = $size;
         $this->color = $color;
+        $this->position = $position;
     }
 
     /**
