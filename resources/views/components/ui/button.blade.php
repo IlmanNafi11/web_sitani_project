@@ -10,7 +10,7 @@
         $buttonClass = $baseClass . " " . ($colors[$color] ?? $colors['blue']);
     @endphp
 
-    <button type="button" class="{{ $buttonClass }}">
+    <button type="button" class="{{ $buttonClass }} {{$width ?? 'w-auto'}}">
         <div class="{{ $contentStyle ?? 'flex gap-3 justify-center items-center'}}">
             {{ $slot }}
             <span class="{{ $titleStyle ?? 'text-lg font-bold' }}">{{ $title ?? 'Button'}}</span>
