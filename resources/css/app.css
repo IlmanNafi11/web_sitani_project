@@ -4,3 +4,23 @@
 @plugin "flowbite/plugin";
 @source "../../node_modules/flowbite";
 
+.datatable-dropdown, .datatable-search
+{
+    flex-grow: 1;
+}
+
+.datatable-top
+{
+    flex-direction: row;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.title-label-page
+{
+    color: black;
+    font-size: 24px;
+    font-weight: 500;
+}
+
+
