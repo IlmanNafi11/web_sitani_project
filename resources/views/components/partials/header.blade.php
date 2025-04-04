@@ -1,5 +1,5 @@
 <header
-    class="header w-full h-[70px] bg-white shadow-sm px-6 fixed top-0 z-50 border-b border-gray-200 dark:bg-gray-800 dark:border-gray-700 flex justify-between items-center p-0 m-0">
+    class="header w-full h-[70px] bg-white px-6 fixed top-0 z-50 border-b border-gray-200 dark:bg-gray-800 dark:border-gray-700 flex justify-between items-center p-0 m-0">
     <div class="app-logo inline-block">
         <span class="text-[46px] text-black dark:text-white" style="font-family: Marck Script">Sitani</span>
     </div>
