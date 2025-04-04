@@ -76,7 +76,7 @@
                 const dataTable = $(".datatable-top");
                 dataTable.prepend(`
                                             <div class="action-header-container flex flex-wrap gap-4">
-                                                <div
+                                                <a href="{{ route('kecamatan.create') }}"
                                                     class="add-data-button cursor-pointer text-white bg-blue-700 hover:bg-blue-800 w-fit p-2 flex justify-center items-center space-x-1 rounded-lg h-auto">
                                                     <svg class="w-6 h-6 text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
                                                         width="24" height="24" fill="none" viewBox="0 0 24 24">
@@ -84,8 +84,8 @@
                                                             stroke-width="2"
                                                             d="M10 3v4a1 1 0 0 1-1 1H5m4 8h6m-6-4h6m4-8v16a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V7.914a1 1 0 0 1 .293-.707l3.914-3.914A1 1 0 0 1 9.914 3H18a1 1 0 0 1 1 1Z" />
                                                     </svg>
-                                                    <a href="{{ route('kecamatan.create') }}">Tambah Data</a>
-                                                </div>
+                                                    <span >Tambah Data</span>
+                                                </a>
                                                 <div
                                                     class="import-csv-button cursor-pointer text-white bg-green-500 hover:bg-green-800 w-fit p-2 flex justify-center items-center space-x-1 rounded-lg h-auto">
                                                     <svg class="w-6 h-6 text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
