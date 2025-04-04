@@ -18,12 +18,12 @@ class KecamatanRepository implements KecamatanRepositoryInterfaces{
 
     public function update($id, array $data)
     {
-
+        return Kecamatan::where('id', $id)->update($data);
     }
 
     public function find($id)
     {
-
+        return Kecamatan::find($id);
     }
 
     public function delete($id)

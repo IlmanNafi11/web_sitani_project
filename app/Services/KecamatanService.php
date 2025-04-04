@@ -21,6 +21,15 @@ class KecamatanService {
         }
     }
 
+    public function findById($id)
+    {
+        try {
+            return $this->kecamatanRepository->find($id);
+        } catch (\Throwable $th) {
+            Log::error('Gagal dalam mencari data kecamatan: ' . $th->getMessage());
+        }
+    }
+
     public function create(array $data)
     {
         try {
@@ -29,6 +38,15 @@ class KecamatanService {
             Log::error('Gagal Menyimpan kecamatan: ' . $th->getMessage());
         }
 
+    }
+
+    public function update($id, $data)
+    {
+        try {
+            return $this->kecamatanRepository->update($id, $data);
+        } catch (\Throwable $th) {
+            Log::error('Gagal memperbarui kecamatan' . $th->getMessage());
+        }
     }
 
     public function delete($id)

@@ -36,8 +36,8 @@ class KecamatanController extends Controller
      */
     public function store(KecamatanRequest $request)
     {
-        $validated = $this->kecamatanService->create($request->validated());
-        if ($validated) {
+        $result = $this->kecamatanService->create($request->validated());
+        if ($result) {
             return redirect()->route('kecamatan.index')->with('success', 'Data Berhasil disimpan');
         }
 
@@ -57,15 +57,22 @@ class KecamatanController extends Controller
      */
     public function edit(string $id)
     {
-        //
+        $kecamatan = $this->kecamatanService->findById($id);
+        return view('pages.kecamatan.update', compact('kecamatan'));
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(KecamatanRequest $request, string $id)
     {
-        //
+        $result = $this->kecamatanService->update($id, $request->validated());
+
+        if ($result) {
+            return redirect()->route('kecamatan.index')->with('success', 'Data berhasil diperbarui');
+        }
+
+        return redirect()->route('kecamatan.index')->with('failed','Data gagal diperbarui');
     }
 
     /**
