@@ -40,7 +40,7 @@ class KecamatanController extends Controller
         if ($validated) {
             return redirect()->route('kecamatan.index')->with('success', 'Data Berhasil disimpan');
         }
-        
+
         return redirect()->route('kecamatan.create')->with('failed', 'Data Gagal disimpan');
     }
 
@@ -73,6 +73,7 @@ class KecamatanController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $this->kecamatanService->delete($id);
+        return redirect()->route('kecamatan.index')->with('success', 'Data berhasil dihapus!');
     }
 }

@@ -30,4 +30,13 @@ class KecamatanService {
         }
 
     }
+
+    public function delete($id)
+    {
+        try {
+            return $this->kecamatanRepository->delete($id);
+        } catch (\Throwable $th) {
+            Log::error('Gagal menghapus kecamatan: ' . $th->getMessage());
+        }
+    }
 }

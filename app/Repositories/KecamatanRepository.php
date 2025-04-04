@@ -28,6 +28,6 @@ class KecamatanRepository implements KecamatanRepositoryInterfaces{
 
     public function delete($id)
     {
-
+        return Kecamatan::destroy($id);
     }
 }
