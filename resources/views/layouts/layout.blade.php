@@ -15,6 +15,7 @@
 </head>
 <body class="max-w-screen max-h-screen">
     <script src="https://cdn.jsdelivr.net/npm/flowbite@3.1.2/dist/flowbite.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <div class="layout mx-auto md:w-full md:min-h-screen md:h-auto md:mx-0 bg-[#F5F7FF]">
         @yield('content')
     </div>
