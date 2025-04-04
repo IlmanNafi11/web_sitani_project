@@ -14,7 +14,7 @@
     <label for="{{ $inputName }}"
         class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ $textLabel }}</label>
     <input type="{{ $inputType }}" id="{{ $inputName }}" class="{{ $Typemode[$mode] ?? 'normal'}}"
-        placeholder="{{ $inputPlaceholder }}" />
+        placeholder="{{ $inputPlaceholder }}" name="{{ $inputName }}"/>
     <p
         class="mt-2 text-sm font-medium {{ $mode == 'success' ? 'text-green-600 dark:text-green-500' : ($mode == 'error' ? 'text-red-600 dark:text-red-500' : 'text-gray-600 dark:text-gray-500') }} {{ $messageVisible ?? 'visible' }}">
         {{ $errorMessage ?? "" }}
