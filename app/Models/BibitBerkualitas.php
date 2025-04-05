@@ -11,4 +11,14 @@ class BibitBerkualitas extends Model
         'komoditas_id',
         'deskripsi',
     ];
+
+    /**
+     * Relasin one to one dengan model komoditas
+     * 
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<Komoditas, BibitBerkualitas>
+     */
+    public function komoditas()
+    {
+        return $this->belongsTo(Komoditas::class);
+    }
 }

@@ -11,4 +11,14 @@ class Komoditas extends Model
         'deskripsi',
         'musim',
     ];
+
+    /**
+     * Relasi one to one dengan model bibit berkualitas
+     * 
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne<BibitBerkualitas, Komoditas>
+     */
+    public function bibitBerkualitas()
+    {
+        return $this->hasOne(BibitBerkualitas::class);
+    }
 }
