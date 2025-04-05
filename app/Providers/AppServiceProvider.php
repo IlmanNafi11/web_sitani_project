@@ -5,7 +5,9 @@ namespace App\Providers;
 use App\Repositories\DesaRepository;
 use App\Repositories\Interfaces\DesaRepositoryInterface;
 use App\Repositories\Interfaces\KecamatanRepositoryInterfaces;
+use App\Repositories\Interfaces\KomoditasRepositoryInterface;
 use App\Repositories\KecamatanRepository;
+use App\Repositories\KomoditasRepository;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -17,6 +19,7 @@ class AppServiceProvider extends ServiceProvider
     {
         $this->app->bind(KecamatanRepositoryInterfaces::class, KecamatanRepository::class);
         $this->app->bind(DesaRepositoryInterface::class, DesaRepository::class);
+        $this->app->bind(KomoditasRepositoryInterface::class, KomoditasRepository::class);
     }
 
     /**
