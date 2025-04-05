@@ -32,7 +32,7 @@ class PenyuluhTerdaftarController extends Controller
     {
         $kecamatans = $kecamatanService->getAll();
 
-        return view('pages.penyuluh-terdaftar.create', compact('kecamatans'));
+        return view('pages.penyuluh_terdaftar.create', compact('kecamatans'));
     }
 
     /**
@@ -65,7 +65,7 @@ class PenyuluhTerdaftarController extends Controller
         $penyuluh = $this->penyuluhService->getById($id);
         $kecamatans = $kecamatanService->getAll();
 
-        return view('pages.penyuluh-terdaftar.update', compact('penyuluh', 'kecamatans'));
+        return view('pages.penyuluh_terdaftar.update', compact('penyuluh', 'kecamatans'));
     }
 
     /**
