@@ -18,4 +18,14 @@ class Kecamatan extends Model
     {
         return $this->hasOne(Desa::class);
     }
+
+    /**
+     * Relasi one to one dengan model penyuluh terdaftar
+     * 
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne<PenyuluhTerdaftar, Kecamatan>
+     */
+    public function penyuluhTerdaftar()
+    {
+        return $this->hasOne(PenyuluhTerdaftar::class);
+    }
 }
