@@ -21,11 +21,21 @@ class Kecamatan extends Model
 
     /**
      * Relasi one to one dengan model penyuluh terdaftar
-     * 
+     *
      * @return \Illuminate\Database\Eloquent\Relations\HasOne<PenyuluhTerdaftar, Kecamatan>
      */
     public function penyuluhTerdaftar()
     {
         return $this->hasOne(PenyuluhTerdaftar::class);
+    }
+
+    /**
+     * Relasi one to one dengan model kelompok tani
+     * 
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne<KelompokTani, Kecamatan>
+     */
+    public function kelompokTani()
+    {
+        return $this->hasOne(KelompokTani::class);
     }
 }

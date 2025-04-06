@@ -19,4 +19,14 @@ class Desa extends Model
     {
         return $this->belongsTo(Kecamatan::class);
     }
+
+    /**
+     * Relasi one to one dengan model kelompok tani
+     * 
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne<KelompokTani, Desa>
+     */
+    public function kelompokTani()
+    {
+        return $this->hasOne(KelompokTani::class);
+    }
 }
