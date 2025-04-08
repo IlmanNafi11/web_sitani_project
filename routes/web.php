@@ -22,3 +22,7 @@ Route::resource('kecamatan', KecamatanController::class);
 Route::resource('kelompok-tani', KelompokTaniController::class);
 Route::resource('komoditas', KomoditasController::class);
 Route::resource('penyuluh-terdaftar', PenyuluhTerdaftarController::class);
+
+Route::get('test-component', fn()=> view('test-components'));
+Route::get('kecamatan/{id}/desa', [DesaController::class, 'getByKecamatanId']);
+Route::get('kecamatan/{id}/penyuluh', [PenyuluhTerdaftarController::class, 'getByKecamatanId']);
