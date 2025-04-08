@@ -89,4 +89,16 @@ class DesaController extends Controller
 
         return redirect()->route('desa.index')->with('success', 'Data berhasil dihapus');
     }
+
+    public function getByKecamatanId($id)
+    {
+        $desas = $this->desaService->getByKecamatanId($id);
+        if ($desas->isNotEmpty()) {
+            return response()->json($desas);
+        }
+
+        return response()->json([
+            "message" => "Data desa kosong",
+        ]);
+    }
 }

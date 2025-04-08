@@ -91,4 +91,17 @@ class PenyuluhTerdaftarController extends Controller
 
         return redirect()->route('penyuluh-terdaftar.index')->with('success', 'Data berhasil dihapus');
     }
+
+    public function getByKecamatanId($id)
+    {
+        $penyuluhs = $this->penyuluhService->getByKecamatanId($id);
+
+        if ($penyuluhs->isNotEmpty()) {
+            return response()->json($penyuluhs);
+        }
+
+        return response()->json([
+            "message" => "Penyuluh tidak tersedia",
+        ]);
+    }
 }
