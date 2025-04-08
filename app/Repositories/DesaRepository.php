@@ -2,9 +2,10 @@
 namespace App\Repositories;
 
 use App\Models\Desa;
+use App\Repositories\Interfaces\DesaCustomQueryInterface;
 use App\Repositories\Interfaces\DesaRepositoryInterface;
 
-class DesaRepository implements DesaRepositoryInterface {
+class DesaRepository implements DesaRepositoryInterface, DesaCustomQueryInterface {
 
     public function getAll()
     {
@@ -29,5 +30,10 @@ class DesaRepository implements DesaRepositoryInterface {
     public function delete($id)
     {
         return Desa::destroy($id);
+    }
+
+    public function getByKecamatanId($id): \Illuminate\Database\Eloquent\Collection
+    {
+        return Desa::select(['id', 'nama'])->where('kecamatan_id', $id)->get();
     }
 }

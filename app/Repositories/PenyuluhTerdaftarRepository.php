@@ -3,8 +3,9 @@ namespace App\Repositories;
 
 use App\Models\PenyuluhTerdaftar;
 use App\Repositories\Interfaces\PenyuluhRepositoryInterface;
+use App\Repositories\Interfaces\PenyuluhTerdaftarCustomQueryInterface;
 
-class PenyuluhTerdaftarRepository implements PenyuluhRepositoryInterface {
+class PenyuluhTerdaftarRepository implements PenyuluhRepositoryInterface, PenyuluhTerdaftarCustomQueryInterface {
 
     public function getAll()
     {
@@ -25,5 +26,10 @@ class PenyuluhTerdaftarRepository implements PenyuluhRepositoryInterface {
     public function delete($id)
     {
         return PenyuluhTerdaftar::destroy($id);
+    }
+
+    public function getByKecamatanId(int|string $id): \Illuminate\Database\Eloquent\Collection
+    {
+        return PenyuluhTerdaftar::select(['id', 'nama'])->where('kecamatan_id', $id)->get();
     }
 }
