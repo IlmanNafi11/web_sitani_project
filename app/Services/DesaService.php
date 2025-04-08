@@ -2,17 +2,20 @@
 
 namespace App\Services;
 
-use App\Repositories\Interfaces\DesaRepositoryInterface;
 use Illuminate\Support\Facades\Log;
+use App\Repositories\Interfaces\DesaRepositoryInterface;
+use App\Repositories\Interfaces\DesaCustomQueryInterface;
 
 class DesaService
 {
 
     protected DesaRepositoryInterface $desaRepository;
+    protected DesaCustomQueryInterface $desaCustomQuery;
 
-    public function __construct(DesaRepositoryInterface $desaRepository)
+    public function __construct(DesaRepositoryInterface $desaRepository, DesaCustomQueryInterface $desaCustomQuery)
     {
         $this->desaRepository = $desaRepository;
+        $this->desaCustomQuery = $desaCustomQuery;
     }
 
     public function getAll()
@@ -68,6 +71,15 @@ class DesaService
             return $this->desaRepository->delete($id);
         } catch (\Throwable $th) {
             Log::error('Gagal menghapus data desa: ' . $th->getMessage());
+        }
+    }
+
+    public function getByKecamatanId($id)
+    {
+        try {
+            return $this->desaCustomQuery->getByKecamatanId($id);
+        } catch (\Throwable $th) {
+            Log::error('Gagal mengambil data desa berdasarkan kecamatan id: ' . $th->getMessage());
         }
     }
 }

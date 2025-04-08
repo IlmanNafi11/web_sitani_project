@@ -2,14 +2,17 @@
 namespace App\Services;
 
 use App\Repositories\Interfaces\PenyuluhRepositoryInterface;
+use App\Repositories\Interfaces\PenyuluhTerdaftarCustomQueryInterface;
 use Illuminate\Support\Facades\Log;
 
 class PenyuluhTerdaftarService {
     protected PenyuluhRepositoryInterface $penyuluhRepository;
+    protected PenyuluhTerdaftarCustomQueryInterface $penyuluhTerdaftarCustomQuery;
 
-    public function __construct(PenyuluhRepositoryInterface $penyuluhRepository)
+    public function __construct(PenyuluhRepositoryInterface $penyuluhRepository, PenyuluhTerdaftarCustomQueryInterface $penyuluhTerdaftarCustomQuery)
     {
         $this->penyuluhRepository = $penyuluhRepository;
+        $this->penyuluhTerdaftarCustomQuery = $penyuluhTerdaftarCustomQuery;
     }
 
     public function getAll()
@@ -64,6 +67,15 @@ class PenyuluhTerdaftarService {
             return $this->penyuluhRepository->delete($id);
         } catch (\Throwable $th) {
             Log::error('Gagal menghapus data penyuluh terdaftar: ' . $th->getMessage());
+        }
+    }
+
+    public function getByKecamatanId($id)
+    {
+        try {
+            return $this->penyuluhTerdaftarCustomQuery->getByKecamatanId($id);
+        } catch (\Throwable $th) {
+            Log::error('Gagal mengambil data penyuluh terdaftar berdasarkan id kecamatan: ' . $th->getMessage());
         }
     }
 }
