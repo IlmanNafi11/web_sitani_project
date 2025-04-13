@@ -34,11 +34,21 @@ class KelompokTani extends Model
 
     /**
      * Relasi one to one dengan model kecamatan
-     * 
+     *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<Kecamatan, KelompokTani>
      */
     public function kecamatan()
     {
         return $this->belongsTo(Kecamatan::class);
+    }
+
+    /**
+     * Relasi one to many dengan model Laporan kondisi
+     * 
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<LaporanKondisi, KelompokTani>
+     */
+    public function laporanKondisi()
+    {
+        return $this->hasMany(LaporanKondisi::class);
     }
 }

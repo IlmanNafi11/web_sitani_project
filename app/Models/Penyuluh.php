@@ -10,4 +10,14 @@ class Penyuluh extends Model
         'user_id',
         'penyuluh_terdaftar_id'
     ];
+
+    /**
+     * Relasi one to many dengan model laporan kondisi
+     * 
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<LaporanKondisi, Penyuluh>
+     */
+    public function laporanKondisi()
+    {
+        return $this->hasMany(LaporanKondisi::class);
+    }
 }
