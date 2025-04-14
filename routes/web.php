@@ -5,6 +5,7 @@ use App\Http\Controllers\DesaController;
 use App\Http\Controllers\KecamatanController;
 use App\Http\Controllers\KelompokTaniController;
 use App\Http\Controllers\KomoditasController;
+use App\Http\Controllers\LaporanBibitController;
 use App\Http\Controllers\PenyuluhTerdaftarController;
 use Illuminate\Support\Facades\Route;
 
@@ -22,6 +23,10 @@ Route::resource('kecamatan', KecamatanController::class);
 Route::resource('kelompok-tani', KelompokTaniController::class);
 Route::resource('komoditas', KomoditasController::class);
 Route::resource('penyuluh-terdaftar', PenyuluhTerdaftarController::class);
+Route::get('laporan-bibit', [LaporanBibitController::class, 'index'])->name('laporan-bibit.index');
+Route::put('laporan-bibit/{id}', [LaporanBibitController::class, 'update'])->name('laporan-bibit.update');
+Route::delete('laporan-bibit/{id}', [LaporanBibitController::class, 'destroy'])->name('laporan-bibit.destroy');
+
 
 Route::get('test-component', fn()=> view('test-components'));
 Route::get('kecamatan/{id}/desa', [DesaController::class, 'getByKecamatanId']);
