@@ -101,7 +101,7 @@
                 </button>
                 <ul id="dropdown-laporan" class="hidden py-2 space-y-2">
                     <li>
-                        <a href="#"
+                        <a href="{{ route('laporan-bibit.index') }}"
                             class="flex items-center w-full p-2 text-gray-900 transition duration-75 rounded-lg pl-11 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">Laporan Bibit Berkualitas</a>
                     </li>
                     <li>
