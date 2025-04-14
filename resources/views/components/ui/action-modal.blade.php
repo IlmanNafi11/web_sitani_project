@@ -1,7 +1,4 @@
 <div>
-    <button type="button" class="btn btn-primary" aria-haspopup="dialog" aria-expanded="false" aria-controls="form-modal"
-        data-overlay="#form-modal">{{ $titleButton ?? 'Modal' }}</button>
-
     <div id="form-modal" class="overlay modal overlay-open:opacity-100 overlay-open:duration-300 hidden [--body-scroll:true]" role="dialog"
         tabindex="-1">
         <div class="modal-dialog overlay-open:opacity-100 overlay-open:duration-300">
