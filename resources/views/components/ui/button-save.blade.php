@@ -10,8 +10,8 @@
 
                 const sweetalert = Swal.mixin({
                     customClass: {
-                        confirmButton: "btn-success cursor-pointer w-auto h-auto p-[12px] text-white bg-blue-600 rounded-lg ms-[8px]",
-                        cancelButton: "btn-failed cursor-pointer w-auto h-auto p-[12px] text-white bg-red-600 rounded-lg me-[8px]"
+                        confirmButton: "btn btn-soft btn-success",
+                        cancelButton: "btn btn-soft btn-error"
                     },
                     buttonsStyling: false
                 });

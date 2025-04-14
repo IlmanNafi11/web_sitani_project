@@ -20,6 +20,11 @@
     flex-wrap: wrap;
 }
 
+.swal2-actions
+{
+    column-gap: 12px;
+}
+
 /* .title-label-page
 {
     color: black;
