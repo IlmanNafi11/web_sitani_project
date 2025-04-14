@@ -6,6 +6,7 @@
 @plugin "flyonui";
 @import "flyonui/variants.css";
 @source "../node_modules/flyonui/flyonui.js";
+@plugin "@iconify/tailwind4";
 
 .datatable-dropdown, .datatable-search
 {
