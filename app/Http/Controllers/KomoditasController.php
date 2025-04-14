@@ -89,4 +89,14 @@ class KomoditasController extends Controller
 
         return redirect()->route('komoditas.index')->with('success', 'Data berhasil dihapus');
     }
+
+    public function getAll()
+    {
+
+    }
+
+    public function getById($id)
+    {
+
+    }
 }

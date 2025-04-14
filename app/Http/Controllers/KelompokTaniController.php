@@ -89,4 +89,14 @@ class KelompokTaniController extends Controller
 
         return redirect()->route('kelompok-tani.index')->with('success', 'Data berhasil dihapus');
     }
+
+    public function getAllByPenyuluh()
+    {
+
+    }
+
+    public function getById($id)
+    {
+        
+    }
 }
