@@ -3,8 +3,8 @@
     <x-ui.result-alert />
     <x-ui.card>
         <div class="mb-5">
-            <x-ui.title :title="'Data Desa'" />
-            <x-ui.sub-title :title="'Manajemen Data desa'" />
+            <x-ui.title :title="'Data Bibit'" />
+            <x-ui.sub-title :title="'Manajemen Data bibit berkualitas'" />
         </div>
         <table id="bibit-table" class="table">
             <x-ui.table.header-table :items="[
