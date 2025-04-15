@@ -1,102 +1,130 @@
-<form id="wizard-validation-form-horizontal" class="mt-5 sm:mt-8">
-
-    <!-- start info kelompok tani -->
-    <div id="account-details-validation" class="space-y-5" data-stepper-content-item='{ "index": 1 }'>
-        <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
-            <div>
-                <label class="label-text" for="nama-kelompok-tani">Kelompok Tani</label>
-                <input type="text" placeholder="Nama kelompok tani" class="input" id="nama-kelompok-tani" required />
-            </div>
-            <div>
-                <label class="label-text" for="desa-kelompok-tani">Desa</label>
-                <input type="text" placeholder="Desa kelompok tani" class="input" id="desa-kelompok-tani" required />
-            </div>
-        </div>
-        <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
-            <div>
-                <label class="label-text" for="kecamatan-kelompok-tani">Kecamatan</label>
-                <input type="text" placeholder="kecamatan-kelompok-tani" class="input" id="kecamatan-kelompok-tani"
-                    required />
-            </div>
-            <div>
-                <label class="label-text" for="nama-komoditas">Komoditas</label>
-                <input type="text" placeholder="nama komoditas" class="input" id="nama-komoditas" required />
-            </div>
-        </div>
-    </div>
-    <!-- End info kelompok tani -->
-
-    <!-- start detail laporan -->
-    <div id="personal-info-validation" class="space-y-5" data-stepper-content-item='{ "index": 2 }'
-        style="display: none">
-        <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
-            <div>
-                <label class="label-text" for="informasi-bibit">Bibit</label>
-                <input type="text" placeholder="Bibit yang digunakan" class="input" id="informasi-bibit" required />
-            </div>
-            <div>
-                <label class="label-text" for="luas-lahan">Luas lahan</label>
-                <input type="text" placeholder="Luas lahan penanaman" class="input" id="luas-lahan" required />
-            </div>
-        </div>
-        <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
-            <div>
-                <label class="label-text" for="estimasi-panen">Estimasi Panen</label>
-                <input type="text" placeholder="Estimasi panen" class="input" id="estimasi-panen" required />
-            </div>
-            <div>
-                <label class="label-text" for="nama-penyuluh">Pelapor</label>
-                <input type="text" placeholder="Nama penyuluh" class="input" id="nama-penyuluh" required />
-            </div>
-        </div>
-        <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
-            <div>
-                <label class="label-text" for="foto-bibit">Foto Bibit</label>
-                <div class="relative min-w-8 max-w-96 h-60">
-                    <div class="skeleton skeleton-animated absolute inset-0" id="skeleton-image-bibit"></div>
-                    <img class="image-bibit w-full h-full object-cover rounded-md shadow absolute"
-                        src="{{'/storage/foto_bibit/2/1744541905_Screenshot from 2025-04-09 06-42-49.png'}}"
-                        alt="foto-bibit" onload="document.getElementById('skeleton-image-bibit').style.display='none';">
-                </div>
-            </div>
-            <div class="grid grid-cols-1 gap-6 md:flex md:flex-col">
+<form id="form-verify-bibit" action="{{route('laporan-bibit.update', $laporan->id)}}" method="post" class="flex flex-col space-y-5">
+    @method('PUT')
+    @csrf
+    <div class="input-container space-y-5">
+        {{-- start info kelompok tani --}}
+        <div id="info-kelompok-tani" class="space-y-5">
+            <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
                 <div>
-                    <label class="label-text" for="waktu-laporan">Waktu Laporan</label>
-                    <input type="text" placeholder="Waktu laporan" class="input" id="waktu-laporan" required />
+                    <label for="nama-kelompok-tani">Kelompok Tani</label>
+                    <input
+                        class="bg-gray-50 border border-gray-300 text-gray-600 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 cursor-not-allowed"
+                        placeholder="Nama kelompok tani" type="text" id="nama-kelompok-tani" name="nama-kelompok-tani"
+                        value="{{ old('nama-kelompok-tani', $laporan->kelompokTani->nama) }}" disabled>
                 </div>
                 <div>
-                    <label class="label-text" for="radio-verifikasi">Kualitas bibit</label>
-                    <div class="flex flex-wrap gap-2">
-                        <div class="flex items-center gap-1">
-                            <input type="radio" name="status" class="radio radio-inset radio-success"
-                                id="radio-berkualitas" />
-                            <label class="label-text text-base" for="radio-berkualitas"> Berkualitas </label>
-                        </div>
-                        <div class="flex items-center gap-1">
-                            <input type="radio" name="status" class="radio radio-inset radio-error"
-                                id="radio-tidak-berkualitas" />
-                            <label class="label-text text-base" for="radio-tidak-berkualitas"> Tidak Berkualitas
-                            </label>
-                        </div>
+                    <label for="desa-kelompok-tani">Desa</label>
+                    <input
+                        class="bg-gray-50 border border-gray-300 text-gray-600 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 cursor-not-allowed"
+                        placeholder="Asal desa kelompok tani" type="text" id="desa-kelompok-tani" name="desa-kelompok-tani"
+                        value="{{ old('desa-kelompok-tani', $laporan->kelompokTani->desa->nama) }}" disabled>
+                </div>
+            </div>
+            <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+                <div>
+                    <label for="kecamatan-kelompok-tani">Kecamatan</label>
+                    <input
+                        class="bg-gray-50 border border-gray-300 text-gray-600 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 cursor-not-allowed"
+                        placeholder="Asal kecamatan kelompok tani" type="text" id="kecamatan-kelompok-tanii"
+                        name="kecamatan-kelompok-tani" value="{{ old('kecamatan-kelompok-tani', $laporan->kelompokTani->kecamatan->nama) }}" disabled>
+                </div>
+                <div>
+                    <label for="komoditas">Komoditas</label>
+                    <input
+                        class="bg-gray-50 border border-gray-300 text-gray-600 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 cursor-not-allowed"
+                        placeholder="Komoditas yang ditanam" type="text" id="komoditas" name="komoditas"
+                        value="{{ old('komoditas', $laporan->komoditas->nama) }}" disabled>
+                </div>
+            </div>
+        </div>
+        {{-- End info kelompok tani --}}
+
+        {{-- start detail laporan --}}
+        <div id="detail-laporan" class="space-y-5">
+            <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+                <div>
+                    <label for="bibit">Bibit</label>
+                    <input
+                        class="bg-gray-50 border border-gray-300 text-gray-600 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 cursor-not-allowed"
+                        placeholder="Bibit yang digunakan" type="text" id="bibit" name="bibit" value="{{ old('bibit', $laporan->laporanKondisiDetail->jenis_bibit) }}" disabled>
+                </div>
+                <div>
+                    <label for="luas-lahan">Luas Lahan</label>
+                    <input
+                        class="bg-gray-50 border border-gray-300 text-gray-600 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 cursor-not-allowed"
+                        placeholder="Luas lahan yang ditanam" type="text" id="luas-lahan" name="luas-lahan"
+                        value="{{ old('luas-lahan', $laporan->laporanKondisiDetail->luas_lahan) . ' Hektar' }}" disabled>
+                </div>
+            </div>
+            <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+                <div>
+                    <label for="estimasi-panen">Estimasi Panen</label>
+                    <input
+                        class="bg-gray-50 border border-gray-300 text-gray-600 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 cursor-not-allowed"
+                        placeholder="Estimasi panen" type="text" id="estimasi-panen" name="estimasi-panen"
+                        value="{{ old('estimasi-panen', $laporan->laporanKondisiDetail->estimasi_panen) }}" disabled>
+                </div>
+                <div>
+                    <label for="pelapor">Pelapor</label>
+                    <input
+                        class="bg-gray-50 border border-gray-300 text-gray-600 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 cursor-not-allowed"
+                        placeholder="Nama penyuluh(pelapor)" type="text" id="pelapor" name="pelapor"
+                        value="{{ old('pelapor', $laporan->penyuluh->penyuluhTerdaftar->nama) }}" disabled>
+                </div>
+            </div>
+            <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+                <div>
+                    <label for="foto-bibit">Foto Bibit</label>
+                    <div class="relative min-w-8 max-w-96 h-60">
+                        <div class="skeleton skeleton-animated absolute inset-0" id="skeleton-image-bibit"></div>
+                        <img class="image-bibit w-full h-full object-cover rounded-md shadow absolute cursor-not-allowed"
+                            src="{{ asset('storage/' . $laporan->laporanKondisiDetail->foto_bibit)}}"
+                            alt="foto-bibit" onload="document.getElementById('skeleton-image-bibit').style.display='none';" draggable="false">
                     </div>
-                    <span class="helper-text">Verifikasi kualitas bibit dengan memilih opsi yang tersedia</span>
+                </div>
+                <div class="grid grid-cols-1 gap-6 md:flex md:flex-col">
+                    <div>
+                        <label for="waktu-laporan">Waktu Laporan</label>
+                        <input
+                            class="bg-gray-50 border border-gray-300 text-gray-600 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 cursor-not-allowed"
+                            placeholder="Waktu laporan" type="text" id="waktu-laporan" name="waktu-laporan"
+                            value="{{ old('waktu-laporan', $laporan->created_at) }}" disabled>
+                    </div>
+                    <div>
+                        <label for="radio-verifikasi">Kualitas bibit</label>
+                        <div class="flex flex-wrap gap-2">
+                            <div class="flex items-center gap-1">
+                                <input type="radio" name="status" class="radio radio-inset radio-success"
+                                    id="radio-berkualitas" value="1" />
+                                <label class="label-text text-base" for="radio-berkualitas"> Berkualitas </label>
+                            </div>
+                            <div class="flex items-center gap-1">
+                                <input type="radio" name="status" class="radio radio-inset radio-error"
+                                    id="radio-tidak-berkualitas" value="0"/>
+                                <label class="label-text text-base" for="radio-tidak-berkualitas"> Tidak Berkualitas
+                                </label>
+                            </div>
+                        </div>
+                        @error('status')
+                            <p class="helper-text text-red-600">{{ $message }}</p>
+                            @else
+                            <span class="helper-text">Verifikasi kualitas bibit dengan memilih opsi yang tersedia</span>
+                        @enderror
+                    </div>
                 </div>
             </div>
         </div>
+        {{-- End detail laporan --}}
     </div>
-    <!-- End detail laporan -->
 
-    <!-- Button Group -->
-    <div class="mt-5 flex items-center justify-between gap-y-2">
-        <button type="button" class="btn btn-accent btn-prev max-sm:btn-square" data-stepper-back-btn="">
-            <span class="icon-[tabler--chevron-left] text-primary-content size-5 rtl:rotate-180"></span>
-            <span class="max-sm:hidden">Kembali</span>
-        </button>
-        <button type="button" class="btn btn-accent btn-next max-sm:btn-square" data-stepper-next-btn="">
-            <span class="max-sm:hidden">Selanjutnya</span>
-            <span class="icon-[tabler--chevron-right] text-primary-content size-5 rtl:rotate-180"></span>
-        </button>
-        <button type="button" class="btn btn-accent" data-stepper-finish-btn="" style="display: none">Simpan</button>
-        <button type="reset" class="btn btn-accent" data-stepper-reset-btn="" style="display: none">Reset</button>
+    {{-- action button --}}
+    <div class="button-group flex space-x-4">
+        <button class="btn btn-soft btn-secondary" onclick="back()">Kembali</button>
+        <x-ui.button-save :formId="'form-verify-bibit'" :title="'Verifikasi'"/>
     </div>
 </form>
+<script>
+    function back(){
+        history.back();
+    }
+</script>
