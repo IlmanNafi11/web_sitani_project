@@ -46,7 +46,7 @@ class LaporanBibitObserver
      */
     public function deleted(LaporanKondisi $laporanKondisi): void
     {
-        //
+        LaporanKondisiDetail::where('laporan_kondisi_id', $laporanKondisi->id)->delete();
     }
 
     /**
