@@ -8,18 +8,13 @@ use Illuminate\View\Component;
 
 class Card extends Component
 {
-    public $dropShadow;
-    public $width;
-    public $height;
 
     /**
      * Create a new component instance.
      */
-    public function __construct(bool $dropShadow, string $width, string $height)
+    public function __construct()
     {
-        $this->dropShadow = $dropShadow;
-        $this->width = $width;
-        $this->height = $height;
+        //
     }
 
     /**

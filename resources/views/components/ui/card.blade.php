@@ -1,4 +1,3 @@
-<div
-    class="card {{ $width ?? 'w-full' }} {{ $height ?? 'h-auto' }} {{ $dropShadow ? 'shadow-sm' : ''}} bg-white border border-gray-200 rounded-lg dark:bg-gray-800 dark:border-slate-400">
+<div class="w-auto h-auto overflow-x-hidden overflow-y-auto border border-[#E5E8EC] rounded-xl bg-white">
     {{ $slot }}
 </div>
