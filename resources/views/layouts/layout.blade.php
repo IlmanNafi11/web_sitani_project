@@ -13,11 +13,17 @@
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <title>Login | Sitani</title>
 </head>
-<body class="max-w-screen max-h-screen">
+<body class="w-screen h-screen max-w-screen max-h-screen">
     <script src="https://cdn.jsdelivr.net/npm/flowbite@3.1.2/dist/flowbite.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <div class="layout mx-auto md:w-full md:min-h-screen md:h-auto md:mx-0 bg-[#F5F7FF]">
-        @yield('content')
+    <div class="layout w-full h-full bg-[#F5F7FF] relative">
+        <x-partials.navbar />
+        <x-partials.side-bar />
+        <div class="container-content h-[calc(100%-63px)] w-[calc(100%-256px)] absolute sm:right-0 sm:top-[63px] p-6">
+            @yield('content')
+        </div>
     </div>
+    <script src="https://code.jquery.com/jquery-3.7.1.js"
+        integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
 </body>
 </html>
