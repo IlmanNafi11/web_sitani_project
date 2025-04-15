@@ -23,10 +23,7 @@ Route::resource('kecamatan', KecamatanController::class);
 Route::resource('kelompok-tani', KelompokTaniController::class);
 Route::resource('komoditas', KomoditasController::class);
 Route::resource('penyuluh-terdaftar', PenyuluhTerdaftarController::class);
-Route::get('laporan-bibit', [LaporanBibitController::class, 'index'])->name('laporan-bibit.index');
-Route::put('laporan-bibit/{id}', [LaporanBibitController::class, 'update'])->name('laporan-bibit.update');
-Route::delete('laporan-bibit/{id}', [LaporanBibitController::class, 'destroy'])->name('laporan-bibit.destroy');
-
+Route::resource('laporan-bibit', LaporanBibitController::class);
 
 Route::get('test-component', fn()=> view('test-components'));
 Route::get('kecamatan/{id}/desa', [DesaController::class, 'getByKecamatanId']);
