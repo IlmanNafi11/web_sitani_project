@@ -20,7 +20,6 @@ class LaporanBibitController extends Controller
     public function index()
     {
         $laporans = $this->laporanService->getAll();
-        // dd($laporans);
         return view('pages.laporan_bibit.index', compact('laporans'));
     }
 
@@ -66,15 +65,26 @@ class LaporanBibitController extends Controller
      */
     public function edit(string $id)
     {
-        //
+        $laporan = $this->laporanService->getById($id);
+        return view('pages.laporan_bibit.verifikasi-bibit', compact('laporan'));
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(string $id)
+    public function update(Request $request, string $id)
     {
-        //
+        $request->validate([
+            'status' => 'required'
+        ], ['status.required' => 'Silahkan pilih opsi kualitas bibit yang tersedia']);
+        // dd($request->status);
+        $result = $this->laporanService->update($id, ['status' => $request->status]);
+
+        if ($result) {
+            return redirect()->route('laporan-bibit.index')->with('success', 'Laporan berhasil diverifikasi');
+        }
+
+        return redirect()->route('laporan-bibit.index')->with('failed', 'Laporan gagal diverifikasi');
     }
 
     /**
@@ -82,6 +92,8 @@ class LaporanBibitController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $this->laporanService->delete($id);
+
+        return redirect()->route('laporan-bibit.index')->with('success', 'Data berhasil dihapus');
     }
 }
