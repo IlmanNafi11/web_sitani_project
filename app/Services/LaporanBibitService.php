@@ -22,7 +22,7 @@ class LaporanBibitService {
     public function getAll()
     {
         try {
-            return $this->repository->getAll();
+            return $this->repository->getAll(true);
         } catch (\Throwable $th) {
             Log::error('Gagal mengambil seluruh data laporan bibit: ' . $th->getMessage());
         }
