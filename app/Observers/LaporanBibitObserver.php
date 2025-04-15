@@ -5,6 +5,7 @@ namespace App\Observers;
 use App\Models\LaporanKondisi;
 use App\Models\LaporanKondisiDetail;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 
 class LaporanBibitObserver
 {
@@ -17,8 +18,9 @@ class LaporanBibitObserver
             if (request()->hasFile('foto_bibit')) {
                 $data = request()->all();
                 $file = $data['foto_bibit'];
+                $now = date('Y-m-d');
                 $filename = time() . '_' . $file->getClientOriginalName();
-                $path = $file->storeAs('foto_bibit/' . $data['kelompok_tani_id'], $filename, 'public');
+                $path = $file->storeAs('foto_bibit/' . $data['kelompok_tani_id'] . '/' . $now, $filename, 'public');
                 LaporanKondisiDetail::create([
                     'laporan_kondisi_id' => $laporanKondisi->id,
                             'luas_lahan' => $data['luas_lahan'],
@@ -46,7 +48,19 @@ class LaporanBibitObserver
      */
     public function deleted(LaporanKondisi $laporanKondisi): void
     {
-        LaporanKondisiDetail::where('laporan_kondisi_id', $laporanKondisi->id)->delete();
+        $laporanDetail = LaporanKondisiDetail::where('laporan_kondisi_id', $laporanKondisi->id)->select(['id', 'foto_bibit'])->first();
+
+        if ($laporanDetail) {
+            if ($laporanDetail->foto_bibit) {
+                try {
+                    Storage::disk('public')->delete($laporanDetail->foto_bibit);
+                } catch (\Throwable $th) {
+                    Log::error('Gagal menghapus foto bibit: ' . $th->getMessage());
+                }
+            }
+            $laporanDetail->delete();
+        }
+
     }
 
     /**
