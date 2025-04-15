@@ -45,7 +45,7 @@ class LaporanBibitService {
                 'kelompok_tani_id' => $data['kelompok_tani_id'],
                 'komoditas_id' => $data['komoditas_id'],
                 'penyuluh_id' => $data['penyuluh_id'],
-                'status' => 'pending',
+                'status' => '2',
             ]);
         } catch (\Throwable $th) {
             Log::error('Gagal menyimpan laporan bibit: ' . $th->getMessage());
