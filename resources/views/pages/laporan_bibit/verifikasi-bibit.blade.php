@@ -12,7 +12,7 @@
                             <span class="title-label-page font-medium mb-4 block">Verifikasi laporan</span>
                         </div>
                         <div class="form-container">
-                            <x-form.form-bibit-verify />
+                            <x-form.form-bibit-verify :laporan="$laporan"/>
                         </div>
                     </div>
                 </div>
