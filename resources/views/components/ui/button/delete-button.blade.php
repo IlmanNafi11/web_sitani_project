@@ -4,7 +4,7 @@
         @csrf
     </form>
     <button
-        class="delete-button w-full btn {{ $style ?? '' }} {{ $color ?? 'btn-primary' }}"
+        class="delete-button w-full btn {{ $style ?? '' }} {{ $color ?? 'btn-primary' }} {{ $extraClassOption ?? '' }}"
         onclick="confirmDelete('{{$keyId}}')" type="button">
         <span class="{{ $icon ?? 'hidden'}} size-4.5 shrink-0"></span> {{ $title ?? 'Button' }}
     </button>
