@@ -1,5 +1,4 @@
 <div class="badge {{ $style ?? ''}} {{$color ?? 'badge-primary'}}">
-    <span>
-        {{ $title ?? 'Badge'}}
-    </span>
+    <span class="{{ $icon ?? 'hidden'}} size-4.5 shrink-0"></span>
+    {{ $title ?? 'Badge'}}
 </div>

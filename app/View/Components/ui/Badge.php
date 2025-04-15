@@ -11,11 +11,14 @@ class Badge extends Component
     public $color;
     public $style;
     public $title;
-    public function __construct($color, $style, $title)
+    public $icon;
+
+    public function __construct($color, $style, $title, $icon)
     {
         $this->color = $color;
         $this->style = $style;
         $this->title = $title;
+        $this->icon = $icon;
     }
 
     /**
