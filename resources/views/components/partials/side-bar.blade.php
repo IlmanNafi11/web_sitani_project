@@ -4,7 +4,7 @@
     <div class="drawer-body px-2 pt-4">
         <ul class="menu p-0">
             <li>
-                <a href="#">
+                <a href="{{ route('dashboard.admin') }}">
                     <span class="icon-[tabler--home] size-5"></span>
                     Beranda
                 </a>
