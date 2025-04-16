@@ -19,7 +19,7 @@
     <script src="https://cdn.jsdelivr.net/npm/simple-datatables@9.0.3"></script>
     <script src="https://code.jquery.com/jquery-3.7.1.js"
         integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
-    <div class="layout w-full h-full bg-[#F5F7FF] relative">
+    <div class="layout w-full h-full bg-[#F5F7FF]">
         <x-partials.navbar />
         <x-partials.side-bar />
         <div class="container-content max-sm:w-full h-[calc(100%-63px)] w-[calc(100%-256px)] absolute right-0 sm:top-[63px] p-6">
