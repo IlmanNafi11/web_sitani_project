@@ -1,6 +1,8 @@
 <div class="w-full {{ $extraClassOption ?? '' }}">
     <label class="label-text" for="{{ $keyId ?? 'input-phone-' . $name }}">{{ $label ?? 'Label' }}</label>
-    <div class="input w-full pr-0 {{ $extraClassElement ?? '' }}">
+    <div class="input w-full pr-0 {{ $extraClassElement ?? '' }} @error($name)
+        is-invalid
+    @enderror">
         <span
             class="{{ $icon ?? 'icon-[line-md--phone-call]' }} text-base-content/80 my-auto me-3 size-5 shrink-0"></span>
         <input type="text" class="grow outline-none border-0" placeholder="{{ $placeholder ?? 'Masukan...' }}"
