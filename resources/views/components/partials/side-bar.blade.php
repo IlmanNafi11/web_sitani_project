@@ -80,7 +80,7 @@
                     class="collapse hidden w-auto space-y-0.5 overflow-hidden transition-[height] duration-300"
                     aria-labelledby="menu-data-laporan">
                     <li>
-                        <a href="#">
+                        <a href="{{ route('laporan-bibit.index') }}">
                             <span class="icon-[mdi--seed-outline] size-5"></span>
                             Laporan Bibit
                         </a>
