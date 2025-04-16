@@ -1,7 +1,10 @@
 @extends('layouts.layout')
 @section('content')
-    <div class="dashboard-section flex flex-col w-full h-screen">
-        <x-partials.header />
-        <x-partials.side-bar />
+    <div class="w-full h-full flex justify-center items-center flex-col">
+        <picture>
+            <source srcset="{{ asset('storage/profile/profile.jpg') }}" type="image/jpeg" />
+            <img src="{{ asset('storage/profile/profile.webp') }}" alt="avatar profil" />
+        </picture>
+        <span>Proses....</span>
     </div>
 @endsection
