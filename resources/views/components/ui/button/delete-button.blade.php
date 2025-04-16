@@ -1,10 +1,10 @@
-<div class="w-fit">
+<div class="w-fit {{ $extraClassOption ?? '' }}">
     <form id="form-delete-resource-{{ $keyId }}" action="{{ $route }}" method="post">
         @method('DELETE')
         @csrf
     </form>
     <button
-        class="delete-button w-fit btn {{ $style ?? '' }} {{ $color ?? 'btn-primary' }} {{ $extraClassOption ?? '' }}"
+        class="delete-button w-full btn {{ $style ?? '' }} {{ $color ?? 'btn-primary' }} {{ $extraClassElement ?? '' }}"
         onclick="confirmDelete('{{$keyId}}')" type="button">
         <span class="{{ $icon ?? 'hidden'}} size-4.5 shrink-0"></span> {{ $title ?? 'Button' }}
     </button>

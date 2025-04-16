@@ -15,8 +15,9 @@ class DeleteButton extends Component
     public $route;
     public $keyId;
     public $extraClassOption;
+    public $extraClassElement;
 
-    public function __construct($color, $icon, $style, $title, $route, $keyId, $extraClassOption)
+    public function __construct($color, $icon, $style, $title, $route, $keyId, $extraClassOption, $extraClassElement)
     {
         $this->color = $color;
         $this->icon = $icon;
@@ -25,6 +26,7 @@ class DeleteButton extends Component
         $this->route = $route;
         $this->keyId = $keyId;
         $this->$extraClassOption = $extraClassOption;
+        $this->extraClassElement = $extraClassElement;
     }
 
     /**
