@@ -22,7 +22,7 @@
     <div class="layout w-full h-full bg-[#F5F7FF] relative">
         <x-partials.navbar />
         <x-partials.side-bar />
-        <div class="container-content h-[calc(100%-63px)] w-[calc(100%-256px)] absolute sm:right-0 sm:top-[63px] p-6">
+        <div class="container-content max-sm:w-full h-[calc(100%-63px)] w-[calc(100%-256px)] absolute right-0 sm:top-[63px] p-6">
             @yield('content')
         </div>
     </div>
