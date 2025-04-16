@@ -14,7 +14,10 @@
                 aria-haspopup="menu" aria-expanded="false" aria-label="Dropdown">
                 <div class="avatar">
                     <div class="size-9.5 rounded-full">
-                        <img src="https://cdn.flyonui.com/fy-assets/avatar/avatar-1.png" alt="avatar 1" />
+                        <picture>
+                            <source srcset="{{ asset('storage/profile/profile.jpg') }}" type="image/jpeg"/>
+                            <img src="{{ asset('storage/profile/profile.webp') }}" alt="avatar profil" />
+                        </picture>
                     </div>
                 </div>
             </button>
@@ -23,7 +26,10 @@
                 <li class="dropdown-header gap-2">
                     <div class="avatar">
                         <div class="w-10 rounded-full">
-                            <img src="https://cdn.flyonui.com/fy-assets/avatar/avatar-1.png" alt="avatar" />
+                            <picture>
+                                <source srcset="{{ asset('storage/profile/profile.jpg') }}" type="image/jpeg" />
+                                <img src="{{ asset('storage/profile/profile.webp') }}" alt="avatar profil" />
+                            </picture>
                         </div>
                     </div>
                     <div>
@@ -34,13 +40,13 @@
                 <li>
                     <a class="dropdown-item" href="#">
                         <span class="icon-[tabler--user]"></span>
-                        My Profile
+                        Profil Saya
                     </a>
                 </li>
                 <li class="dropdown-footer gap-2">
                     <a class="btn btn-error btn-soft btn-block" href="#">
                         <span class="icon-[tabler--logout]"></span>
-                        Sign out
+                        Keluar
                     </a>
                 </li>
             </ul>
