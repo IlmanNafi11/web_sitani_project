@@ -1,4 +1,5 @@
 @extends('layouts.layout')
+@section('title', 'Komoditas | Sitani')
 @section('content')
     <x-ui.card>
         <div class="mb-5 border-b border-[#E5E8EC]">

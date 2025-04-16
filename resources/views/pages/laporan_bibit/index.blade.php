@@ -1,4 +1,5 @@
 @extends('layouts.layout')
+@section('title', 'Laporan Bibit | Sitani')
 @section('content')
     <x-ui.result-alert />
     <x-ui.card>
@@ -8,14 +9,14 @@
         </div>
         <table id="laporan-bibit-table" class="table">
             <x-ui.table.header-table :items="[
-            ['title' => 'Kelompok Tani'],
-            ['title' => 'Komoditas'],
-            ['title' => 'Estimasi Panen'],
-            ['title' => 'Pelapor'],
-            ['title' => 'Waktu Laporan'],
-            ['title' => 'Status'],
-            ['title' => 'Aksi'],
-        ]" />
+        ['title' => 'Kelompok Tani'],
+        ['title' => 'Komoditas'],
+        ['title' => 'Estimasi Panen'],
+        ['title' => 'Pelapor'],
+        ['title' => 'Waktu Laporan'],
+        ['title' => 'Status'],
+        ['title' => 'Aksi'],
+    ]" />
             <tbody>
                 @forelse ($laporans as $laporan)
                             <tr class="text-black">
@@ -32,13 +33,13 @@
                                         :icon="'icon-[fluent--document-bullet-list-clock-20-regular]'" :title="$laporan->created_at" />
                                 </td>
                                 @php
-                                    $statusMap = [
-                                        "1" => ['title' => 'Berkualitas', 'color' => 'badge-success', 'icon' => 'icon-[solar--verified-check-bold]'],
-                                        "0" => ['title' => 'Tidak Berkualitas', 'color' => 'badge-error', 'icon' => 'icon-[lucide--badge-alert]'],
-                                        "2" => ['title' => 'Menunggu Verifikasi', 'color' => 'badge-warning', 'icon' => 'icon-[ph--clock-user-light]'],
-                                    ];
+    $statusMap = [
+        "1" => ['title' => 'Berkualitas', 'color' => 'badge-success', 'icon' => 'icon-[solar--verified-check-bold]'],
+        "0" => ['title' => 'Tidak Berkualitas', 'color' => 'badge-error', 'icon' => 'icon-[lucide--badge-alert]'],
+        "2" => ['title' => 'Menunggu Verifikasi', 'color' => 'badge-warning', 'icon' => 'icon-[ph--clock-user-light]'],
+    ];
 
-                                    $statusData = $statusMap[$laporan->status] ?? ['title' => 'Status tidak diketahui', 'color' => 'badge-secondary'];
+    $statusData = $statusMap[$laporan->status] ?? ['title' => 'Status tidak diketahui', 'color' => 'badge-secondary'];
                                 @endphp
                                 <td>
                                     <x-ui.badge :color="$statusData['color']" :title="$statusData['title']" :style="'badge-soft'"

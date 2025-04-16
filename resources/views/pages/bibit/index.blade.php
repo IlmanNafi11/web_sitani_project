@@ -1,4 +1,5 @@
 @extends('layouts.layout')
+@section('title', 'Bibit | Sitani')
 @section('content')
     <x-ui.result-alert />
     <x-ui.card>
@@ -8,11 +9,11 @@
         </div>
         <table id="bibit-table" class="table">
             <x-ui.table.header-table :items="[
-            ['title' => 'Nama Bibit'],
-            ['title' => 'Komoditas'],
-            ['title' => 'Deskripsi'],
-            ['title' => 'Aksi'],
-        ]" />
+        ['title' => 'Nama Bibit'],
+        ['title' => 'Komoditas'],
+        ['title' => 'Deskripsi'],
+        ['title' => 'Aksi'],
+    ]" />
             <tbody>
                 @forelse ($datas as $bibit)
                     <tr class="text-black">
