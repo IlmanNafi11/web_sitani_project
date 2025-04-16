@@ -120,7 +120,7 @@
     {{-- action button --}}
     <div class="button-group flex space-x-4">
         <button class="btn btn-soft btn-secondary" onclick="back()">Kembali</button>
-        <x-ui.button.save-button :formId="'form-verify-bibit'" :title="'Verifikasi'"/>
+        <x-ui.button.save-button :style="'btn-soft'" :formId="'form-verify-bibit'" :title="'Verifikasi'"/>
     </div>
 </form>
 <script>
