@@ -2,7 +2,7 @@
 
 @section('title', 'Perbarui Sandi | Sitani')
 @section('content')
-    <x-ui.card>
+    <x-ui.card :extraClassOptions="'max-sm:w-full max-sm:h-full max-sm:flex max-sm:justify-center max-sm:items-center max-sm:rounded-none!'">
         <form id="reset-password" action="{{ route('login') }}" method="GET">
             <div class="card-header">
                 <span class="block w-full text-center text-3xl" style="font-family: Marck Script">Perbarui Sandi</span>
