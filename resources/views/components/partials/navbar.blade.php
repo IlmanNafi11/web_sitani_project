@@ -44,7 +44,7 @@
                     </a>
                 </li>
                 <li class="dropdown-footer gap-2">
-                    <a class="btn btn-error btn-soft btn-block" href="#">
+                    <a class="btn btn-error btn-soft btn-block" href="{{ route('login') }}">
                         <span class="icon-[tabler--logout]"></span>
                         Keluar
                     </a>
