@@ -1,4 +1,4 @@
-<button class="simpan-button btn {{ $style ?? '' }} {{ $color ?? 'btn-accent' }}" type="button" id="btn-simpan"><span
+<button class="simpan-button btn {{ $style ?? '' }} {{ $color ?? 'btn-accent' }} {{ $extraClassElement ?? '' }}" type="button" id="btn-simpan"><span
         class="{{ $icon ?? 'hidden'}} size-4.5 shrink-0"></span> {{ $title ?? 'Simpan' }}</button>
 
 @once
