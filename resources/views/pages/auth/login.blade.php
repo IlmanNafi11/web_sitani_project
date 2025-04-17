@@ -16,7 +16,7 @@
                     :title="'Login'" />
             </div>
             <div class="card-footer">
-                <span class="label-text block text-center">Lupa Kata sandi?<a href="#"
+                <span class="label-text block text-center">Lupa Kata sandi?<a href="{{ route('verifikasi-email') }}"
                         class="ml-1 link link-accent link-animated">Perbarui</a></span>
             </div>
         </form>
