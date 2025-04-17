@@ -10,7 +10,10 @@
             <div class="card-body">
                 <x-form.input-email :label="'Email'" :name="'email'" :keyId="'email'" :placeholder="'Masukan email'"
                     :helperText="'Pastikan anda memiliki akses ke email anda'" />
-                <x-ui.button.save-button :icon="'icon-[fa--send]'" :formId="'verif-email'" :style="'btn-soft'" :title="'Kirim'" />
+                <a href="{{ route('verifikasi-otp') }}" id="send-button" type="button"
+                    class="btn w-full btn-soft btn-accent">
+                    <span class="icon-[fa--send] size-4.5 shrink-0"></span> Kirim
+                </a>
             </div>
             <div class="card-footer">
                 <span class="label-text block text-center"><a href="{{ route('login') }}"
