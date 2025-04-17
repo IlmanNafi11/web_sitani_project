@@ -3,7 +3,7 @@
 @section('title', 'Login | Sitani')
 @section('content')
     <x-ui.card :extraClassOptions="'max-sm:w-full max-sm:h-full max-sm:flex max-sm:justify-center max-sm:items-center max-sm:rounded-none!'">
-        <form id="login-form" action="{{ route('verifikasi-email') }}" method="GET" class="max-sm:w-full ">
+        <form id="login-form" action="{{ route('dashboard.admin') }}" method="GET" class="max-sm:w-full ">
             <div class="card-header h-auto w-full">
                 <span class="logo text-4xl block text-center" style="font-family: Marck Script">Sitani</span>
             </div>
