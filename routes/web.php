@@ -12,7 +12,10 @@ use Illuminate\Support\Facades\Route;
 // sementara
 Route::get('/', function () {
     return view('pages.auth.login');
-});
+})->name('login');
+Route::get('verif-email', fn() => view('pages.auth.email-verification'))->name('verifikasi-email');
+Route::get('verifikasi-otp', fn() => view('pages.auth.otp-verification'))->name('verifikasi-otp');
+Route::get('perbaru-sandi', fn() => view('pages.auth.reset-password'))->name('reset-password');
 Route::get('/dashboard', function() {
     return view('pages.dashboard');
 })->name('dashboard.admin');
