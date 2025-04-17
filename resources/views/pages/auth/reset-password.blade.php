@@ -15,7 +15,7 @@
                 </button>
             </div>
             <div class="card-footer">
-                <span class="label-text block text-center"><a href="{{ route('login') }}"
+                <span class="label-text block text-center"><a href="{{ route('verifikasi-otp') }}"
                         class="link link-accent link-animated">Kembali</a></span>
             </div>
         </form>
