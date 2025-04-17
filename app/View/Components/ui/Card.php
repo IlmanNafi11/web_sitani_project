@@ -9,12 +9,11 @@ use Illuminate\View\Component;
 class Card extends Component
 {
 
-    /**
-     * Create a new component instance.
-     */
-    public function __construct()
+    public $extraClassOptions;
+
+    public function __construct($extraClassOptions)
     {
-        //
+        $this->extraClassOptions = $extraClassOptions;
     }
 
     /**
