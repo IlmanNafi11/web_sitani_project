@@ -12,7 +12,7 @@
                     :helperText="'Masukan email terdaftar'" />
                 <x-form.password-input :name="'password'" :keyId="'password'" :placeholder="'Masukan Password'"
                     :label="'Kata Sandi'" :helperText="'Masukan password akun'" />
-                <button type="submit" id="send-button" type="button" class="btn w-full btn-soft btn-accent">
+                <button type="submit" id="send-button" class="btn w-full btn-soft btn-accent">
                         <span class="icon-[line-md--login] size-4.5 shrink-0"></span>Login
                 </button>
             </div>
