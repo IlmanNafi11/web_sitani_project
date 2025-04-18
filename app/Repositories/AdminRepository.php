@@ -1,0 +1,54 @@
+<?php
+
+namespace App\Repositories;
+
+use App\Models\Admin;
+use App\Models\User;
+use App\Repositories\Interfaces\CrudInterface;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Model;
+
+class AdminRepository implements CrudInterface
+{
+
+    public function getAll($withRelations = false): Collection|array
+    {
+        return Admin::select(['id', 'nama', 'no_hp', 'alamat', 'user_id'])->with(['user' => function ($query) {
+            $query->select(['id', 'email', 'role']);
+        }])->get();
+    }
+
+    public function find($id): Model|Collection|array|null
+    {
+        return Admin::with(['user' => function ($query) {
+            $query->select(['id', 'email', 'role']);
+        }])->find($id);
+    }
+
+    public function create(array $data): ?Model
+    {
+        $user = User::create([
+            'email' => $data['email'],
+            'password' => $data['password'],
+            'role' => $data['role'],
+            'is_password_set' => $data['is_password_set'],
+        ]);
+
+        return Admin::create([
+            'nama' => $data['nama'],
+            'no_hp' => $data['no_hp'],
+            'alamat' => $data['alamat'],
+            'user_id' => $user->id,
+        ]);
+    }
+
+    public function update(int|string $id, array $data): Model|int|bool
+    {
+        return Admin::where('id', $id)->update($data);
+    }
+
+    public function delete(int|string $id): Model|int|bool
+    {
+        return Admin::destroy($id);
+    }
+}
