@@ -5,7 +5,7 @@
     @enderror">
         <span
             class="{{ $icon ?? 'icon-[line-md--phone-call]' }} text-base-content/80 my-auto me-3 size-5 shrink-0"></span>
-        <input type="text" class="grow outline-none border-0" placeholder="{{ $placeholder ?? 'Masukan...' }}"
+        <input type="text" class="grow outline-none border-none focus:outline-none focus:ring-0" placeholder="{{ $placeholder ?? 'Masukan...' }}"
             id="{{ $keyId ?? 'input-phone-' . $name }}" name="{{ $name }}"
             value="{{ old($name, $defaultValue ?? '') }}" />
     </div>
