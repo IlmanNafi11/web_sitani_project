@@ -1,10 +1,10 @@
 <div class="w-full h-auto {{ $extraClassOption ?? '' }}">
-    <div class="input w-full {{ $extraClassElement ?? '' }}">
+    <div class="input w-full {{ $extraClassElement ?? '' }} @error($name) is-invalid @enderror">
         <span
             class="{{ $icon ?? 'icon-[solar--lock-password-broken]' }} text-base-content/80 my-auto size-5 shrink-0"></span>
         <div class="input-floating grow">
-            <input id="{{ $keyId ?? 'toggle-password-' . $name }}" type="password"
-                placeholder="{{ $placeholder ?? 'Masukan...' }}" value="{{ old($name) }}" class="ps-3 w-full border-none outline-none focus:outline-none focus:ring-0" />
+            <input name="{{ $name }}" id="{{ $keyId ?? 'toggle-password-' . $name }}" type="password"
+                placeholder="{{ $placeholder ?? 'Masukan...' }}" value="{{ old($name, $defaultValue ?? '') }}" class="ps-3 w-full border-none outline-none focus:outline-none focus:ring-0" />
             <label class="input-floating-label"
                 for="{{ $keyId ?? 'toggle-password-' . $name }}">{{ $label ?? 'Label' }}</label>
         </div>
