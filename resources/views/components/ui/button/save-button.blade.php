@@ -15,8 +15,8 @@
                     buttonsStyling: false
                 });
                 sweetalert.fire({
-                    title: "Simpan data?",
-                    text: "Pastikan data telah di isi dengan benar!",
+                    title: "{{ $titleAlert ?? 'Simpan data?' }}",
+                    text: "{{ $messageAlert ?? 'Pastikan data telah di isi dengan benar!' }}",
                     icon: "warning",
                     showCancelButton: true,
                     confirmButtonText: "Ya, Simpan",
