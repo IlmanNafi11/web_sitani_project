@@ -15,5 +15,10 @@
                 class="icon-[tabler--eye-off] text-base-content/80 password-active:hidden block size-5 shrink-0"></span>
         </button>
     </div>
-    <span class="helper-text">{{ $helperText ?? '' }}</span>
+    @error($name)
+    <p class="helper-text">{{ $message }}</p>
+    @else
+        <p id="helper-text" class="helper-text text-gray-500 dark:text-gray-400">{{ $helperText ?? ''}}
+        </p>
+        @enderror
 </div>
