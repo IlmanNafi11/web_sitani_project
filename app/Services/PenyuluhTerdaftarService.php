@@ -1,15 +1,15 @@
 <?php
 namespace App\Services;
 
-use App\Repositories\Interfaces\PenyuluhRepositoryInterface;
+use App\Repositories\Interfaces\CrudInterface;
 use App\Repositories\Interfaces\PenyuluhTerdaftarCustomQueryInterface;
 use Illuminate\Support\Facades\Log;
 
 class PenyuluhTerdaftarService {
-    protected PenyuluhRepositoryInterface $penyuluhRepository;
+    protected CrudInterface $penyuluhRepository;
     protected PenyuluhTerdaftarCustomQueryInterface $penyuluhTerdaftarCustomQuery;
 
-    public function __construct(PenyuluhRepositoryInterface $penyuluhRepository, PenyuluhTerdaftarCustomQueryInterface $penyuluhTerdaftarCustomQuery)
+    public function __construct(CrudInterface $penyuluhRepository, PenyuluhTerdaftarCustomQueryInterface $penyuluhTerdaftarCustomQuery)
     {
         $this->penyuluhRepository = $penyuluhRepository;
         $this->penyuluhTerdaftarCustomQuery = $penyuluhTerdaftarCustomQuery;

@@ -3,15 +3,14 @@
 namespace App\Repositories;
 
 use App\Models\KelompokTani;
-use App\Repositories\Interfaces\KelompokTaniRepositoryInterface;
+use App\Repositories\Interfaces\CrudInterface;
 use App\Repositories\Interfaces\ManyRelationshipManagement;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Log;
 
-class KelompokTaniRepository implements KelompokTaniRepositoryInterface, ManyRelationshipManagement
+class KelompokTaniRepository implements CrudInterface, ManyRelationshipManagement
 {
 
-    public function getAll($withRelations = false)
+    public function getAll($withRelations = false): \Illuminate\Database\Eloquent\Collection|array
     {
         if ($withRelations) {
             return KelompokTani::with(relations: [
@@ -27,21 +26,21 @@ class KelompokTaniRepository implements KelompokTaniRepositoryInterface, ManyRel
         return KelompokTani::all();
     }
 
-    public function create(array $data)
+    public function create(array $data): ?Model
     {
         return KelompokTani::create($data);
     }
-    public function update($id, array $data)
+    public function update($id, array $data): Model|bool|int
     {
         $model = KelompokTani::find($id);
         $model->update($data);
         return $model;
     }
-    public function find($id)
+    public function find($id): Model|\Illuminate\Database\Eloquent\Collection|array|null
     {
         return KelompokTani::find($id);
     }
-    public function delete($id)
+    public function delete($id): Model|bool|int
     {
         $model = KelompokTani::find($id);
         $model->delete($id);

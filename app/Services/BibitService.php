@@ -1,13 +1,13 @@
 <?php
 namespace App\Services;
 
-use App\Repositories\Interfaces\BibitRepositoryInterface;
+use App\Repositories\Interfaces\CrudInterface;
 use Illuminate\Support\Facades\Log;
 
 class BibitService {
-    protected BibitRepositoryInterface $bibitRepository;
+    protected CrudInterface $bibitRepository;
 
-    public function __construct(BibitRepositoryInterface $bibitRepository)
+    public function __construct(CrudInterface $bibitRepository)
     {
         $this->bibitRepository = $bibitRepository;
     }

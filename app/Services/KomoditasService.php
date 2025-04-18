@@ -1,14 +1,14 @@
 <?php
 namespace App\Services;
 
-use App\Repositories\Interfaces\KomoditasRepositoryInterface;
+use App\Repositories\Interfaces\CrudInterface;
 use Illuminate\Support\Facades\Log;
 
 class KomoditasService {
 
-    protected KomoditasRepositoryInterface $komoditasRepository;
+    protected CrudInterface $komoditasRepository;
 
-    public function __construct(KomoditasRepositoryInterface $komoditasRepository)
+    public function __construct(CrudInterface $komoditasRepository)
     {
         $this->komoditasRepository = $komoditasRepository;
     }

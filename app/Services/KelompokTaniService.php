@@ -2,16 +2,16 @@
 
 namespace App\Services;
 
-use App\Repositories\Interfaces\KelompokTaniRepositoryInterface;
+use App\Repositories\Interfaces\CrudInterface;
 use App\Repositories\Interfaces\ManyRelationshipManagement;
 use Illuminate\Support\Facades\Log;
 
 class KelompokTaniService
 {
-    protected KelompokTaniRepositoryInterface $kelompokTaniRepository;
+    protected CrudInterface $kelompokTaniRepository;
     protected ManyRelationshipManagement $relationManager;
 
-    public function __construct(KelompokTaniRepositoryInterface $kelompokTaniRepository, ManyRelationshipManagement $relationManager)
+    public function __construct(CrudInterface $kelompokTaniRepository, ManyRelationshipManagement $relationManager)
     {
         $this->kelompokTaniRepository = $kelompokTaniRepository;
         $this->relationManager = $relationManager;

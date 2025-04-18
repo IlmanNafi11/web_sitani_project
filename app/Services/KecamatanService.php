@@ -1,13 +1,13 @@
 <?php
 namespace App\Services;
 
-use App\Repositories\Interfaces\KecamatanRepositoryInterfaces;
+use App\Repositories\Interfaces\CrudInterface;
 use Illuminate\Support\Facades\Log;
 
 class KecamatanService {
-    protected KecamatanRepositoryInterfaces $kecamatanRepository;
+    protected CrudInterface $kecamatanRepository;
 
-    public function __construct(KecamatanRepositoryInterfaces $kecamatanRepository)
+    public function __construct(CrudInterface $kecamatanRepository)
     {
         $this->kecamatanRepository = $kecamatanRepository;
     }

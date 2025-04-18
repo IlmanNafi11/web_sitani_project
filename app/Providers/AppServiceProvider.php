@@ -21,8 +21,11 @@ use App\Repositories\KelompokTaniRepository;
 use App\Repositories\KomoditasRepository;
 use App\Repositories\LaporanBibitRepository;
 use App\Repositories\PenyuluhTerdaftarRepository;
+use App\Services\BibitService;
 use App\Services\DesaService;
+use App\Services\KecamatanService;
 use App\Services\KelompokTaniService;
+use App\Services\KomoditasService;
 use App\Services\LaporanBibitService;
 use App\Services\PenyuluhTerdaftarService;
 use Illuminate\Support\ServiceProvider;
@@ -34,12 +37,12 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        $this->app->bind(KecamatanRepositoryInterfaces::class, KecamatanRepository::class);
-        $this->app->bind(DesaRepositoryInterface::class, DesaRepository::class);
-        $this->app->bind(KomoditasRepositoryInterface::class, KomoditasRepository::class);
-        $this->app->bind(BibitRepositoryInterface::class, BibitRepository::class);
-        $this->app->bind(PenyuluhRepositoryInterface::class, PenyuluhTerdaftarRepository::class);
-        $this->app->bind(KelompokTaniRepositoryInterface::class, KelompokTaniRepository::class);
+        $this->app->when(KecamatanService::class)->needs(CrudInterface::class)->give(KecamatanRepository::class);
+        $this->app->when(DesaService::class)->needs(CrudInterface::class)->give(DesaRepository::class);
+        $this->app->when(KomoditasService::class)->needs(CrudInterface::class)->give(KomoditasRepository::class);
+        $this->app->when(BibitService::class)->needs(CrudInterface::class)->give(BibitRepository::class);
+        $this->app->when(PenyuluhTerdaftarService::class)->needs(CrudInterface::class)->give(PenyuluhTerdaftarRepository::class);
+        $this->app->when(KelompokTaniService::class)->needs(CrudInterface::class)->give(KelompokTaniRepository::class);
         $this->app->when(KelompokTaniService::class)->needs(ManyRelationshipManagement::class)->give(KelompokTaniRepository::class);
         $this->app->when(DesaService::class)->needs(DesaCustomQueryInterface::class)->give(DesaRepository::class);
         $this->app->when(PenyuluhTerdaftarService::class)->needs(PenyuluhTerdaftarCustomQueryInterface::class)->give(PenyuluhTerdaftarRepository::class);
