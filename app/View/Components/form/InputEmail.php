@@ -17,8 +17,9 @@ class InputEmail extends Component
     public $extraClassElement;
     public $defaultValue;
     public $icon;
+    public $isFloatingLabel;
 
-    public function __construct($keyId, $name, $label, $placeholder, $helperText, $extraClassOption, $extraClassElement, $defaultValue, $icon)
+    public function __construct($keyId, $name, $label, $placeholder, $helperText, $extraClassOption, $extraClassElement, $defaultValue, $icon, $isFloatingLabel)
     {
         $this->keyId = $keyId;
         $this->name = $name;
@@ -29,6 +30,7 @@ class InputEmail extends Component
         $this->extraClassElement = $extraClassElement;
         $this->defaultValue = $defaultValue;
         $this->icon = $icon;
+        $this->isFloatingLabel = $isFloatingLabel;
     }
 
     /**
