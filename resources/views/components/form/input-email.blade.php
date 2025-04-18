@@ -4,7 +4,7 @@
 
 @if($isFloatingLabel)
     <div class="w-full h-auto {{ $extraClassOption ?? '' }}">
-        <div class="input w-full {{ $extraClassElement ?? '' }}">
+        <div class="input w-full {{ $extraClassElement ?? '' }} @error($name) is-invalid @enderror">
         <span
             class="{{ $icon ?? 'icon-[line-md--email-opened-multiple-twotone]' }} text-base-content/80 my-auto size-5 shrink-0"></span>
             <div class="input-floating grow">
