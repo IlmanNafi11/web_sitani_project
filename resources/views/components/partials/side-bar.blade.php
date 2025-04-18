@@ -94,7 +94,7 @@
                 </ul>
             </li>
             <li>
-                <a href="#">
+                <a href="{{ route('admin.index') }}">
                     <span class="icon-[iconoir--user-crown] size-5"></span>
                     Data Admin
                 </a>
