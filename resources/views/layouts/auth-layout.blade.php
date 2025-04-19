@@ -13,7 +13,8 @@
 </head>
 
 <body class="w-screen h-screen max-w-screen max-h-screen">
-    <div class="root-container w-full h-full flex justify-center items-center bg-[#F5F7FF]">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <div id="root-container" class="root-container min-w-screen min-h-screen w-full h-full flex justify-center items-center bg-[#F5F7FF]">
         @yield('content')
     </div>
 </body>

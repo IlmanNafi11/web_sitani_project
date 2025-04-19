@@ -3,7 +3,7 @@
 @section('title', 'Verifikasi OTP | Sitani')
 @section('content')
     <x-ui.card :extraClassOptions="'max-sm:w-full max-sm:h-full max-sm:flex max-sm:justify-center max-sm:items-center max-sm:rounded-none!'">
-        <form id="verif-otp" action="{{ route('reset-password') }}" method="GET">
+        <form id="verif-otp" action="{{ route('verifikasi-otp.post') }}" method="post">
             <div class="card-header">
                 <span class="block w-full text-center text-3xl" style="font-family: Marck Script">Verifikasi OTP</span>
             </div>

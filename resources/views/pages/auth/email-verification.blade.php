@@ -3,7 +3,8 @@
 @section('title', 'Verifikasi Email | Sitani')
 @section('content')
     <x-ui.card :extraClassOptions="'max-sm:w-full max-sm:h-full max-sm:flex max-sm:justify-center max-sm:items-center max-sm:rounded-none!'">
-        <form id="verif-email" action="{{ route('verifikasi-otp') }}" method="GET">
+        <form id="verif-email" action="{{ route('verifikasi-email.post') }}" method="post">
+            @csrf
             <div class="card-header">
                 <span class="block w-full text-center text-3xl" style="font-family: Marck Script">Verifikasi email</span>
             </div>
