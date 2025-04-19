@@ -80,4 +80,14 @@ class User extends Authenticatable implements JWTSubject
     {
         return $this->hasOne(Admin::class);
     }
+
+    /**
+     * Relasi one to one dengan model otp code
+     *
+     * @return HasOne
+     */
+    public function otpCode()
+    {
+        return $this->hasOne(OtpCode::class);
+    }
 }
