@@ -24,6 +24,7 @@ class PasswordRequest extends FormRequest
     {
         return [
             'password' => 'required|string|confirmed|min:8',
+            'password_confirmation' => 'required|string|min:8',
         ];
     }
 
@@ -32,8 +33,11 @@ class PasswordRequest extends FormRequest
         return [
             'password.required' => 'Password wajib diisi.',
             'password.string' => 'Password harus berupa teks.',
-            'password.confirmed' => 'Password dan konfirmasi tidak sama.',
+            'password.confirmed' => 'Password dan konfirmasi password wajib sama.',
             'password.min' => 'Password minimal 8 karakter.',
+            'password_confirmation.required' => 'Konfirmasi password wajib diisi.',
+            'password_confirmation.string' => 'Konfirmasi password harus berupa teks.',
+            'password_confirmation.min' => 'Konfirmasi password minimal 8 karakter.',
         ];
     }
 }
