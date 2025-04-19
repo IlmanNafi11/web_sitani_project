@@ -2,6 +2,7 @@
 
 @section('title', 'Login | Sitani')
 @section('content')
+    <x-ui.result-alert />
     <x-ui.card :extraClassOptions="'max-sm:w-full max-sm:h-full max-sm:flex max-sm:justify-center max-sm:items-center max-sm:rounded-none!'">
         <form id="login-form" action="{{ route('login.post') }}" method="post" class="max-sm:w-full ">
             @csrf

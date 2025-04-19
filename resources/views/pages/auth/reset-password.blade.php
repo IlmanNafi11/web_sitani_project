@@ -2,6 +2,7 @@
 
 @section('title', 'Perbarui Sandi | Sitani')
 @section('content')
+    <x-ui.result-alert />
     <x-ui.card :extraClassOptions="'max-sm:w-full max-sm:h-full max-sm:flex max-sm:justify-center max-sm:items-center max-sm:rounded-none!'">
         <form id="reset-password" action="{{ route('reset-password.post') }}" method="post">
             @csrf

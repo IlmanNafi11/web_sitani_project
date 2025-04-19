@@ -2,21 +2,7 @@
 
 @section('title', 'Verifikasi Email | Sitani')
 @section('content')
-    <div>
-        @if(session('failed'))
-            <script>
-                document.addEventListener('DOMContentLoaded', () => {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Gagal!',
-                        text: "{{ session('failed') }}",
-                        showConfirmButton: true
-                    });
-                })
-            </script>
-        @endif
-    </div>
-
+    <x-ui.result-alert />
     <x-ui.card :extraClassOptions="'max-sm:w-full max-sm:h-full max-sm:flex max-sm:justify-center max-sm:items-center max-sm:rounded-none!'">
         <form id="verif-email" action="{{ route('verifikasi-email.post') }}" method="post">
             @csrf
