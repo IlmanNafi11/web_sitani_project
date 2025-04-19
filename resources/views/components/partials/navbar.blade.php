@@ -44,12 +44,43 @@
                     </a>
                 </li>
                 <li class="dropdown-footer gap-2">
-                    <a class="btn btn-error btn-soft btn-block" href="{{ route('login') }}">
-                        <span class="icon-[tabler--logout]"></span>
-                        Keluar
-                    </a>
+                    <form id="logout-form" action="{{ route('admin.logout') }}" method="POST" class="w-full">
+                        @csrf
+                        <button class="btn btn-error btn-soft btn-block" type="button" id="logout-btn">
+                            <span class="icon-[tabler--logout]"></span>
+                            Keluar
+                        </button>
+                    </form>
                 </li>
             </ul>
         </div>
     </div>
 </nav>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const logoutBtn = document.getElementById('logout-btn');
+        if (logoutBtn) {
+            logoutBtn.addEventListener('click', function (e) {
+                e.preventDefault();
+                Swal.fire({
+                    title: "Keluar dari aplikasi?",
+                    text: "Anda yakin ingin keluar?",
+                    icon: "question",
+                    showCancelButton: true,
+                    confirmButtonText: "Ya, keluar",
+                    cancelButtonText: "Tidak",
+                    reverseButtons: true,
+                    customClass: {
+                        confirmButton: "btn btn-soft btn-error me-2",
+                        cancelButton: "btn btn-soft btn-secondary"
+                    },
+                    buttonsStyling: false
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        document.getElementById('logout-form').submit();
+                    }
+                });
+            });
+        }
+    });
+</script>
