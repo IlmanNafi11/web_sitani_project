@@ -23,7 +23,8 @@ class OtpCodeRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'otp' => 'required|digits:6',
+            'otp' => 'required|array|size:6',
+            'otp.*' => 'required|digits:1',
         ];
     }
 
@@ -31,7 +32,11 @@ class OtpCodeRequest extends FormRequest
     {
         return [
             'otp.required' => 'Kode OTP wajib diisi.',
-            'otp.digits' => 'Kode OTP harus 6 digit.',
+            'otp.array' => 'Kode OTP harus berupa array.',
+            'otp.size' => 'Kode OTP harus terdiri dari 6 angka.',
+            'otp.*.required' => 'Setiap digit kode OTP wajib diisi.',
+            'otp.*.digits' => 'Setiap digit kode OTP harus berupa satu angka.',
         ];
     }
+
 }
