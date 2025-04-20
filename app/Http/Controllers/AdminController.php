@@ -58,17 +58,41 @@ class AdminController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
+    public function edit($id, RoleService $roleService)
     {
-        //
+        try {
+            $admin = $this->service->getById($id);
+            if (!$admin) {
+                return redirect()->route('admin.index')->withErrors(['failed' =>'Data admin tidak ditemukan.']);
+            }
+            $roles = $roleService->getAllRole();
+            return view('pages.admin.update', compact('admin', 'roles'));
+        } catch (\Throwable $e) {
+            \Log::error('Gagal memuat halaman edit admin', ['id' => $id, 'error' => $e->getMessage()]);
+            return redirect()->route('admin.index')->withErrors('Gagal memuat data admin.');
+        }
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(AdminRequest $request, $id)
     {
-        //
+        $validated = $request->validated();
+        try {
+            $result = $this->service->update($id, $validated);
+
+            if ($result) {
+                return redirect()->route('admin.index')->with('success', 'Data admin berhasil diperbarui');
+            }
+
+            return back()->withErrors(['failed' => 'Gagal memperbarui data admin.'])->withInput();
+
+        } catch (\Throwable $e) {
+            \Log::error('Gagal update data admin', [
+                'id' => $id, 'error' => $e->getMessage(), 'trace' => $e->getTraceAsString()
+            ]);
+        }
     }
 
     /**
