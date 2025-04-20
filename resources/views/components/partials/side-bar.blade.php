@@ -99,6 +99,12 @@
                     Data Admin
                 </a>
             </li>
+            <li>
+                <a href="{{ route('admin.roles.index') }}">
+                    <span class="icon-[fluent-mdl2--permissions] size-5"></span>
+                    Role Permissions
+                </a>
+            </li>
         </ul>
     </div>
 </aside>
