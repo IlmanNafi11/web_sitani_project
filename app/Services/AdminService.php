@@ -16,7 +16,7 @@ class AdminService
     public function getAll()
     {
         try {
-            return $this->repository->getAll();
+            return $this->repository->getAll(true);
         } catch (\Throwable $th) {
             Log::error('Gagal mengambil seluruh data admin', [
                 'error' => $th->getMessage(),
@@ -56,6 +56,7 @@ class AdminService
             return $this->repository->create($dt);
         } catch (\Throwable $th) {
             Log::error('Gagal menyimpan data admin: ' . $th->getMessage());
+            return null;
         }
     }
 
@@ -70,7 +71,7 @@ class AdminService
                 'error' => $th->getMessage(),
             ]);
 
-            throw $th;
+            return null;
         }
     }
 
@@ -84,7 +85,7 @@ class AdminService
                 'error' => $th->getMessage(),
             ]);
 
-            throw $th;
+            return null;
         }
     }
 }
