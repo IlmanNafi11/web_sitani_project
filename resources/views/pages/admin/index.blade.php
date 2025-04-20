@@ -31,6 +31,9 @@
                         <x-ui.badge :style="'badge-soft'" :icon="$icon" :color="$color" :title="$admin->user->role"/>
                     </td>
                     <td class="flex gap-3">
+                        <x-ui.button.edit-button :color="'btn-warning'" :style="'btn-soft'"
+                                                 :route="route('admin.edit', $admin->id)"
+                                                 :title="'Perbarui'"/>
                         <x-ui.button.delete-button :color="'btn-error'" :style="'btn-soft'" :title="'Hapus'"
                                                    :keyId="$admin->id" :route="route('admin.destroy', $admin->id)"/>
                     </td>
