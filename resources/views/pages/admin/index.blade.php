@@ -25,10 +25,12 @@
                     <td>{{ $admin->user->email }}</td>
                     <td>
                         @php
-                            $icon = $admin->user->role === 'admin' ? 'icon-[solar--shield-user-broken]' : 'icon-[solar--shield-star-broken]';
-                            $color = $admin->user->role === 'admin' ? 'badge-accent' : 'badge-success';
+                            $roleName = $admin->user->roles->first()?->name ?? '';
+                            $isSuperAdmin = strcasecmp($roleName, 'super admin') === 0;
+                            $icon = $isSuperAdmin ? 'icon-[solar--shield-star-broken]' : 'icon-[solar--shield-user-broken]';
+                            $color = $isSuperAdmin ? 'badge-success' : 'badge-accent';
                         @endphp
-                        <x-ui.badge :style="'badge-soft'" :icon="$icon" :color="$color" :title="$admin->user->role"/>
+                        <x-ui.badge :style="'badge-soft'" :icon="$icon" :color="$color" :title="ucwords($roleName ?: 'Tidak Ada Role')"/>
                     </td>
                     <td class="flex gap-3">
                         <x-ui.button.edit-button :color="'btn-warning'" :style="'btn-soft'"
