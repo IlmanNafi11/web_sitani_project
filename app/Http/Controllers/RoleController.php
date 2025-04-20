@@ -92,42 +92,56 @@ class RoleController extends Controller
 
     public function update(Request $request, $id)
     {
-        $validated = $request->validate([
-            'name' => 'required|string|unique:roles,name,' . $id,
-            'permissions' => 'array',
-            'permissions.*' => 'exists:permissions,id',
-        ]);
-
-        DB::beginTransaction();
         try {
-            $this->service->update([
-                'name' => $validated['name'],
-            ], $id);
-
-            $this->service->syncPermissions($id, $validated['permissions'] ?? []);
-
-            DB::commit();
-            return redirect()->route('admin.roles.index')->with('success', 'Role berhasil diupdate');
-        } catch (Throwable $e) {
-            DB::rollBack();
-            Log::error('Gagal memperbarui role', [
-                'id' => $id,
-                'error' => $e->getMessage()
+            $validated = $request->validate([
+                'name' => 'required|string|unique:roles,name,' . $id,
+                'permissions' => 'array',
+                'permissions.*' => 'exists:permissions,id',
             ]);
-            return back()->withErrors('Gagal memperbarui role.');
+        } catch (\Illuminate\Validation\ValidationException $ex) {
+            Log::warning('RoleController@update validation failed', [
+                'errors' => $ex->errors(),
+                'input' => $request->all(),
+                'role_id' => $id,
+            ]);
+            return back()->withErrors($ex->errors())->withInput();
         }
+
+        \DB::beginTransaction();
+        try {
+            $this->service->updateRoleAndPermissions($id, [
+                'name' => $validated['name'],
+                'guard_name' => 'web',
+            ], $validated['permissions'] ?? []);
+
+        \DB::commit();
+        return redirect()->route('admin.roles.index')
+            ->with('success', 'Role berhasil diupdate');
+    } catch (\Throwable $e) {
+        \DB::rollBack();
+        Log::error('Gagal memperbarui role', [
+            'role_id' => $id,
+            'error' => $e->getMessage(),
+            'trace' => $e->getTraceAsString(),
+            'input' => $request->all(),
+        ]);
+        return back()->withErrors('Gagal memperbarui role.')->withInput();
     }
+}
 
     public function destroy($id)
     {
-        DB::beginTransaction();
         try {
-            $this->service->delete($id);
-            DB::commit();
-            return redirect()->route('admin.roles.index')->with('success', 'Role berhasil dihapus');
+            $deleted = $this->service->delete($id);
+            if ($deleted) {
+                return redirect()->route('admin.roles.index')->with('success', 'Role berhasil dihapus');
+            }
+            return back()->withErrors('Tidak dapat menghapus role. Role tidak ditemukan.');
         } catch (Throwable $e) {
-            DB::rollBack();
-            Log::error('Gagal menghapus role', ['id' => $id, 'error' => $e->getMessage()]);
+            Log::error('RoleController@destroy failed', [
+                'role_id' => $id,
+                'error' => $e->getMessage(),
+            ]);
             return back()->withErrors('Gagal menghapus role.');
         }
     }
