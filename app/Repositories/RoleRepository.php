@@ -15,18 +15,15 @@ class RoleRepository implements CrudInterface, RoleRepositoryInterface
 {
     public function getAll($withRelations = false): Collection|array
     {
-        if ($withRelations) {
-            return Role::with('permissions')->get();
-        }
-
-        return Role::all();
+        return $withRelations
+            ? Role::with('permissions')->get()
+            : Role::all();
     }
 
     public function find($id): Model|Collection|array|null
     {
         return Role::with('permissions')->find($id);
     }
-
 
     public function create(array $data): Role
     {
@@ -36,7 +33,7 @@ class RoleRepository implements CrudInterface, RoleRepositoryInterface
                 'guard_name' => $data['guard_name'] ?? 'web'
             ]);
         } catch (Throwable $e) {
-            Log::error('RoleRepository::create error', ['error' => $e->getMessage(), 'data' => $data]);
+            Log::error('RoleRepository@create failed', ['error' => $e->getMessage(), 'data' => $data]);
             throw $e;
         }
     }
@@ -44,15 +41,18 @@ class RoleRepository implements CrudInterface, RoleRepositoryInterface
     public function update(int|string $id, array $data): bool
     {
         try {
-            $role = $this->find($id);
+            $role = Role::find($id);
             if (!$role) {
-                Log::warning('RoleRepository::update - Role not found', ['id' => $id]);
+                Log::warning('RoleRepository@update - Role not found', ['id' => $id]);
                 return false;
             }
-            $role->update(['name' => $data['name']]);
+            $role->update([
+                'name'       => $data['name'] ?? $role->name,
+                'guard_name' => $data['guard_name'] ?? $role->guard_name,
+            ]);
             return true;
         } catch (Throwable $e) {
-            Log::error('RoleRepository::update error', ['id' => $id, 'error' => $e->getMessage()]);
+            Log::error('RoleRepository@update failed', ['id' => $id, 'error' => $e->getMessage()]);
             throw $e;
         }
     }
@@ -60,14 +60,15 @@ class RoleRepository implements CrudInterface, RoleRepositoryInterface
     public function delete(int|string $id): bool
     {
         try {
-            $role = $this->find($id);
+            $role = Role::find($id);
             if (!$role) {
-                Log::warning('RoleRepository::delete - Role not found', ['id' => $id]);
+                Log::warning('RoleRepository@delete - Role not found', ['id' => $id]);
                 return false;
             }
-            return $role->delete();
+
+            return (bool) $role->delete();
         } catch (Throwable $e) {
-            Log::error('RoleRepository::delete error', ['id' => $id, 'error' => $e->getMessage()]);
+            Log::error('RoleRepository@delete failed', ['id' => $id, 'error' => $e->getMessage()]);
             throw $e;
         }
     }
@@ -77,7 +78,7 @@ class RoleRepository implements CrudInterface, RoleRepositoryInterface
         try {
             $role = $this->find($roleId);
             if (!$role) {
-                Log::warning('RoleRepository::syncPermissions - Role not found', ['role_id' => $roleId]);
+                Log::warning('RoleRepository@syncPermissions - Role not found', ['role_id' => $roleId]);
                 return;
             }
 
@@ -85,7 +86,7 @@ class RoleRepository implements CrudInterface, RoleRepositoryInterface
 
             if (count($permissionNames) !== count($permissionIds)) {
                 $notFound = array_diff($permissionIds, Permission::whereIn('id', $permissionIds)->pluck('id')->toArray());
-                Log::warning('RoleRepository::syncPermissions - Some permissions not found', [
+                Log::warning('RoleRepository@syncPermissions - Some permissions not found', [
                     'role_id' => $roleId,
                     'not_found_permission_ids' => $notFound,
                 ]);
@@ -93,7 +94,7 @@ class RoleRepository implements CrudInterface, RoleRepositoryInterface
 
             $role->syncPermissions($permissionNames);
         } catch (Throwable $e) {
-            Log::error('RoleRepository::syncPermissions error', [
+            Log::error('RoleRepository@syncPermissions failed', [
                 'role_id' => $roleId,
                 'permission_ids' => $permissionIds,
                 'error' => $e->getMessage()
