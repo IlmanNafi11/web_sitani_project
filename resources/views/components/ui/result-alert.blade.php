@@ -18,7 +18,7 @@
                 Swal.fire({
                     icon: 'error',
                     title: 'Gagal!',
-                    text: "{{ session('failed') }}",
+                    text: "{{ session('error') }}",
                     showConfirmButton: true
                 });
             })
