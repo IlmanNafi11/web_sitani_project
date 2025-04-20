@@ -1,6 +1,7 @@
 @extends('layouts.layout')
 @section('title', 'Admin | Sitani')
 @section('content')
+    <x-ui.result-alert />
     <x-ui.card>
         <div class="mb-5 border-b border-[#E5E8EC]">
             <x-ui.title :title="'Tambah Data Admin'"/>
@@ -17,24 +18,8 @@
                 <x-form.input-email :keyId="'email'" :label="'Email'" :name="'email'"
                                     :placeholder="'Masukan email admin'" :isFloatingLabel="false"
                                     :helperText="'Pastikan email admin aktif'"/>
-                <div class="flex flex-col gap-1.5 mb-2">
-                    <div class="join gap-2.5">
-                        <x-form.radio :extraClassOption="'join-item'" :extraClassElement="'radio-inset'"
-                                      :keyId="'role-bibit'" :label="'Admin Bibit'" :name="'role'" :value="'admin_bibit'"
-                                      :checked="old('role') === 'admin_bibit'"
-                                      :helperText="'Admin bibit dapat menambahkan bibit dan mengelola bibit'"
-                                      :defaultValue="null" />
-                        <x-form.radio :extraClassOption="'join-item'" :extraClassElement="'radio-inset'"
-                                      :keyId="'role-hibah'" :label="'Admin Hibah Alat'" :name="'role'"
-                                      :value="'admin_hibah'" :checked="old('role') === 'admin_hibah'"
-                                      :helperText="'Admin hibah alat dapat menambahkan hibah alat dan mengelola hibah alat'"
-                                      :defaultValue="null" />
-                    </div>
-
-                    @error('role')
-                    <span class="helper-text text-red-500 mt-1">{{ $message }}</span>
-                    @enderror
-                </div>
+                <x-form.select :label="'Role'" :name="'role'" :keyId="'role'" :options="$roles" :selected="null"
+                               :optionValue="'name'" :optionLabel="'name'"/>
             </div>
             <div class="flex gap-2.5">
                 <x-ui.button.back-button :style="'btn-soft'" :title="'Kembali'"/>
