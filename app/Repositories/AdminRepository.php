@@ -7,6 +7,7 @@ use App\Models\User;
 use App\Repositories\Interfaces\CrudInterface;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 
 class AdminRepository implements CrudInterface
 {
@@ -58,7 +59,32 @@ class AdminRepository implements CrudInterface
 
     public function update(int|string $id, array $data): Model|int|bool
     {
-        return Admin::where('id', $id)->update($data);
+        return DB::transaction(function () use ($id, $data) {
+            $admin = Admin::find($id);
+
+            if (!$admin) {
+                Log::error("[Admin Update] Admin id {$id} tidak ditemukan");
+                throw new \Exception("Admin tidak ditemukan");
+            }
+
+            $admin->nama    = $data['nama']    ?? $admin->nama;
+            $admin->no_hp   = $data['no_hp']   ?? $admin->no_hp;
+            $admin->alamat  = $data['alamat']  ?? $admin->alamat;
+
+            if ($admin->user) {
+                $admin->user->email = $data['email'] ?? $admin->user->email;
+                $admin->user->role  = $data['role']  ?? $admin->user->role;
+                $admin->user->save();
+            } else {
+                Log::error("[Admin Update] User untuk admin id {$id} tidak ditemukan");
+                throw new \Exception("User untuk admin tidak ditemukan");
+            }
+
+            $admin->save();
+
+            return $admin;
+        }, 3);
+
     }
 
     public function delete(int|string $id): Model|int|bool
