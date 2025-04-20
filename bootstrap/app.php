@@ -19,6 +19,9 @@ return Application::configure(basePath: dirname(__DIR__))
             'active.session' => \App\Http\Middleware\CheckActiveSession::class,
             'otp.session' => \App\Http\Middleware\CheckOtpSession::class,
             'panel.admin.permission' => \App\Http\Middleware\CheckPanelAdminPermission::class,
+            'role' => \Spatie\Permission\Middleware\RoleMiddleware::class,
+            'permission' => \Spatie\Permission\Middleware\PermissionMiddleware::class,
+            'role_or_permission' => \Spatie\Permission\Middleware\RoleOrPermissionMiddleware::class
         ]);
 
         // If you have group middleware, continue appending like before
