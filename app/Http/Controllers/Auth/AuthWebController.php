@@ -39,10 +39,6 @@ class AuthWebController extends Controller
             return back()->withErrors(['email' => 'Email tidak terdaftar.'])->withInput();
         }
 
-        if (!in_array($user->role, ['admin', 'super_admin'])) {
-            return back()->with('failed', 'Akses ditolak! Akun anda tidak memiliki izin login ke admin panel.');
-        }
-
         if (!Auth::attempt(['email' => $validated['email'], 'password' => $validated['password']])) {
             return back()->withErrors(['password' => 'Password yang anda masukkan salah.'])->withInput();
         }
@@ -70,7 +66,7 @@ class AuthWebController extends Controller
         $result = $this->service->resetPassword(Auth::user(), $validated['password']);
 
         if (!$result) {
-            return back()->with('failed', 'Gagal memperbarui password.')->withInput();
+            return back()->with('error', 'Gagal memperbarui password.')->withInput();
         }
 
         return redirect()->route('dashboard.admin')->with('Selamat Datang di Web Admin Panel SiTani');
@@ -88,12 +84,12 @@ class AuthWebController extends Controller
 
         $user = $this->service->findUser(['email' => $validated['email']]);
 
-        if (!$user || !in_array($user->role, ['admin', 'super_admin'])) {
+        if (!$user || !$user->can('akses-panel.Akses ke Panel Admin')) {
             return back()->withErrors(['email' => 'Email tidak terdaftar atau tidak punya akses.'])->withInput();
         }
 
         if (!$this->service->sendOtpToEmail($user)) {
-            return back()->with('failed', 'Gagal mengirim OTP ke email. Silakan coba lagi.');
+            return back()->with('error', 'Gagal mengirim OTP ke email. Silakan coba lagi.');
         }
 
         session(['otp_user_id' => $user->id]);
@@ -132,7 +128,7 @@ class AuthWebController extends Controller
         $user = $this->service->findUser(['id' => session('otp_user_id')]);
 
         if (!$user) {
-            return redirect()->route('verifikasi-email')->with('failed', 'Kesalahan sesi. Silakan mulai ulang proses.');
+            return redirect()->route('verifikasi-email')->with('error', 'Kesalahan sesi. Silakan mulai ulang proses.');
         }
 
         if (!$this->service->verifyOtp($user, $validated)) {
@@ -156,7 +152,7 @@ class AuthWebController extends Controller
             return redirect()->route('verifikasi-email')->with('failed', 'Kesalahan sesi. Silakan mulai ulang proses.');
         }
         if (!$this->service->sendOtpToEmail($user)) {
-            return back()->with('failed', 'Gagal mengirim ulang OTP.');
+            return back()->with('error', 'Gagal mengirim ulang OTP.');
         }
         return back()->with('success', 'Kode OTP baru berhasil dikirim!');
     }
@@ -180,7 +176,7 @@ class AuthWebController extends Controller
         $this->service->invalidateOtps($user);
         if (!$this->service->resetPassword($user, $validated['password'])) {
             Log::error('Password update failed on reset', ['user_id' => $user->id]);
-            return back()->with('failed', 'Gagal memperbarui password.')->withInput();
+            return back()->with('error', 'Gagal memperbarui password.')->withInput();
         }
 
         session()->forget('otp_user_id');
