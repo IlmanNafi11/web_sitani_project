@@ -40,7 +40,7 @@ class AdminService
                 'no_hp' => $data['no_hp'],
                 'alamat' => $data['alamat'],
                 'password' => 'sitani',
-                'role' => 'admin',
+                'role' => $data['role'],
                 'is_password_set' => false,
             ];
 

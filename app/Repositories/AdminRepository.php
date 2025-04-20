@@ -27,19 +27,31 @@ class AdminRepository implements CrudInterface
 
     public function create(array $data): ?Model
     {
-        $user = User::create([
-            'email' => $data['email'],
-            'password' => $data['password'],
-            'role' => $data['role'],
-            'is_password_set' => $data['is_password_set'],
-        ]);
+        try {
+            return \DB::transaction(function () use ($data) {
+                $user = \App\Models\User::create([
+                    'email'           => $data['email'],
+                    'password'        => bcrypt($data['password']),
+                    'role'            => $data['role'],
+                    'is_password_set' => $data['is_password_set'],
+                ]);
 
-        return Admin::create([
-            'nama' => $data['nama'],
-            'no_hp' => $data['no_hp'],
-            'alamat' => $data['alamat'],
-            'user_id' => $user->id,
-        ]);
+                $admin = \App\Models\Admin::create([
+                    'nama'    => $data['nama'],
+                    'no_hp'   => $data['no_hp'],
+                    'alamat'  => $data['alamat'],
+                    'user_id' => $user->id,
+                ]);
+
+                return $admin;
+            });
+        } catch (\Throwable $e) {
+            \Log::error('Gagal menyimpan data admin beserta user baru', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+            return null;
+        }
     }
 
     public function update(int|string $id, array $data): Model|int|bool

@@ -27,6 +27,7 @@ class AdminRequest extends FormRequest
             'no_hp' => 'required|starts_with:08|digits_between:11,13',
             'alamat' => 'required|min:3|max:255',
             'email' => 'required|email',
+            'role' => 'required',
         ];
     }
 
@@ -45,6 +46,7 @@ class AdminRequest extends FormRequest
             'alamat.max' => 'Alamat maksimal terdiri dari :max karakter.',
             'email.required' => 'Email wajib diisi!',
             'email.email' => 'Email harus berupa alamat email yang valid.',
+            'role.required' => 'Pilih opsi role yang tersedia!',
         ];
     }
 }
