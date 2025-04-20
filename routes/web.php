@@ -48,7 +48,7 @@ Route::middleware('otp.session')->group(function () {
  * @see \App\Http\Middleware\ActiveSessionMiddleware
  *
  */
-Route::middleware('active.session')->group(function() {
+Route::middleware(['active.session', 'panel.admin.permission'])->group(function() {
     Route::get('admin/dashboard', fn() => view('pages.dashboard'))->name('dashboard.admin');
 
     Route::resource('admin/bibit', BibitBerkualitasController::class);
@@ -78,10 +78,10 @@ Route::middleware('active.session')->group(function() {
         Route::put('admin/roles/{id}', 'update')->name('admin.roles.update');
     });
 
+    Route::get('kecamatan/{id}/desa', [DesaController::class, 'getByKecamatanId']);
+    Route::get('kecamatan/{id}/penyuluh', [PenyuluhTerdaftarController::class, 'getByKecamatanId']);
     Route::post('admin/logout',[AuthWebController::class, 'logout'])->name('admin.logout');
 });
 
 // Untuk sementara nggk aku proteksi
 Route::get('test-component', fn() => view('test-components'));
-Route::get('kecamatan/{id}/desa', [DesaController::class, 'getByKecamatanId']);
-Route::get('kecamatan/{id}/penyuluh', [PenyuluhTerdaftarController::class, 'getByKecamatanId']);
