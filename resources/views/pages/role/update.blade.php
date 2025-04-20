@@ -33,6 +33,7 @@
                             'laporan-hibah' => 'Kelola Laporan Hibah',
                             'admin' => 'Kelola Admin',
                             'role-permission' => 'Kelola Role Permission',
+                            'akses-panel' => 'Akses Panel Admin',
                         ];
                         $selectedPermissions = old('permissions', $role->permissions->pluck('id')->toArray());
                     @endphp

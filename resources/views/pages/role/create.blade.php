@@ -31,6 +31,7 @@
                             'laporan-hibah' => 'Kelola Laporan Hibah',
                             'admin' => 'Kelola Admin',
                             'role-permission' => 'Kelola Role Permission',
+                            'akses-panel' => 'Akses Panel Admin',
                         ];
                     @endphp
                     <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 mt-2">
