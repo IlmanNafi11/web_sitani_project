@@ -9,6 +9,7 @@ use App\Http\Controllers\KelompokTaniController;
 use App\Http\Controllers\KomoditasController;
 use App\Http\Controllers\LaporanBibitController;
 use App\Http\Controllers\PenyuluhTerdaftarController;
+use App\Http\Controllers\RoleController;
 use Illuminate\Support\Facades\Route;
 
 /**
@@ -62,8 +63,19 @@ Route::middleware('active.session')->group(function() {
         Route::get('admin/admin-users', 'index')->name('admin.index');
         Route::get('admin/admin-users/create', 'create')->name('admin.create');
         Route::post('admin/admin-users', 'store')->name('admin.store');
+        Route::get('admin/admin-users/{id}/edit', 'edit')->name('admin.edit');
+        Route::put('admin/admin-users/{id}', 'update')->name('admin.update');
         Route::delete('admin/admin-users/{id}', 'destroy')->name('admin.destroy');
         Route::get('admin/profil', 'profile')->name('admin.profile');
+    });
+
+    Route::controller(RoleController::class)->group(function() {
+        Route::get('admin/roles', 'index')->name('admin.roles.index');
+        Route::get('admin/roles/create', 'create')->name('admin.roles.create');
+        Route::post('admin/roles', 'store')->name('admin.roles.store');
+        Route::delete('admin/roles/{id}', 'destroy')->name('admin.roles.destroy');
+        Route::get('admin/roles/{id}/edit', 'edit')->name('admin.roles.edit');
+        Route::put('admin/roles/{id}', 'update')->name('admin.roles.update');
     });
 
     Route::post('admin/logout',[AuthWebController::class, 'logout'])->name('admin.logout');
