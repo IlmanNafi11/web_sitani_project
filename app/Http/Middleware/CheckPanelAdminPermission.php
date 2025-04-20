@@ -19,7 +19,7 @@ class CheckPanelAdminPermission
         $user = Auth::user();
 
         if (!$user || !$user->can('akses-panel.Akses ke Panel Admin')) {
-            return redirect()->route('login')->with('error', 'Akses ditolak! Akun anda tidak memiliki izin ke panel admin.');
+            return redirect()->route('login')->with('error', 'Akses ditolak! Silahkan login menggunakan akun admin.');
         }
 
         return $next($request);
