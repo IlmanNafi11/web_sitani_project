@@ -22,9 +22,9 @@ class RoleService
         $this->roleRepository = $roleRepository;
     }
 
-    public function getAll(): Collection|array
+    public function getAll($withRelations = false): Collection|array
     {
-        return $this->repository->getAll(true);
+        return $this->repository->getAll($withRelations);
     }
 
     public function getById(int|string $id): ?Role
@@ -32,34 +32,25 @@ class RoleService
         return $this->repository->find($id);
     }
 
-    public function create(array $data): ?Model
+    public function createWithPermissions(array $data, array $permissionIds = []): Model
     {
-        try {
-            return $this->repository->create($data);
-        } catch (Throwable $e) {
-            Log::error('RoleService::create error', ['error' => $e->getMessage(), 'data' => $data]);
-            throw $e;
-        }
+        return DB::transaction(function () use ($data, $permissionIds) {
+            $role = $this->repository->create($data);
+            $this->roleRepository->syncPermissions($role->id, $permissionIds);
+            return $role;
+        });
     }
 
     public function updateRoleAndPermissions(int $id, array $roleData, array $permissionIds): void
     {
-        try {
+        DB::transaction(function () use ($id, $roleData, $permissionIds) {
             $updated = $this->repository->update($id, $roleData);
+
             if (!$updated) {
                 throw new \Exception('Role not found or failed to update.');
             }
-
             $this->roleRepository->syncPermissions($id, $permissionIds);
-        } catch (\Throwable $e) {
-            Log::error('RoleService::updateRoleAndPermissions error', [
-                'role_id' => $id,
-                'role_data' => $roleData,
-                'permission_ids' => $permissionIds,
-                'error' => $e->getMessage()
-            ]);
-            throw $e;
-        }
+        });
     }
 
     public function delete(int $id): bool
@@ -90,16 +81,6 @@ class RoleService
             $this->roleRepository->syncPermissions($roleId, $permissionIds);
         } catch (Throwable $e) {
             Log::error('RoleService::syncPermissions error', ['role_id' => $roleId, 'permission_ids' => $permissionIds, 'error' => $e->getMessage()]);
-            throw $e;
-        }
-    }
-
-    public function getAllRole()
-    {
-        try {
-            return $this->repository->getAll(false);
-        } catch (Throwable $e) {
-            Log::error('RoleService::getAllRole error', ['error' => $e->getMessage()]);
             throw $e;
         }
     }

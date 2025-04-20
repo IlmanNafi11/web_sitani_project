@@ -30,7 +30,7 @@ class AdminController extends Controller
      */
     public function create(RoleService $roleService)
     {
-        $roles = $roleService->getAllRole();
+        $roles = $roleService->getAll();
         return view('pages.admin.create', compact('roles'));
     }
 
@@ -65,7 +65,7 @@ class AdminController extends Controller
             if (!$admin) {
                 return redirect()->route('admin.index')->withErrors(['failed' =>'Data admin tidak ditemukan.']);
             }
-            $roles = $roleService->getAllRole();
+            $roles = $roleService->getAll();
             return view('pages.admin.update', compact('admin', 'roles'));
         } catch (\Throwable $e) {
             \Log::error('Gagal memuat halaman edit admin', ['id' => $id, 'error' => $e->getMessage()]);

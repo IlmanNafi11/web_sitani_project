@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreRoleRequest;
+use App\Http\Requests\UpdateRoleRequest;
 use App\Services\RoleService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -40,35 +42,17 @@ class RoleController extends Controller
         }
     }
 
-    public function store(Request $request)
+    public function store(StoreRoleRequest $request)
     {
         try {
-            $validated = $request->validate([
-                'name' => 'required|string|unique:roles,name',
-                'permissions' => 'array',
-                'permissions.*' => 'exists:permissions,id',
-            ]);
-        } catch (\Illuminate\Validation\ValidationException $ex) {
-            Log::warning('RoleController@store validasi gagal', [
-                'errors' => $ex->errors(),
-                'input' => $request->all(),
-            ]);
-            return back()->withErrors($ex->errors())->withInput();
-        }
-
-        DB::beginTransaction();
-        try {
-            $role = $this->service->create([
+            $validated = $request->validated();
+            $role = $this->service->createWithPermissions([
                 'name' => $validated['name'],
                 'guard_name' => 'web',
-            ]);
+            ], $validated['permissions'] ?? []);
 
-            $this->service->syncPermissions($role->id, $validated['permissions'] ?? []);
-
-            DB::commit();
             return redirect()->route('admin.roles.index')->with('success', 'Role berhasil dibuat');
         } catch (\Throwable $e) {
-            DB::rollBack();
             Log::error('Gagal membuat role', [
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString(),
@@ -90,44 +74,27 @@ class RoleController extends Controller
         }
     }
 
-    public function update(Request $request, $id)
+    public function update(UpdateRoleRequest $request, $id)
     {
         try {
-            $validated = $request->validate([
-                'name' => 'required|string|unique:roles,name,' . $id,
-                'permissions' => 'array',
-                'permissions.*' => 'exists:permissions,id',
-            ]);
-        } catch (\Illuminate\Validation\ValidationException $ex) {
-            Log::warning('RoleController@update validation failed', [
-                'errors' => $ex->errors(),
-                'input' => $request->all(),
-                'role_id' => $id,
-            ]);
-            return back()->withErrors($ex->errors())->withInput();
-        }
-
-        \DB::beginTransaction();
-        try {
+            $validated = $request->validated();
             $this->service->updateRoleAndPermissions($id, [
                 'name' => $validated['name'],
                 'guard_name' => 'web',
             ], $validated['permissions'] ?? []);
 
-        \DB::commit();
-        return redirect()->route('admin.roles.index')
-            ->with('success', 'Role berhasil diupdate');
-    } catch (\Throwable $e) {
-        \DB::rollBack();
-        Log::error('Gagal memperbarui role', [
-            'role_id' => $id,
-            'error' => $e->getMessage(),
-            'trace' => $e->getTraceAsString(),
-            'input' => $request->all(),
-        ]);
-        return back()->withErrors('Gagal memperbarui role.')->withInput();
+            return redirect()->route('admin.roles.index')
+                ->with('success', 'Role berhasil diupdate');
+        } catch (\Throwable $e) {
+            Log::error('Gagal memperbarui role', [
+                'role_id' => $id,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'input' => $request->all(),
+            ]);
+            return back()->withErrors('Gagal memperbarui role.')->withInput();
+        }
     }
-}
 
     public function destroy($id)
     {
