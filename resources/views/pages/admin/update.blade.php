@@ -1,7 +1,7 @@
 @extends('layouts.layout')
 @section('title', 'Edit Admin | Sitani')
 @section('content')
-    <x-ui.result-alert />
+    <x-ui.result-alert/>
     <x-ui.card>
         <div class="mb-5 border-b border-[#E5E8EC]">
             <x-ui.title :title="'Perbarui Data Admin'"/>
@@ -13,14 +13,16 @@
                 <x-form.input-text :keyId="'nama'" :label="'Nama Admin'" :name="'nama'"
                                    :placeholder="'Masukan nama admin'" :defaultValue="$admin->nama"/>
                 <x-form.input-phone :name="'no_hp'" :label="'No Hp'" :placeholder="'Masukan no hp admin'"
-                                    :keyId="'no_hp'" :helperText="'Gunakan format 08xxxxxxxxxx'" :defaultValue="$admin->no_hp"/>
+                                    :keyId="'no_hp'" :helperText="'Gunakan format 08xxxxxxxxxx'"
+                                    :defaultValue="$admin->no_hp"/>
                 <x-form.input-text :keyId="'alamat'" :label="'Alamat'" :name="'alamat'"
                                    :placeholder="'Masukan alamat lengkap admin'" :defaultValue="$admin->alamat"/>
                 <x-form.input-email :keyId="'email'" :label="'Email'" :name="'email'"
                                     :placeholder="'Masukan email admin'" :defaultValue="$admin->user->email"
                                     :isFloatingLabel="false" :helperText="'Pastikan email admin aktif'"/>
                 <x-form.select :label="'Role'" :name="'role'" :keyId="'role'" :options="$roles"
-                               :selected="$admin->user->role" :optionValue="'name'" :optionLabel="'name'"/>
+                               :selected="$admin->user->roles->first()?->name ?? null"
+                               :optionValue="'name'" :optionLabel="'name'"/>
             </div>
             <div class="flex gap-2.5">
                 <x-ui.button.back-button :style="'btn-soft'" :title="'Kembali'"/>
