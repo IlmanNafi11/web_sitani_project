@@ -18,6 +18,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'active.session' => \App\Http\Middleware\CheckActiveSession::class,
             'otp.session' => \App\Http\Middleware\CheckOtpSession::class,
+            'panel.admin.permission' => \App\Http\Middleware\CheckPanelAdminPermission::class,
         ]);
 
         // If you have group middleware, continue appending like before
