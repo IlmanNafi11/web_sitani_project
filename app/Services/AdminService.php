@@ -18,7 +18,11 @@ class AdminService
         try {
             return $this->repository->getAll();
         } catch (\Throwable $th) {
-            Log::error('Gagal mengambil seluruh data admin: ' . $th->getMessage());
+            Log::error('Gagal mengambil seluruh data admin', [
+                'error' => $th->getMessage(),
+            ]);
+
+            throw $th;
         }
     }
 
@@ -27,7 +31,12 @@ class AdminService
         try {
             return $this->repository->find($id);
         } catch (\Throwable $th) {
-            Log::error('Gagal mengambil data admin berdasarkan id: ' . $th->getMessage());
+            Log::error('Gagal mengambil data admin berdasarkan id', [
+                'id'    => $id,
+                'error' => $th->getMessage(),
+            ]);
+
+            throw $th;
         }
     }
 
@@ -55,7 +64,13 @@ class AdminService
         try {
             return $this->repository->update($id, $data);
         } catch (\Throwable $th) {
-            Log::error('Gagal memperbarui data admin: ' . $th->getMessage());
+            Log::error('Gagal memperbarui data admin', [
+                'id'    => $id,
+                'data'  => $data,
+                'error' => $th->getMessage(),
+            ]);
+
+            throw $th;
         }
     }
 
@@ -64,7 +79,12 @@ class AdminService
         try {
             return $this->repository->delete($id);
         } catch (\Throwable $th) {
-            Log::error('Gagal menghapus data admin: ' . $th->getMessage());
+            Log::error('Gagal menghapus data admin', [
+                'id'    => $id,
+                'error' => $th->getMessage(),
+            ]);
+
+            throw $th;
         }
     }
 }
