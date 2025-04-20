@@ -8,21 +8,17 @@ use App\Repositories\AdminRepository;
 use App\Repositories\BibitRepository;
 use App\Repositories\DesaRepository;
 use App\Repositories\Interfaces\AuthInterface;
-use App\Repositories\Interfaces\BibitRepositoryInterface;
 use App\Repositories\Interfaces\CrudInterface;
 use App\Repositories\Interfaces\DesaCustomQueryInterface;
-use App\Repositories\Interfaces\DesaRepositoryInterface;
-use App\Repositories\Interfaces\KecamatanRepositoryInterfaces;
-use App\Repositories\Interfaces\KelompokTaniRepositoryInterface;
-use App\Repositories\Interfaces\KomoditasRepositoryInterface;
 use App\Repositories\Interfaces\ManyRelationshipManagement;
-use App\Repositories\Interfaces\PenyuluhRepositoryInterface;
 use App\Repositories\Interfaces\PenyuluhTerdaftarCustomQueryInterface;
+use App\Repositories\Interfaces\RoleRepositoryInterface;
 use App\Repositories\KecamatanRepository;
 use App\Repositories\KelompokTaniRepository;
 use App\Repositories\KomoditasRepository;
 use App\Repositories\LaporanBibitRepository;
 use App\Repositories\PenyuluhTerdaftarRepository;
+use App\Repositories\RoleRepository;
 use App\Repositories\UserRepository;
 use App\Services\AdminService;
 use App\Services\BibitService;
@@ -32,6 +28,7 @@ use App\Services\KelompokTaniService;
 use App\Services\KomoditasService;
 use App\Services\LaporanBibitService;
 use App\Services\PenyuluhTerdaftarService;
+use App\Services\RoleService;
 use App\Services\UserService;
 use Illuminate\Support\ServiceProvider;
 
@@ -54,6 +51,8 @@ class AppServiceProvider extends ServiceProvider
         $this->app->when(LaporanBibitService::class)->needs(CrudInterface::class)->give(LaporanBibitRepository::class);
         $this->app->when(AdminService::class)->needs(CrudInterface::class)->give(AdminRepository::class);
         $this->app->when(UserService::class)->needs(AuthInterface::class)->give(UserRepository::class);
+        $this->app->when(RoleService::class)->needs(CrudInterface::class)->give(RoleRepository::class);
+        $this->app->when(RoleService::class)->needs(RoleRepositoryInterface::class)->give(RoleRepository::class);
     }
 
     /**
