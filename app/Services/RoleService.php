@@ -6,6 +6,7 @@ use App\Repositories\Interfaces\CrudInterface;
 use App\Repositories\Interfaces\RoleRepositoryInterface;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 use Spatie\Permission\Models\Role;
 use Illuminate\Support\Facades\Log;
 use Throwable;
@@ -41,22 +42,44 @@ class RoleService
         }
     }
 
-    public function update(array $data, int $id): bool
+    public function updateRoleAndPermissions(int $id, array $roleData, array $permissionIds): void
     {
         try {
-            return $this->repository->update($id, $data);
-        } catch (Throwable $e) {
-            Log::error('RoleService::update error', ['id' => $id, 'error' => $e->getMessage()]);
+            $updated = $this->repository->update($id, $roleData);
+            if (!$updated) {
+                throw new \Exception('Role not found or failed to update.');
+            }
+
+            $this->roleRepository->syncPermissions($id, $permissionIds);
+        } catch (\Throwable $e) {
+            Log::error('RoleService::updateRoleAndPermissions error', [
+                'role_id' => $id,
+                'role_data' => $roleData,
+                'permission_ids' => $permissionIds,
+                'error' => $e->getMessage()
+            ]);
             throw $e;
         }
     }
 
     public function delete(int $id): bool
     {
+        DB::beginTransaction();
         try {
-            return $this->repository->delete($id);
+            $deleted = $this->repository->delete($id);
+            if (!$deleted) {
+                DB::rollBack();
+                Log::warning('RoleService@delete - Role not found', ['role_id' => $id]);
+                return false;
+            }
+            DB::commit();
+            return true;
         } catch (Throwable $e) {
-            Log::error('RoleService::delete error', ['id' => $id, 'error' => $e->getMessage()]);
+            DB::rollBack();
+            Log::error('RoleService@delete failed', [
+                'role_id' => $id,
+                'error' => $e->getMessage(),
+            ]);
             throw $e;
         }
     }
