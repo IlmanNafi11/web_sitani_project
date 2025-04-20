@@ -36,6 +36,8 @@ class AdminRepository implements CrudInterface
                     'is_password_set' => $data['is_password_set'],
                 ]);
 
+                $user->assignRole($data['role']);
+
                 $admin = \App\Models\Admin::create([
                     'nama'    => $data['nama'],
                     'no_hp'   => $data['no_hp'],
