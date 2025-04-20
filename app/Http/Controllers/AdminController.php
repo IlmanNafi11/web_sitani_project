@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\AdminRequest;
 use App\Services\AdminService;
+use App\Services\RoleService;
 use Illuminate\Http\Request;
 
 class AdminController extends Controller
@@ -27,9 +28,10 @@ class AdminController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
+    public function create(RoleService $roleService)
     {
-        return view('pages.admin.create');
+        $roles = $roleService->getAllRole();
+        return view('pages.admin.create', compact('roles'));
     }
 
     /**
