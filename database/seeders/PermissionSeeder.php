@@ -73,6 +73,9 @@ class PermissionSeeder extends Seeder
             'role-permission.tambah',
             'role-permission.ubah',
             'role-permission.hapus',
+
+            // Panel. Jangan dihapus biar bisa akses ke panel admin
+            'akses-panel.Akses ke Panel Admin',
         ];
 
         foreach ($permissions as $permission) {

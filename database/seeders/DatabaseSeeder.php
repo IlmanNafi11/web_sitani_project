@@ -15,13 +15,16 @@ class DatabaseSeeder extends Seeder
     {
         // User::factory(10)->create();
 
-        User::create([
-            'email' => 'admin@gmail.com',
-            'email_verified_at' => now(),
-            'password' => bcrypt('password'),
-            'role' => 'super admin',
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
+//        User::create([
+//            'email' => 'admin@gmail.com',
+//            'email_verified_at' => now(),
+//            'password' => bcrypt('password'),
+//            'role' => 'super admin',
+//            'created_at' => now(),
+//            'updated_at' => now(),
+//        ]);
+
+        $this->call(PermissionSeeder::class);
+
     }
 }

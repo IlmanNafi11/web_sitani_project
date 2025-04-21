@@ -20,9 +20,9 @@
                         <td>{{ $desa->kecamatan->nama }}</td>
                         <td class="flex gap-3">
                             <x-ui.button.edit-button :color="'btn-warning'" :style="'btn-soft'"
-                                :route="route('desa.edit', $desa->id)" :title="'Perbarui'" />
+                                :route="route('desa.edit', $desa->id)" :title="'Perbarui'" :permission="'desa.ubah'" />
                             <x-ui.button.delete-button :color="'btn-error'" :style="'btn-soft'" :title="'Hapus'"
-                                :keyId="$desa->id" :route="route('desa.destroy', $desa->id)" />
+                                :keyId="$desa->id" :route="route('desa.destroy', $desa->id)" :permission="'desa.hapus'" />
                         </td>
                     </tr>
                 @empty
@@ -54,7 +54,7 @@
 
             $(document).ready(function () {
                 const dataTable = $(".datatable-top");
-                dataTable.prepend(`<div class="action-header-container flex"><x-ui.button.add-button :color="'btn-accent'" :style="'btn-soft'" :route="route('desa.create')" :title="'Tambah Data'" /></div>`);
+                dataTable.prepend(`<div class="action-header-container flex"><x-ui.button.add-button :color="'btn-accent'" :style="'btn-soft'" :route="route('desa.create')" :title="'Tambah Data'" :permission="'desa.tambah'" /></div>`);
                 $(".datatable-top").children().not(".action-header-container").wrapAll('<div class="features-action-container flex flex-row-reverse gap-4 flex-wrap"></div>');
             });
         }

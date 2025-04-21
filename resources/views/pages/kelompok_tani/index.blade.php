@@ -24,9 +24,9 @@
                         <td>{{ $kelompokTani->penyuluhTerdaftars->pluck('nama')->implode(', ') }}</td>
                         <td class="flex gap-3">
                             <x-ui.button.edit-button :color="'btn-warning'" :style="'btn-soft'"
-                                :route="route('kelompok-tani.edit', $kelompokTani->id)" :title="'Perbarui'" />
+                                :route="route('kelompok-tani.edit', $kelompokTani->id)" :title="'Perbarui'" :permission="'kelompok-tani.ubah'" />
                             <x-ui.button.delete-button :color="'btn-error'" :style="'btn-soft'" :title="'Hapus'"
-                                :keyId="$kelompokTani->id" :route="route('kelompok-tani.destroy', $kelompokTani->id)" />
+                                :keyId="$kelompokTani->id" :route="route('kelompok-tani.destroy', $kelompokTani->id)" :permission="'kelompok-tani.hapus'" />
                         </td>
                     </tr>
                 @empty
@@ -58,7 +58,7 @@
 
             $(document).ready(function () {
                 const dataTable = $(".datatable-top");
-                dataTable.prepend(`<div class="action-header-container flex"><x-ui.button.add-button :color="'btn-accent'" :style="'btn-soft'" :route="route('kelompok-tani.create')" :title="'Tambah Data'" /></div>`);
+                dataTable.prepend(`<div class="action-header-container flex"><x-ui.button.add-button :color="'btn-accent'" :style="'btn-soft'" :route="route('kelompok-tani.create')" :title="'Tambah Data'" :permission="'kelompok-tani.tambah'" /></div>`);
                 $(".datatable-top").children().not(".action-header-container").wrapAll('<div class="features-action-container flex flex-row-reverse gap-4 flex-wrap"></div>');
             });
         }

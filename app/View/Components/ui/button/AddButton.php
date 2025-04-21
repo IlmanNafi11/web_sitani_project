@@ -14,8 +14,9 @@ class AddButton extends Component
     public $title;
     public $route;
     public $extraClassOption;
+    public $permission;
 
-    public function __construct($color, $icon, $style, $title, $route, $extraClassOption)
+    public function __construct($color, $icon, $style, $title, $route, $extraClassOption, $permission)
     {
         $this->color = $color;
         $this->icon = $icon;
@@ -23,6 +24,7 @@ class AddButton extends Component
         $this->title = $title;
         $this->route = $route;
         $this->extraClassOption = $extraClassOption;
+        $this->permission = $permission;
     }
 
     /**

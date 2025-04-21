@@ -21,9 +21,9 @@
                         <td>{{ $bibit->komoditas->nama }}</td>
                         <td>{{ $bibit->deskripsi ?? 'Tidak ada deskripsi' }}</td>
                         <td class="flex gap-3">
-                            <x-ui.button.edit-button :color="'btn-warning'" :style="'btn-soft'" :route="route('bibit.edit', $bibit->id)" :title="'Perbarui'" />
+                            <x-ui.button.edit-button :color="'btn-warning'" :style="'btn-soft'" :route="route('bibit.edit', $bibit->id)" :title="'Perbarui'" :permission="'bibit.ubah'" />
                             <x-ui.button.delete-button :color="'btn-error'" :style="'btn-soft'" :title="'Hapus'"
-                                :keyId="$bibit->id" :route="route('bibit.destroy', $bibit->id)" />
+                                :keyId="$bibit->id" :route="route('bibit.destroy', $bibit->id)" :permission="'bibit.hapus'" />
                         </td>
                     </tr>
                 @empty
@@ -55,7 +55,7 @@
 
             $(document).ready(function () {
                 const dataTable = $(".datatable-top");
-                dataTable.prepend(`<div class="action-header-container flex"><x-ui.button.add-button :color="'btn-accent'" :style="'btn-soft'" :route="route('bibit.create')" :title="'Tambah Data'" /></div>`);
+                dataTable.prepend(`<div class="action-header-container flex"><x-ui.button.add-button :color="'btn-accent'" :style="'btn-soft'" :route="route('bibit.create')" :title="'Tambah Data'" :permission="'bibit.tambah'" /></div>`);
                 $(".datatable-top").children().not(".action-header-container").wrapAll('<div class="features-action-container flex flex-row-reverse gap-4 flex-wrap"></div>');
             });
         }

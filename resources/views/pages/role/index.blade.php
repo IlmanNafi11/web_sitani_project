@@ -22,9 +22,9 @@
                         </td>
                         <td class="flex gap-3 py-2">
                             <x-ui.button.edit-button :color="'btn-warning'" :style="'btn-soft'"
-                                :route="route('admin.roles.edit', $role->id)" :title="'Perbarui'" />
+                                :route="route('admin.roles.edit', $role->id)" :title="'Perbarui'" :permission="'role-permission.ubah'" />
                             <x-ui.button.delete-button :color="'btn-error'" :style="'btn-soft'" :title="'Hapus'"
-                                :keyId="$role->id" :route="route('admin.roles.destroy', $role->id)" />
+                                :keyId="$role->id" :route="route('admin.roles.destroy', $role->id)" :permission="'role-permission.hapus'" />
                         </td>
                     </tr>
                 @empty
@@ -54,9 +54,9 @@
             $(document).ready(function () {
                 const dataTable = $(".datatable-top");
                 dataTable.prepend(`<div class="action-header-container flex">
-                    <x-ui.button.add-button :color="'btn-accent'" :style="'btn-soft'" :route="route('admin.roles.create')" :title="'Tambah Data'" />
+                    <x-ui.button.add-button :color="'btn-accent'" :style="'btn-soft'" :route="route('admin.roles.create')" :title="'Tambah Data'" :permission="'role-permission.tambah'" />
                 </div>`);
-                $(".datatable-top").children().not(".action-header-container").wrapAll('<div class="features-action-container flex flex-row-reverse gap-4 flex-wrap"></div>');
+                dataTable.children().not(".action-header-container").wrapAll('<div class="features-action-container flex flex-row-reverse gap-4 flex-wrap"></div>');
             });
         }
     </script>

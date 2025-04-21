@@ -14,15 +14,17 @@ class EditButton extends Component
     public $title;
     public $route;
     public $extraClassOption;
+    public $permission;
 
-    public function __construct($color, $icon, $style, $title, $route, $extraClassOption)
+    public function __construct($color, $icon, $style, $title, $route, $extraClassOption, $permission)
     {
         $this->color = $color;
         $this->icon = $icon;
         $this->style = $style;
         $this->title = $title;
         $this->route = $route;
-        $this->$extraClassOption = $extraClassOption;
+        $this->extraClassOption = $extraClassOption;
+        $this->permission = $permission;
     }
 
     /**

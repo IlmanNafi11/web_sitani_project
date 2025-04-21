@@ -51,10 +51,10 @@
                                     <x-ui.dropdown-action :title="'Lihat Aksi'">
                                         <x-ui.button.edit-button :route="route('laporan-bibit.edit', $laporan->id)"
                                             :title="'Verifikasi'" :style="'btn-soft'" :color="'btn-success'"
-                                            :icon="'icon-[line-md--check-list-3-filled]'" :extraClassOption="'w-full'" />
+                                            :icon="'icon-[line-md--check-list-3-filled]'" :extraClassOption="'w-full'" :permission="'laporan-bibit.ubah'" />
                                         <x-ui.button.delete-button :route="route('laporan-bibit.destroy', $laporan->id)"
                                             :keyId="$laporan->id" :color="'btn-error'" :style="'btn-soft'" :title="'Hapus'"
-                                            :icon="'icon-[line-md--document-delete]'" :extraClassOption="'w-full'" />
+                                            :icon="'icon-[line-md--document-delete]'" :extraClassOption="'w-full'" :permission="'laporan-bibit.hapus'" />
                                     </x-ui.dropdown-action>
                                 </td>
                             </tr>
@@ -87,7 +87,7 @@
 
             $(document).ready(function () {
                 const dataTable = $(".datatable-top");
-                dataTable.prepend(`<div class="action-header-container flex"><x-ui.button.add-button :color="'btn-accent'" :style="'btn-soft'" :route="route('kelompok-tani.create')" :title="'Tambah Data'" /></div>`);
+                dataTable.prepend(`<div class="action-header-container flex"><x-ui.button.add-button :color="'btn-accent'" :style="'btn-soft'" :route="route('kelompok-tani.create')" :title="'Tambah Data'" :permission="null" /></div>`);
                 $(".datatable-top").children().not(".action-header-container").wrapAll('<div class="features-action-container flex flex-row-reverse gap-4 flex-wrap"></div>');
             });
         }

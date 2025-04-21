@@ -35,9 +35,9 @@
                     <td class="flex gap-3">
                         <x-ui.button.edit-button :color="'btn-warning'" :style="'btn-soft'"
                                                  :route="route('admin.edit', $admin->id)"
-                                                 :title="'Perbarui'"/>
+                                                 :title="'Perbarui'" :permission="'admin.ubah'" />
                         <x-ui.button.delete-button :color="'btn-error'" :style="'btn-soft'" :title="'Hapus'"
-                                                   :keyId="$admin->id" :route="route('admin.destroy', $admin->id)"/>
+                                                   :keyId="$admin->id" :route="route('admin.destroy', $admin->id)" :permission="'admin.hapus'"/>
                     </td>
                 </tr>
             @empty
@@ -69,7 +69,7 @@
 
             $(document).ready(function () {
                 const dataTable = $(".datatable-top");
-                dataTable.prepend(`<div class="action-header-container flex"><x-ui.button.add-button :color="'btn-accent'" :style="'btn-soft'" :route="route('admin.create')" :title="'Tambah Data'" /></div>`);
+                dataTable.prepend(`<div class="action-header-container flex"><x-ui.button.add-button :color="'btn-accent'" :style="'btn-soft'" :route="route('admin.create')" :title="'Tambah Data'" :permission="'admin.tambah'" /></div>`);
                 dataTable.children().not(".action-header-container").wrapAll('<div class="features-action-container flex flex-row-reverse gap-4 flex-wrap"></div>');
             });
         }
