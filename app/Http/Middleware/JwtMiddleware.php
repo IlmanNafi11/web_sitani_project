@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Trait\ApiResponse;
 use Closure;
 use Illuminate\Http\Request;
 use Tymon\JWTAuth\Facades\JWTAuth;
@@ -10,6 +11,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 class JwtMiddleware
 {
+    use ApiResponse;
     /**
      * Handle an incoming request.
      *
@@ -20,7 +22,7 @@ class JwtMiddleware
         try {
             $user = JWTAuth::parseToken()->authenticate();
         } catch (JWTException $e) {
-            return response()->json(['error' => 'Token not valid'], 401);
+            return $this->errorResponse('Token tidak valid', Response::HTTP_UNAUTHORIZED);
         }
 
         return $next($request);
