@@ -75,7 +75,7 @@ class PenyuluhTerdaftarController extends Controller
     {
         $result = $this->penyuluhService->update($id, $request->validated());
 
-        if ($result) {
+        if ($result['success']) {
             return redirect()->route('penyuluh-terdaftar.index')->with('success', 'Data berhasil diperbarui');
         }
 

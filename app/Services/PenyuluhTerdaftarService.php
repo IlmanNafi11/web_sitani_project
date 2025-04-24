@@ -1,11 +1,13 @@
 <?php
+
 namespace App\Services;
 
 use App\Repositories\Interfaces\CrudInterface;
 use App\Repositories\Interfaces\PenyuluhTerdaftarCustomQueryInterface;
 use Illuminate\Support\Facades\Log;
 
-class PenyuluhTerdaftarService {
+class PenyuluhTerdaftarService
+{
     protected CrudInterface $penyuluhRepository;
     protected PenyuluhTerdaftarCustomQueryInterface $penyuluhTerdaftarCustomQuery;
 
@@ -61,9 +63,37 @@ class PenyuluhTerdaftarService {
     public function update($id, array $data)
     {
         try {
-            return $this->penyuluhRepository->update($id, $data);
+            $result = $this->penyuluhRepository->update($id, $data);
+
+            if ($result) {
+                return [
+                    'success' => true,
+                    'message' => 'Data penyuluh berhasil diperbarui',
+                    'data' => $data,
+                ];
+            }
+
+            return [
+                'success' => false,
+                'message' => 'Data penyuluh gagal diperbarui',
+                'data' => $data,
+            ];
         } catch (\Throwable $th) {
-            Log::error('Gagal memperbarui data penyuluh terdaftar: ' . $th->getMessage());
+            Log::error('Gagal memperbarui data penyuluh terdaftar', [
+                'source' => __METHOD__,
+                'error' => $th->getMessage(),
+                'trace' => $th->getTraceAsString(),
+                'data' => [
+                    'penyuluh_terdaftar_id' => $id,
+                    'data' => $data,
+                ],
+            ]);
+
+            return [
+                'success' => false,
+                'message' => 'Data penyuluh gagal diperbarui',
+                'data' => $data,
+            ];
         }
     }
 
