@@ -1,0 +1,199 @@
+<?php
+
+namespace App\Repositories;
+
+use App\Models\Penyuluh;
+use App\Models\User;
+use App\Repositories\Interfaces\CrudInterface;
+use Exception;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\QueryException;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Throwable;
+
+class PenyuluhRepository implements CrudInterface
+{
+
+    /**
+     * Mendapatkan semua data penyuluh beserta relasi relasi.
+     *
+     * @param bool $withRelations set true untuk mengambil data beserta relasi(default false)
+     * @return Collection|array
+     */
+    public function getAll($withRelations = false): Collection|array
+    {
+        try {
+            $query = Penyuluh::select(['id', 'user_id', 'penyuluh_terdaftar_id']);
+
+            if ($withRelations) {
+                $query->with([
+                    'user:id,email,created_at',
+                    'penyuluhTerdaftar:id,nama,no_hp,alamat',
+                ]);
+            }
+
+            return $query->get();
+
+        } catch (QueryException $e) {
+            Log::error("Gagal mengambil seluruh data penyuluh", [
+                'source' => __METHOD__,
+                'error' => $e->getMessage(),
+                'sql' => $e->getSql(),
+            ]);
+
+            return Collection::make();
+
+        } catch (Exception $e) {
+            Log::error("Gagal mengambil seluruh data penyuluh", [
+                'source' => __METHOD__,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            return Collection::make();
+        }
+    }
+
+    /**
+     * Mengambil data penyuluh berdasarkan ID.
+     *
+     * @param int $id Id penyuluh
+     * @return Model|Collection|array|null
+     */
+    public function find($id): array|Collection|Model|null
+    {
+        try {
+            return Penyuluh::where('id', $id)->with([
+                'user:id,email',
+                'penyuluhTerdaftar:id,nama,no_hp,alamat',
+            ])->first();
+        } catch (QueryException $e) {
+            Log::error('Gagal mengambil data penyuluh dengan id ' . $id, [
+                'source' => __METHOD__,
+                'error' => $e->getMessage(),
+                'sql' => $e->getSql(),
+            ]);
+
+            return null;
+        } catch (Exception $e) {
+            Log::error('Gagal mengambil data penyuluh dengan id ' . $id, [
+                'source' => __METHOD__,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            return null;
+        }
+    }
+
+    /**
+     * Membuat data penyuluh baru beserta user terkait.
+     *
+     * @param array $data Data penyuluh
+     * @return Model|null
+     */
+    public function create(array $data): ?Model
+    {
+        try {
+            return DB::transaction(function () use ($data) {
+                $user = User::create([
+                    'email' => $data['email'],
+                    'password' => bcrypt($data['password']),
+                    'is_password_set' => true,
+                ]);
+
+                $user->assignRole('penyuluh');
+
+                $penyuluh = Penyuluh::create([
+                    'user_id' => $user->id,
+                    'penyuluh_terdaftar_id' => $data['penyuluh_terdaftar_id'],
+                ]);
+
+                return $penyuluh->load('user:id,email,created_at', 'penyuluhTerdaftar:id,nama,no_hp,alamat,kecamatan_id');
+            });
+        } catch (QueryException $e) {
+          Log::error("Gagal menyimpan data penyuluh beserta user baru", [
+              'source' => __METHOD__,
+              'error' => $e->getMessage(),
+              'sql' => $e->getSql(),
+              'data' => $data,
+          ]);
+
+          return null;
+        } catch (Throwable $e) {
+            Log::error('Gagal menyimpan data penyuluh beserta user baru.', [
+                'source' => __METHOD__,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'data' => $data,
+            ]);
+
+            return null;
+        }
+    }
+
+    /**
+     * Memperbarui data penyuluh berdasarkan ID.
+     *
+     * @param int|string $id
+     * @param array $data
+     * @return bool
+     */
+    public function update(int|string $id, array $data): bool
+    {
+        try {
+            return Penyuluh::findOrFail($id)->update($data);
+        } catch (QueryException $e) {
+            Log::error('Gagal memperbarui data penyuluh dengan id ' . $id, [
+                'source' => __METHOD__,
+                'error' => $e->getMessage(),
+                'sql' => $e->getSql(),
+                'data' => $data,
+            ]);
+
+            return false;
+        }
+        catch (Throwable $e) {
+            Log::error('Gagal memperbarui data penyuluh dengan id ' . $id, [
+                'source' => __METHOD__,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'data' => $data,
+            ]);
+
+            return false;
+        }
+    }
+
+    /**
+     * Menghapus data penyuluh berdasarkan ID.
+     *
+     * @param int $id
+     * @return bool
+     */
+    public function delete($id): bool
+    {
+        try {
+            $deleted = Penyuluh::destroy($id);
+            return $deleted > 0;
+        } catch (QueryException $e) {
+          Log::error('Gagal hapus data penyuluh dengan id ' . $id, [
+              'source' => __METHOD__,
+              'error' => $e->getMessage(),
+              'sql' => $e->getSql(),
+          ]);
+
+          return false;
+        } catch (Throwable $e) {
+            Log::error('Gagal hapus data penyuluh dengan id ' . $id, [
+                'source' => __METHOD__,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            return false;
+        }
+    }
+}
