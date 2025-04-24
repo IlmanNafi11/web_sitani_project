@@ -35,8 +35,7 @@ class PenyuluhTerdaftarService
     public function getAllWithKecamatan()
     {
         try {
-            $penyuluh = $this->penyuluhRepository->getAll();
-            return $penyuluh->load('kecamatan');
+            return $this->penyuluhRepository->getAll(true);
         } catch (\Throwable $th) {
             Log::error('Gagal mengambil seluruh data penyuluh terdaftar beserta kecamatan: ' . $th->getMessage());
         }
@@ -45,9 +44,36 @@ class PenyuluhTerdaftarService
     public function getById($id)
     {
         try {
-            return $this->penyuluhRepository->find($id);
+            $penyuluh = $this->penyuluhRepository->find($id);
+
+            if (!empty($penyuluh)) {
+                return [
+                    'success' => true,
+                    'message' => 'Berhasil mengambil data penyuluh terdaftar',
+                    'data' => $penyuluh
+                ];
+            }
+
+            return [
+                'success' => false,
+                'message' => 'Gagal mengambil data penyuluh terdaftar',
+                'data' => [],
+            ];
         } catch (\Throwable $th) {
-            Log::error('Gagal mengambil data penyuluh terdaftar berdasarkan id: ' . $th->getMessage());
+            Log::error('Gagal mengambil data penyuluh terdaftar berdasarkan id', [
+                'source' => __METHOD__,
+                'error' => $th->getMessage(),
+                'trace' => $th->getTraceAsString(),
+                'data' => [
+                    'penyuluh_terdaftar_id' => $id,
+                ],
+            ]);
+
+            return [
+                'success' => false,
+                'message' => 'Gagal mengambil data penyuluh terdaftar',
+                'data' => [],
+            ];
         }
     }
 

@@ -38,9 +38,8 @@ class PenyuluhController extends Controller
         ]);
 
         if ($result['success']) {
-            return $this->successResponse([
-                'data' => $request->validated(),
-            ], 'Data penyuluh berhasil diperbarui');
+            $data = $this->penyuluhTerdaftarService->getById($validated['id']);
+            return $this->successResponse($data['data'], 'Data penyuluh berhasil diperbarui');
         }
 
         return $this->errorResponse('Data penyuluh gagal diperbarui', 500);

@@ -21,7 +21,6 @@ class PenyuluhTerdaftarController extends Controller
     public function index()
     {
         $penyuluhs = $this->penyuluhService->getAllWithKecamatan();
-
         return view('pages.penyuluh_terdaftar.index', compact('penyuluhs'));
     }
 
@@ -62,7 +61,13 @@ class PenyuluhTerdaftarController extends Controller
      */
     public function edit(string $id, KecamatanService $kecamatanService)
     {
-        $penyuluh = $this->penyuluhService->getById($id);
+        $resultPenyuluh = $this->penyuluhService->getById($id);
+        $penyuluh = null;
+
+        if ($resultPenyuluh['success']) {
+            $penyuluh = $resultPenyuluh['data'];
+        }
+
         $kecamatans = $kecamatanService->getAll();
 
         return view('pages.penyuluh_terdaftar.update', compact('penyuluh', 'kecamatans'));
