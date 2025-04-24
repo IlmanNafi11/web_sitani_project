@@ -28,7 +28,7 @@ class KomoditasRepository implements CrudInterface
             ]);
 
             return Collection::make();
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             Log::error('Gagal mengambil seluruh data komoditas', [
                 'source' => __METHOD__,
                 'error' => $e->getMessage(),
@@ -39,7 +39,7 @@ class KomoditasRepository implements CrudInterface
         }
     }
 
-    public function find($id): Model|Collection|array|null
+    public function getById($id): Model|Collection|array|null
     {
         try {
             return Komoditas::select(['id', 'nama', 'deskripsi', 'musim'])->where('id', $id)->first();
@@ -50,7 +50,7 @@ class KomoditasRepository implements CrudInterface
                 'sql' => $e->getSQL(),
             ]);
             return null;
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             Log::error('Gagal mengambil data komoditas berdasarkan ID', [
                 'source' => __METHOD__,
                 'error' => $e->getMessage(),
@@ -73,7 +73,7 @@ class KomoditasRepository implements CrudInterface
             ]);
 
             return null;
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             Log::error('Gagal menyimpan data komoditas', [
                 'source' => __METHOD__,
                 'error' => $e->getMessage(),
@@ -96,7 +96,7 @@ class KomoditasRepository implements CrudInterface
             ]);
 
             return false;
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             Log::error('Gagal memperbarui data komoditas', [
                 'source' => __METHOD__,
                 'error' => $e->getMessage(),
@@ -120,7 +120,7 @@ class KomoditasRepository implements CrudInterface
             ]);
 
             return false;
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             Log::error('Gagal menghapus data komoditas', [
                 'source' => __METHOD__,
                 'error' => $e->getMessage(),

@@ -10,75 +10,149 @@ use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
 use Illuminate\Support\Facades\Log;
 use Throwable;
+use Illuminate\Database\QueryException;
 
 class RoleRepository implements CrudInterface, RoleRepositoryInterface
 {
-    public function getAll($withRelations = false): Collection|array
-    {
-        return $withRelations
-            ? Role::with('permissions')->get()
-            : Role::all();
-    }
-
-    public function find($id): Model|Collection|array|null
-    {
-        return Role::with('permissions')->find($id);
-    }
-
-    public function create(array $data): Role
+    public function getAll(bool $withRelations = false): Collection|array
     {
         try {
-            return Role::create([
-                'name' => $data['name'],
-                'guard_name' => $data['guard_name'] ?? 'web'
+            $query = Role::query();
+            if ($withRelations) {
+                $query->with('permissions');
+            }
+            return $query->get();
+        } catch (QueryException $e) {
+            Log::error('Gagal mengambil semua data role', [
+                'source' => __METHOD__,
+                'error'  => $e->getMessage(),
+                'sql'    => $e->getSQL(),
             ]);
+            return Collection::make();
         } catch (Throwable $e) {
-            Log::error('RoleRepository@create failed', ['error' => $e->getMessage(), 'data' => $data]);
-            throw $e;
+            Log::error('Gagal mengambil semua data role', [
+                'source' => __METHOD__,
+                'error'  => $e->getMessage(),
+                'trace'  => $e->getTraceAsString(),
+            ]);
+            return Collection::make();
         }
     }
 
-    public function update(int|string $id, array $data): bool
+    public function getById(string|int $id): Model|Collection|array|null
     {
         try {
-            $role = Role::find($id);
-            if (!$role) {
-                Log::warning('RoleRepository@update - Role not found', ['id' => $id]);
-                return false;
-            }
+            return Role::with('permissions')->findOrFail($id);
+        } catch (QueryException $e) {
+            Log::error('Gagal mengambil data role berdasarkan id', [
+                'source' => __METHOD__,
+                'error'  => $e->getMessage(),
+                'sql'    => $e->getSQL(),
+                'data'   => ['id' => $id],
+            ]);
+            return null;
+        } catch (Throwable $e) {
+            Log::error('Gagal mengambil data role berdasarkan id', [
+                'source' => __METHOD__,
+                'error'  => $e->getMessage(),
+                'trace'  => $e->getTraceAsString(),
+                'data'   => ['id' => $id],
+            ]);
+            return null;
+        }
+    }
+
+    public function create(array $data): ?Role
+    {
+        try {
+            return Role::create([
+                'name'       => $data['name'],
+                'guard_name' => $data['guard_name'] ?? 'web',
+            ]);
+        } catch (QueryException $e) {
+            Log::error('Gagal menyimpan role baru', [
+                'source' => __METHOD__,
+                'error'  => $e->getMessage(),
+                'sql'    => $e->getSQL(),
+                'data'   => $data,
+            ]);
+            return null;
+        } catch (Throwable $e) {
+            Log::error('Gagal menyimpan role baru', [
+                'source' => __METHOD__,
+                'error'  => $e->getMessage(),
+                'trace'  => $e->getTraceAsString(),
+                'data'   => $data,
+            ]);
+            return null;
+        }
+    }
+
+    public function update(string|int $id, array $data): bool
+    {
+        try {
+            $role = Role::findOrFail($id);
             $role->update([
                 'name'       => $data['name'] ?? $role->name,
                 'guard_name' => $data['guard_name'] ?? $role->guard_name,
             ]);
             return true;
+        } catch (QueryException $e) {
+            Log::error('Gagal memperbarui data role', [
+                'source' => __METHOD__,
+                'error'  => $e->getMessage(),
+                'sql'    => $e->getSQL(),
+                'data'   => [
+                    'id'   => $id,
+                    'data' => $data,
+                ],
+            ]);
+            return false;
         } catch (Throwable $e) {
-            Log::error('RoleRepository@update failed', ['id' => $id, 'error' => $e->getMessage()]);
-            throw $e;
+            Log::error('Gagal memperbarui data role', [
+                'source' => __METHOD__,
+                'error'  => $e->getMessage(),
+                'trace'  => $e->getTraceAsString(),
+                'data'   => [
+                    'id'   => $id,
+                    'data' => $data,
+                ],
+            ]);
+            return false;
         }
     }
 
-    public function delete(int|string $id): bool
+    public function delete(string|int $id): bool
     {
         try {
-            $role = Role::find($id);
-            if (!$role) {
-                Log::warning('RoleRepository@delete - Role not found', ['id' => $id]);
-                return false;
-            }
-
-            return (bool) $role->delete();
+            $role = Role::findOrFail($id);
+            $role->delete();
+            return true;
+        } catch (QueryException $e) {
+            Log::error('Gagal menghapus data role', [
+                'source' => __METHOD__,
+                'error'  => $e->getMessage(),
+                'sql'    => $e->getSQL(),
+                'data'   => ['id' => $id],
+            ]);
+            return false;
         } catch (Throwable $e) {
-            Log::error('RoleRepository@delete failed', ['id' => $id, 'error' => $e->getMessage()]);
-            throw $e;
+            Log::error('Gagal menghapus data role', [
+                'source' => __METHOD__,
+                'error'  => $e->getMessage(),
+                'trace'  => $e->getTraceAsString(),
+                'data'   => ['id' => $id],
+            ]);
+            return false;
         }
     }
 
     public function syncPermissions(int $roleId, array $permissionIds): void
     {
         try {
-            $role = $this->find($roleId);
+            $role = $this->getById($roleId);
             if (!$role) {
-                Log::warning('RoleRepository@syncPermissions - Role not found', ['role_id' => $roleId]);
+                Log::warning(__METHOD__ . ' - Role tidak ditemukan', ['role_id' => $roleId]);
                 return;
             }
 
@@ -86,20 +160,36 @@ class RoleRepository implements CrudInterface, RoleRepositoryInterface
 
             if (count($permissionNames) !== count($permissionIds)) {
                 $notFound = array_diff($permissionIds, Permission::whereIn('id', $permissionIds)->pluck('id')->toArray());
-                Log::warning('RoleRepository@syncPermissions - Some permissions not found', [
+                Log::warning(__METHOD__ . ' - Beberapa izin tidak ditemukan', [
                     'role_id' => $roleId,
                     'not_found_permission_ids' => $notFound,
                 ]);
             }
 
             $role->syncPermissions($permissionNames);
+        } catch (QueryException $e) {
+            Log::error('Gagal sync permissions pada role', [
+                'source'         => __METHOD__,
+                'error'          => $e->getMessage(),
+                'sql'            => $e->getSQL(),
+                'data'           => [
+                    'role_id'      => $roleId,
+                    'permission_ids' => $permissionIds,
+                ],
+            ]);
+            throw $e;
         } catch (Throwable $e) {
-            Log::error('RoleRepository@syncPermissions failed', [
-                'role_id' => $roleId,
-                'permission_ids' => $permissionIds,
-                'error' => $e->getMessage()
+            Log::error('Gagal sync permissions pada role', [
+                'source'         => __METHOD__,
+                'error'          => $e->getMessage(),
+                'trace'          => $e->getTraceAsString(),
+                'data'           => [
+                    'role_id'      => $roleId,
+                    'permission_ids' => $permissionIds,
+                ],
             ]);
             throw $e;
         }
     }
 }
+

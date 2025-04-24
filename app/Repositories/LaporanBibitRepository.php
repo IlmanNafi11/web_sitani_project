@@ -1,75 +1,183 @@
 <?php
+
 namespace App\Repositories;
 
 use App\Models\LaporanKondisi;
 use App\Repositories\Interfaces\CrudInterface;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\QueryException;
+use Illuminate\Support\Facades\Log;
+use Throwable;
 
-class LaporanBibitRepository implements CrudInterface{
-
-    public function getAll($withRelations = false): Collection|array
+class LaporanBibitRepository implements CrudInterface
+{
+    public function getAll(bool $withRelations = false): Collection|array
     {
-        if ($withRelations) {
-            return LaporanKondisi::select(['id', 'status', 'created_at', 'kelompok_tani_id', 'komoditas_id', 'penyuluh_id'])->with([
-                'kelompokTani' => function($query){
-                    $query->select(['id', 'nama']);
-                },
-                'komoditas' => function ($query) {
-                    $query->select(['id', 'nama', 'musim']);
-                },
-                'penyuluh' => function ($query) {
-                    $query->select(['id', 'penyuluh_terdaftar_id']);
-                },
-                'penyuluh.penyuluhTerdaftar' => function ($query) {
-                    $query->select(['id', 'nama', 'no_hp']);
-                },
-            ])->with('laporanKondisiDetail')->get();
+        try {
+            $query = LaporanKondisi::select(['id', 'status', 'created_at', 'kelompok_tani_id', 'komoditas_id', 'penyuluh_id']);
+            if ($withRelations) {
+                $query->with([
+                    'kelompokTani' => function ($q) {
+                        $q->select(['id', 'nama']);
+                    },
+                    'komoditas' => function ($q) {
+                        $q->select(['id', 'nama', 'musim']);
+                    },
+                    'penyuluh' => function ($q) {
+                        $q->select(['id', 'penyuluh_terdaftar_id']);
+                    },
+                    'penyuluh.penyuluhTerdaftar' => function ($q) {
+                        $q->select(['id', 'nama', 'no_hp']);
+                    },
+                    'laporanKondisiDetail'
+                ]);
+            }
+            return $query->get();
+        } catch (QueryException $e) {
+            Log::error('Failed to get all laporan kondisi bibit: ' . $e->getMessage(), [
+                'source' => __METHOD__,
+                'error'  => $e->getMessage(),
+                'sql'    => $e->getSQL(),
+            ]);
+            return Collection::make();
+        } catch (Throwable $e) {
+            Log::error('Failed to get all laporan kondisi bibit: ' . $e->getMessage(), [
+                'source' => __METHOD__,
+                'error'  => $e->getMessage(),
+                'trace'  => $e->getTraceAsString(),
+            ]);
+            return Collection::make();
         }
-
-        return LaporanKondisi::all();
     }
 
-    public function find($id): Model|Collection|null
+    public function getById(string|int $id): Model|Collection|array|null
     {
-        return LaporanKondisi::with([
-            'kelompokTani' => function ($query) {
-                $query->select(['id', 'nama', 'desa_id', 'kecamatan_id']);
-            },
-            'kelompokTani.desa' => function ($query) {
-                $query->select(['id', 'nama']);
-            },
-            'kelompokTani.kecamatan' => function ($query) {
-                $query->select(['id', 'nama']);
-            },
-            'komoditas' => function ($query) {
-                $query->select(['id', 'nama', 'musim']);
-            },
-            'penyuluh' => function ($query) {
-                $query->select(['id', 'penyuluh_terdaftar_id']);
-            },
-            'penyuluh.penyuluhTerdaftar' => function ($query) {
-                $query->select(['id', 'nama', 'no_hp']);
-            },
-            'laporanKondisiDetail'
-        ])
-            ->select(['id', 'status', 'created_at', 'kelompok_tani_id', 'komoditas_id', 'penyuluh_id'])
-            ->where('id', $id)
-            ->first();
+        try {
+            $query = LaporanKondisi::select(['id', 'status', 'created_at', 'kelompok_tani_id', 'komoditas_id', 'penyuluh_id']); // Select columns
+            $query->with([
+                'kelompokTani' => function ($q) {
+                    $q->select(['id', 'nama', 'desa_id', 'kecamatan_id']);
+                    $q->with([
+                        'desa' => function ($q2) {
+                            $q2->select(['id', 'nama']);
+                        },
+                        'kecamatan' => function ($q2) {
+                            $q2->select(['id', 'nama']);
+                        }
+                    ]);
+                },
+                'komoditas' => function ($q) {
+                    $q->select(['id', 'nama', 'musim']);
+                },
+                'penyuluh' => function ($q) {
+                    $q->select(['id', 'penyuluh_terdaftar_id']);
+                    $q->with([
+                        'penyuluhTerdaftar' => function ($q2) {
+                            $q2->select(['id', 'nama', 'no_hp']);
+                        }
+                    ]);
+                },
+                'laporanKondisiDetail'
+            ]);
+
+            return $query->findOrFail($id);
+        } catch (QueryException $e) {
+            Log::error('Gagal mengambil laporan bibit berdasarkan id', [
+                'source' => __METHOD__,
+                'error'  => $e->getMessage(),
+                'sql'    => $e->getSQL(),
+                'data'   => ['id' => $id],
+            ]);
+            return null;
+        } catch (Throwable $e) {
+            Log::error('Gagal mengambil laporan bibit berdasarkan id', [
+                'source' => __METHOD__,
+                'error'  => $e->getMessage(),
+                'trace'  => $e->getTraceAsString(),
+                'data'   => ['id' => $id],
+            ]);
+            return null;
+        }
     }
 
     public function create(array $data): ?Model
     {
-        return LaporanKondisi::create($data);
+        try {
+            return LaporanKondisi::create($data);
+        } catch (QueryException $e) {
+            Log::error('Gagal menyimpan laporan bibit baru', [
+                'source' => __METHOD__,
+                'error'  => $e->getMessage(),
+                'sql'    => $e->getSQL(),
+                'data'   => $data,
+            ]);
+            return null;
+        } catch (Throwable $e) {
+            Log::error('Gagal menyimpan laporan bibit baru', [
+                'source' => __METHOD__,
+                'error'  => $e->getMessage(),
+                'trace'  => $e->getTraceAsString(),
+                'data'   => $data,
+            ]);
+            return null;
+        }
     }
 
-    public function update(string|int $id, array $data): Model|int|bool
+    public function update(string|int $id, array $data): Model|bool|int
     {
-        return LaporanKondisi::where('id', $id)->update($data);
+        try {
+            $model = LaporanKondisi::findOrFail($id);
+            $model->update($data);
+            return true;
+        } catch (QueryException $e) {
+            Log::error('Gagal memperbarui laporan bibit', [
+                'source' => __METHOD__,
+                'error'  => $e->getMessage(),
+                'sql'    => $e->getSQL(),
+                'data'   => [
+                    'id'   => $id,
+                    'data' => $data,
+                ],
+            ]);
+            return false;
+        } catch (Throwable $e) {
+            Log::error('Gagal memperbarui laporan bibit', [
+                'source' => __METHOD__,
+                'error'  => $e->getMessage(),
+                'trace'  => $e->getTraceAsString(),
+                'data'   => [
+                    'id'   => $id,
+                    'data' => $data,
+                ],
+            ]);
+            return false;
+        }
     }
 
-    public function delete(string|int $id): Model|int|bool
+    public function delete(string|int $id): Model|bool|int
     {
-        return LaporanKondisi::destroy($id);
+        try {
+            $model = LaporanKondisi::findOrFail($id);
+            $model->delete();
+            return true;
+        } catch (QueryException $e) {
+            Log::error('Gagal menghapus laporan bibit', [
+                'source' => __METHOD__,
+                'error'  => $e->getMessage(),
+                'sql'    => $e->getSQL(),
+                'data'   => ['id' => $id],
+            ]);
+            return false;
+        } catch (Throwable $e) {
+            Log::error('Gagal menghapus laporan bibit', [
+                'source' => __METHOD__,
+                'error'  => $e->getMessage(),
+                'trace'  => $e->getTraceAsString(),
+                'data'   => ['id' => $id],
+            ]);
+            return false;
+        }
     }
 }
+

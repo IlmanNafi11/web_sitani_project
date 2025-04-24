@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Log;
 
 class PenyuluhTerdaftarRepository implements CrudInterface, PenyuluhTerdaftarCustomQueryInterface
 {
-    public function getAll($withRelations = false): Collection|array
+    public function getAll(bool $withRelations = false): Collection|array
     {
         try {
             $query = PenyuluhTerdaftar::select(['id' , 'nama', 'no_hp', 'alamat', 'kecamatan_id']);
@@ -42,7 +42,7 @@ class PenyuluhTerdaftarRepository implements CrudInterface, PenyuluhTerdaftarCus
         }
     }
 
-    public function find($id): Model|Collection|array|null
+    public function getById(string|int $id): Model|Collection|array|null
     {
         try {
             return PenyuluhTerdaftar::where('id', $id)->select(['id', 'nama', 'no_hp', 'alamat', 'kecamatan_id'])->with(['kecamatan:id,nama'])->first();
@@ -88,7 +88,7 @@ class PenyuluhTerdaftarRepository implements CrudInterface, PenyuluhTerdaftarCus
         }
     }
 
-    public function update($id, array $data): Model|bool|int
+    public function update(string|int $id, array $data): Model|bool|int
     {
         try {
             return PenyuluhTerdaftar::where('id', $id)->update($data);
@@ -111,7 +111,7 @@ class PenyuluhTerdaftarRepository implements CrudInterface, PenyuluhTerdaftarCus
         }
     }
 
-    public function delete($id): Model|bool|int
+    public function delete(string|int $id): Model|bool|int
     {
         try {
             return PenyuluhTerdaftar::where('id', $id)->delete();

@@ -7,38 +7,77 @@ use App\Models\User;
 use App\Repositories\Interfaces\CrudInterface;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class AdminRepository implements CrudInterface
 {
 
-    public function getAll($withRelations = false): Collection|array
+    public function getAll(bool $withRelations = false): Collection|array
     {
-        if ($withRelations) {
-            return Admin::select(['id', 'nama', 'no_hp', 'alamat', 'user_id'])->with([
+        try {
+            $query = Admin::select(['id', 'nama', 'no_hp', 'alamat', 'user_id']);
+            if ($withRelations) {
+                $query->with([
+                    'user' => function ($query) {
+                        $query->select(['id', 'email',]);
+                    },
+                    'user.roles' => function ($query) {
+                        $query->select(['id', 'name']);
+                    },
+                ]);
+            }
+            return $query->get();
+        } catch (QueryException $e) {
+            Log::error('Gagal mengambil seluruh data admin', [
+                'source' => __METHOD__,
+                'error' => $e->getMessage(),
+                'sql' => $e->getSQL(),
+            ]);
+
+            return Collection::make();
+        } catch (\Throwable $e) {
+            Log::error('Gagal mengambil seluruh data admin', [
+                'source' => __METHOD__,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            return Collection::make();
+        }
+    }
+
+    public function getById(string|int $id): Model|Collection|array|null
+    {
+        try {
+            return Admin::with([
                 'user' => function ($query) {
-                    $query->select(['id', 'email',]);
+                    $query->select(['id', 'email']);
                 },
                 'user.roles' => function ($query) {
                     $query->select(['id', 'name']);
                 },
-            ])->get();
+            ])->find($id);
+        } catch (QueryException $e) {
+            Log::error('Gagal mengambil data admin berdasarkan id', [
+                'source' => __METHOD__,
+                'error' => $e->getMessage(),
+                'sql' => $e->getSQL(),
+                'data' => ['id' => $id],
+            ]);
+
+            return null;
+        } catch (\Throwable $e) {
+            Log::error('Gagal mengambil data admin berdasarkan id', [
+                'source' => __METHOD__,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'data' => ['id' => $id],
+            ]);
+
+            return null;
         }
-
-        return Admin::all();
-    }
-
-    public function find($id): Model|Collection|array|null
-    {
-        return Admin::with([
-            'user' => function ($query) {
-                $query->select(['id', 'email']);
-            },
-            'user.roles' => function ($query) {
-                $query->select(['id', 'name']);
-            },
-        ])->find($id);
     }
 
     public function create(array $data): ?Model
@@ -62,22 +101,34 @@ class AdminRepository implements CrudInterface
 
                 return $admin;
             });
+        } catch (QueryException $e) {
+            Log::error('Gagal menyimpan data admin beserta data user', [
+                'source' => __METHOD__,
+                'error' => $e->getMessage(),
+                'sql' => $e->getSQL(),
+                'data' => $data
+            ]);
+
+            return null;
         } catch (\Throwable $e) {
-            Log::error('Gagal menyimpan data admin beserta user baru', [
+            Log::error('Gagal menyimpan data admin beserta data user', [
+                'source' => __METHOD__,
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString(),
+                'data' => $data
             ]);
+
             return null;
         }
     }
 
-    public function update(int|string $id, array $data): Model|int|bool
+    public function update(string|int $id, array $data): Model|int|bool
     {
         try {
             return DB::transaction(function () use ($id, $data) {
                 $admin = Admin::find($id);
                 if (!$admin) {
-                    Log::error("[Admin Update] Admin id {$id} tidak ditemukan");
+                    Log::error("Admin id {$id} tidak ditemukan");
                     throw new \Exception("Admin tidak ditemukan");
                 }
 
@@ -93,7 +144,7 @@ class AdminRepository implements CrudInterface
                         $admin->user->syncRoles([$data['role']]);
                     }
                 } else {
-                    Log::error("[Admin Update] User untuk admin id {$id} tidak ditemukan");
+                    Log::error("User untuk admin id {$id} tidak ditemukan");
                     throw new \Exception("User untuk admin tidak ditemukan");
                 }
 
@@ -101,42 +152,61 @@ class AdminRepository implements CrudInterface
 
                 return $admin;
             }, 3);
+        } catch (QueryException $e) {
+            Log::error('Gagal memperbarui data admin', [
+                'source' => __METHOD__,
+                'error' => $e->getMessage(),
+                'sql' => $e->getSQL(),
+                'data' => $data
+            ]);
+
+            return false;
         } catch (\Throwable $e) {
-            Log::error('Error updating admin', [
-                'id' => $id,
-                'data' => $data,
+            Log::error('Gagal memperbarui data admin', [
+                'source' => __METHOD__,
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString(),
+                'data' => $data,
             ]);
             return false;
         }
     }
 
-    public function delete(int|string $id): Model|int|bool
+    public function delete(string|int $id): Model|int|bool
     {
         try {
             return DB::transaction(function () use ($id) {
                 $admin = Admin::find($id);
 
                 if (!$admin) {
-                    Log::warning("[Admin Delete] Admin id {$id} tidak ditemukan.");
+                    Log::error("Admin id {$id} tidak ditemukan.");
                     return false;
                 }
 
                 if ($admin->user) {
                     $admin->user->delete();
                 } else {
-                    Log::warning("[Admin Delete] User untuk admin id {$id} tidak ditemukan.");
+                    Log::error("User untuk admin id {$id} tidak ditemukan.");
                 }
 
                 $admin->delete();
                 return true;
             });
+        } catch (QueryException $e) {
+            Log::error('Gagal menghapus data admin', [
+                'source' => __METHOD__,
+                'error' => $e->getMessage(),
+                'sql' => $e->getSQL(),
+                'data' => ['id' => $id],
+            ]);
+
+            return false;
         } catch (\Throwable $e) {
-            Log::error("[Admin Delete] Gagal menghapus admin", [
-                'id' => $id,
+            Log::error("Gagal menghapus data admin", [
+                'source' => __METHOD__,
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString(),
+                'data' => ['id' => $id],
             ]);
             return false;
         }

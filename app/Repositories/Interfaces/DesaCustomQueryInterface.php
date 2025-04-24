@@ -12,5 +12,5 @@ interface DesaCustomQueryInterface
      * @param int|string $id Id kecamatan
      * @return Collection
      */
-    public function getByKecamatanId($id): Collection;
+    public function getByKecamatanId(int|string $id): Collection;
 }

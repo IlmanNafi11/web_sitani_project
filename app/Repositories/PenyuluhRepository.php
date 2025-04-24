@@ -22,7 +22,7 @@ class PenyuluhRepository implements CrudInterface
      * @param bool $withRelations set true untuk mengambil data beserta relasi(default false)
      * @return Collection|array
      */
-    public function getAll($withRelations = false): Collection|array
+    public function getAll(bool $withRelations = false): Collection|array
     {
         try {
             $query = Penyuluh::select(['id', 'user_id', 'penyuluh_terdaftar_id']);
@@ -59,10 +59,10 @@ class PenyuluhRepository implements CrudInterface
     /**
      * Mengambil data penyuluh berdasarkan ID.
      *
-     * @param int $id Id penyuluh
+     * @param string|int $id Id penyuluh
      * @return Model|Collection|array|null
      */
-    public function find($id): array|Collection|Model|null
+    public function getById(string|int $id): array|Collection|Model|null
     {
         try {
             return Penyuluh::where('id', $id)->with([
@@ -137,11 +137,11 @@ class PenyuluhRepository implements CrudInterface
     /**
      * Memperbarui data penyuluh berdasarkan ID.
      *
-     * @param int|string $id
+     * @param string|int $id
      * @param array $data
      * @return bool
      */
-    public function update(int|string $id, array $data): bool
+    public function update(string|int $id, array $data): bool
     {
         try {
             return Penyuluh::findOrFail($id)->update($data);
@@ -170,10 +170,10 @@ class PenyuluhRepository implements CrudInterface
     /**
      * Menghapus data penyuluh berdasarkan ID.
      *
-     * @param int $id
+     * @param string|int $id
      * @return bool
      */
-    public function delete($id): bool
+    public function delete(string|int$id): bool
     {
         try {
             $deleted = Penyuluh::destroy($id);
@@ -183,6 +183,7 @@ class PenyuluhRepository implements CrudInterface
               'source' => __METHOD__,
               'error' => $e->getMessage(),
               'sql' => $e->getSql(),
+              'data' => ['id' => $id],
           ]);
 
           return false;
@@ -191,6 +192,7 @@ class PenyuluhRepository implements CrudInterface
                 'source' => __METHOD__,
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString(),
+                'data' => ['id' => $id],
             ]);
 
             return false;
