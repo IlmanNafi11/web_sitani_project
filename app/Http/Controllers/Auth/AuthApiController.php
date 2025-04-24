@@ -5,7 +5,9 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\LoginRequest;
 use App\Http\Requests\PenyuluhRequest;
+use App\Http\Requests\PhonePenyuluhRequest;
 use App\Services\PenyuluhService;
+use App\Services\PenyuluhTerdaftarService;
 use App\Trait\ApiResponse;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -17,10 +19,12 @@ class AuthApiController extends Controller
 {
     use ApiResponse;
     protected PenyuluhService $service;
+    protected PenyuluhTerdaftarService $penyuluhTerdaftarService;
 
-    public function __construct(PenyuluhService $service)
+    public function __construct(PenyuluhService $service, PenyuluhTerdaftarService $penyuluhTerdaftarService)
     {
         $this->service = $service;
+        $this->penyuluhTerdaftarService = $penyuluhTerdaftarService;
     }
 
     public function login(LoginRequest $request)
@@ -38,6 +42,16 @@ class AuthApiController extends Controller
         }
 
         return $this->respondWithToken($token, "Login Berhasil");
+    }
+
+    public function validatePhone(PhonePenyuluhRequest $request)
+    {
+        $result = $this->penyuluhTerdaftarService->getByPhone($request->validated('no_hp'));
+        if ($result['success']) {
+            return $this->successResponse($result['data'], $result['message']);
+        }
+
+        return $this->errorResponse($result['message'], $result['data']);
     }
 
     public function register(PenyuluhRequest $request)
