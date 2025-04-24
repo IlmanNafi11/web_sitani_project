@@ -17,6 +17,7 @@ use App\Repositories\KecamatanRepository;
 use App\Repositories\KelompokTaniRepository;
 use App\Repositories\KomoditasRepository;
 use App\Repositories\LaporanBibitRepository;
+use App\Repositories\PenyuluhRepository;
 use App\Repositories\PenyuluhTerdaftarRepository;
 use App\Repositories\RoleRepository;
 use App\Repositories\UserRepository;
@@ -27,6 +28,7 @@ use App\Services\KecamatanService;
 use App\Services\KelompokTaniService;
 use App\Services\KomoditasService;
 use App\Services\LaporanBibitService;
+use App\Services\PenyuluhService;
 use App\Services\PenyuluhTerdaftarService;
 use App\Services\RoleService;
 use App\Services\UserService;
@@ -53,6 +55,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->when(UserService::class)->needs(AuthInterface::class)->give(UserRepository::class);
         $this->app->when(RoleService::class)->needs(CrudInterface::class)->give(RoleRepository::class);
         $this->app->when(RoleService::class)->needs(RoleRepositoryInterface::class)->give(RoleRepository::class);
+        $this->app->when(PenyuluhService::class)->needs(CrudInterface::class)->give(PenyuluhRepository::class);
     }
 
     /**
