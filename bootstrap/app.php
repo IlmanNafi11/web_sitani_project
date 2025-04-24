@@ -1,11 +1,15 @@
 <?php
 
-use App\Http\Middleware\JwtMiddleware;
 use App\Http\Middleware\CheckActiveSession;
 use App\Http\Middleware\CheckOtpSession;
+use App\Http\Middleware\CheckPanelAdminPermission;
+use App\Http\Middleware\JwtMiddleware;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use Spatie\Permission\Middleware\PermissionMiddleware;
+use Spatie\Permission\Middleware\RoleMiddleware;
+use Spatie\Permission\Middleware\RoleOrPermissionMiddleware;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -16,15 +20,14 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->alias([
-            'active.session' => \App\Http\Middleware\CheckActiveSession::class,
-            'otp.session' => \App\Http\Middleware\CheckOtpSession::class,
-            'panel.admin.permission' => \App\Http\Middleware\CheckPanelAdminPermission::class,
-            'role' => \Spatie\Permission\Middleware\RoleMiddleware::class,
-            'permission' => \Spatie\Permission\Middleware\PermissionMiddleware::class,
-            'role_or_permission' => \Spatie\Permission\Middleware\RoleOrPermissionMiddleware::class
+            'active.session' => CheckActiveSession::class,
+            'otp.session' => CheckOtpSession::class,
+            'panel.admin.permission' => CheckPanelAdminPermission::class,
+            'role' => RoleMiddleware::class,
+            'permission' => PermissionMiddleware::class,
+            'role_or_permission' => RoleOrPermissionMiddleware::class
         ]);
 
-        // If you have group middleware, continue appending like before
         $middleware->appendToGroup('api', JwtMiddleware::class);
     })
     ->withExceptions(function (Exceptions $exceptions) {
