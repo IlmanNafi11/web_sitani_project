@@ -15,7 +15,7 @@ class PenyuluhTerdaftarRepository implements CrudInterface, PenyuluhTerdaftarCus
     public function getAll($withRelations = false): Collection|array
     {
         try {
-            $query = PenyuluhTerdaftar::select(['id' , 'nama', 'no_hp', 'alamat']);
+            $query = PenyuluhTerdaftar::select(['id' , 'nama', 'no_hp', 'alamat', 'kecamatan_id']);
 
             if ($withRelations) {
                 $query->with(['kecamatan:id,nama']);
@@ -45,7 +45,7 @@ class PenyuluhTerdaftarRepository implements CrudInterface, PenyuluhTerdaftarCus
     public function find($id): Model|Collection|array|null
     {
         try {
-            return PenyuluhTerdaftar::findOrFail($id);
+            return PenyuluhTerdaftar::where('id', $id)->select(['id', 'nama', 'no_hp', 'alamat', 'kecamatan_id'])->with(['kecamatan:id,nama'])->first();
         } catch (QueryException $e) {
             Log::error('Gagal mengambil data penyuluh terdaftar berdasarkan id : ' . $id, [
                 'source' => __METHOD__,
