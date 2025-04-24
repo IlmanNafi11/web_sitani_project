@@ -20,7 +20,13 @@ class PenyuluhTerdaftarService {
         try {
             return $this->penyuluhRepository->getAll();
         } catch (\Throwable $th) {
-            Log::error('Gagal mengambil seluruh data penyuluh terdaftar: ' . $th->getMessage());
+            Log::error('Gagal mengambil seluruh data penyuluh terdaftar', [
+                'source' => __METHOD__,
+                'error' => $th->getMessage(),
+                'trace' => $th->getTraceAsString(),
+            ]);
+
+            return null;
         }
     }
 
@@ -76,6 +82,47 @@ class PenyuluhTerdaftarService {
             return $this->penyuluhTerdaftarCustomQuery->getByKecamatanId($id);
         } catch (\Throwable $th) {
             Log::error('Gagal mengambil data penyuluh terdaftar berdasarkan id kecamatan: ' . $th->getMessage());
+        }
+    }
+
+    /**
+     * Mengambil data penyuluh terdaftar di dinas berdasarkan no hp
+     *
+     * @param string $phone No Hp penyuluh terdaftar di dinas
+     * @return array
+     */
+    public function getByPhone(string $phone)
+    {
+        try {
+            $penyuluh = $this->penyuluhTerdaftarCustomQuery->getByPhone($phone);
+
+            if (!empty($penyuluh)) {
+                return [
+                    'success' => true,
+                    'message' => 'Berhasil mengambil data penyuluh terdaftar',
+                    'data' => $penyuluh,
+                ];
+
+            }
+
+            return [
+                'success' => false,
+                'message' => 'Gagal mengambil data penyuluh terdaftar',
+                'data' => [],
+            ];
+        } catch (\Throwable $th) {
+            Log::error('Gagal mengambil data penyuluh terdaftar dengan no hp ' . $phone, [
+                'source' => __METHOD__,
+                'message' => $th->getMessage(),
+                'trace' => $th->getTraceAsString(),
+                'data' => ['no_hp' => $phone],
+            ]);
+
+            return [
+                'success' => false,
+                'message' => 'Gagal mengambil data penyuluh terdaftar',
+                'data' => [],
+            ];
         }
     }
 }
