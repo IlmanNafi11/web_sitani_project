@@ -91,4 +91,14 @@ class User extends Authenticatable implements JWTSubject
     {
         return $this->hasOne(OtpCode::class);
     }
+
+    /**
+     * Relasi one to one dengan model penyuluh
+     *
+     * @return HasOne
+     */
+    public function penyuluh(): HasOne
+    {
+        return $this->hasOne(Penyuluh::class);
+    }
 }
