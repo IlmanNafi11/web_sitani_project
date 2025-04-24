@@ -1,28 +1,133 @@
 <?php
+
 namespace App\Repositories;
 
 use App\Models\Komoditas;
 use App\Repositories\Interfaces\CrudInterface;
-class KomoditasRepository implements CrudInterface {
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\QueryException;
+use Illuminate\Support\Facades\Log;
 
-    public function getAll($withRelations = false): \Illuminate\Database\Eloquent\Collection|array
+class KomoditasRepository implements CrudInterface
+{
+    public function getAll($withRelations = false): Collection|array
     {
-        return Komoditas::all();
+        try {
+            $query = Komoditas::select(['id', 'nama', 'deskripsi', 'musim']);
+            if ($withRelations) {
+                $query->with(['bibitBerkualitas:id,komoditas_id']);
+            }
+
+            return $query->get();
+        } catch (QueryException $e) {
+            Log::error('Gagal mengambil seluruh data komoditas', [
+                'source' => __METHOD__,
+                'error' => $e->getMessage(),
+                'sql' => $e->getSQL(),
+            ]);
+
+            return Collection::make();
+        } catch (\Exception $e) {
+            Log::error('Gagal mengambil seluruh data komoditas', [
+                'source' => __METHOD__,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            return Collection::make();
+        }
     }
-    public function find($id): \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Collection|array|null
+
+    public function find($id): Model|Collection|array|null
     {
-        return Komoditas::find($id);
+        try {
+            return Komoditas::select(['id', 'nama', 'deskripsi', 'musim'])->where('id', $id)->first();
+        } catch (QueryException $e) {
+            Log::error('Gagal mengambil data komoditas berdasarkan ID', [
+                'source' => __METHOD__,
+                'error' => $e->getMessage(),
+                'sql' => $e->getSQL(),
+            ]);
+            return null;
+        } catch (\Exception $e) {
+            Log::error('Gagal mengambil data komoditas berdasarkan ID', [
+                'source' => __METHOD__,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            return null;
+        }
     }
-    public function create(array $data): ?\Illuminate\Database\Eloquent\Model
+
+    public function create(array $data): ?Model
     {
-        return Komoditas::create($data);
+        try {
+            return Komoditas::create($data);
+        } catch (QueryException $e) {
+            Log::error('Gagal menyimpan data komoditas', [
+                'source' => __METHOD__,
+                'error' => $e->getMessage(),
+                'sql' => $e->getSQL(),
+            ]);
+
+            return null;
+        } catch (\Exception $e) {
+            Log::error('Gagal menyimpan data komoditas', [
+                'source' => __METHOD__,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            return null;
+        }
     }
-    public function update($id, array $data): \Illuminate\Database\Eloquent\Model|bool|int
+
+    public function update($id, array $data): Model|bool|int
     {
-        return Komoditas::where('id', $id)->update($data);
+        try {
+            return Komoditas::where('id', $id)->update($data);
+        } catch (QueryException $e) {
+            Log::error('Gagal memperbarui data komoditas', [
+                'source' => __METHOD__,
+                'error' => $e->getMessage(),
+                'sql' => $e->getSQL(),
+            ]);
+
+            return false;
+        } catch (\Exception $e) {
+            Log::error('Gagal memperbarui data komoditas', [
+                'source' => __METHOD__,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            return false;
+        }
+
     }
-    public function delete($id): \Illuminate\Database\Eloquent\Model|bool|int
+
+    public function delete($id): Model|bool|int
     {
-        return Komoditas::destroy($id);
+        try {
+            return Komoditas::where('id', $id)->delete();
+        } catch (QueryException $e) {
+            Log::error('Gagal menghapus data komoditas', [
+                'source' => __METHOD__,
+                'error' => $e->getMessage(),
+                'sql' => $e->getSQL(),
+            ]);
+
+            return false;
+        } catch (\Exception $e) {
+            Log::error('Gagal menghapus data komoditas', [
+                'source' => __METHOD__,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            return false;
+        }
     }
 }
