@@ -12,58 +12,237 @@ class BibitService {
         $this->bibitRepository = $bibitRepository;
     }
 
-    public function getAll()
+    /**
+     * Mengambil seluruh data bibit
+     *
+     * @param bool $withRelations Default false, set true untuk mengambil data beserta relasi
+     * @return array
+     */
+    public function getAll(bool $withRelations = false): array
     {
         try {
-            return $this->bibitRepository->getAll();
-        } catch (\Throwable $th) {
-            Log::error('Gagal mengambil seluruh data bibit: ' . $th->getMessage());
+            $bibits = $this->bibitRepository->getAll($withRelations);
+            if ($bibits->isNotEmpty()) {
+                return [
+                    'success' => true,
+                    'message' => 'Semua data bibit berhasil diambil',
+                    'data' => $bibits
+                ];
+            }
+
+            return [
+                'success' => false,
+                'message' => 'Data bibit tidak ditemukan',
+                'data' => []
+            ];
+        } catch (\Throwable $e) {
+            Log::error('Terjadi kesalahan saat mengambil data bibit.', [
+                'source' => __METHOD__,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            return [
+                'success' => false,
+                'message' => 'Gagal mengambil data bibit.',
+                'data' => []
+            ];
         }
     }
 
-    public function getById($id)
+    /**
+     * Mengambil data bibit berdasarkan id
+     *
+     * @param string|int $id Id bibit
+     * @return array
+     */
+    public function getById(string|int $id): array
     {
         try {
-            return $this->bibitRepository->find($id);
-        } catch (\Throwable $th) {
-            Log::error('Gagal mengambil data bibit berdasarkan id: ' . $th->getMessage());
+            $bibit = $this->bibitRepository->getById($id);
+
+            if (!empty($bibit)) {
+                return [
+                    'success' => true,
+                    'message' => 'Data bibit berhasil diambil',
+                    'data' => $bibit,
+                ];
+            }
+
+            return [
+                'success' => false,
+                'message' => 'Data bibit tidak ditemukan',
+                'data' => [],
+            ];
+        } catch (\Throwable $e) {
+            Log::error('Terjadi kesalahan saat mengambil data bibit berdasarkan id.', [
+                'source' => __METHOD__,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            return [
+                'success' => false,
+                'message' => 'Gagal mengambil data bibit dengan id: ' . $id,
+                'data' => []
+            ];
         }
     }
 
-    public function getAllWithKomoditas()
+    /**
+     * Mengambil data bibit beserta komoditas
+     *
+     * @deprecated Gunakan getAll() dan set true
+     * @return array
+     */
+    public function getAllWithKomoditas(): array
     {
         try {
-            $bibit = $this->bibitRepository->getAll();
-            return $bibit->load('komoditas');
-        } catch (\Throwable $th) {
-            Log::error('Gagal mengambil data bibit dengan komoditas: ' . $th->getMessage());
+            $bibit = $this->bibitRepository->getAll(true);
+
+            if ($bibit->isNotEmpty()) {
+                return [
+                    'success' => true,
+                    'message' => 'Semua data bibit dan komoditas berhasil diambil',
+                    'data' => $bibit
+                ];
+            }
+
+            return [
+                'success' => false,
+                'message' => 'Data bibit tidak ditemukan',
+                'data' => [],
+            ];
+        } catch (\Throwable $e) {
+            Log::error('Terjadi kesalahan saat mengambil data bibit beserta komoditas.', [
+                'source' => __METHOD__,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            return [
+                'success' => false,
+                'message' => 'Gagal mengambil data bibit beserta komoditas.',
+                'data' => []
+            ];
         }
     }
 
-    public function create(array $data)
+    /**
+     * Membuat data bibit baru
+     *
+     * @param array $data Data bibit baru
+     * @return array
+     */
+    public function create(array $data): array
     {
         try {
-            return $this->bibitRepository->create($data);
-        } catch (\Throwable $th) {
-            Log::error('Gagal menyimpan data bibit: ' . $th->getMessage());
+            $bibit = $this->bibitRepository->create($data);
+
+            if (!empty($bibit)) {
+                return [
+                    'success' => true,
+                    'message' => 'Data bibit berhasil disimpan',
+                    'data' => $bibit,
+                ];
+            }
+
+            return [
+                'success' => false,
+                'message' => 'Data bibit gagal disimpan',
+                'data' => [],
+            ];
+        } catch (\Throwable $e) {
+            Log::error('Terjadi kesalahan saat menyimpan data bibit.', [
+                'source' => __METHOD__,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            return [
+                'success' => false,
+                'message' => 'Gagal menyimpan data bibit.',
+                'data' => []
+            ];
         }
     }
 
-    public function update($id, array $data)
+    /**
+     * Memperbarui data bibit
+     *
+     * @param string|int $id Id bibit
+     * @param array $data Data bibit yang baru
+     * @return array
+     */
+    public function update(string|int $id, array $data): array
     {
         try {
-            return $this->bibitRepository->update($id, $data);
-        } catch (\Throwable $th) {
-            Log::error('Gagal memperbarui data bibit: ' . $th->getMessage());
+            $result = $this->bibitRepository->update($id, $data);
+
+            if($result) {
+                return [
+                    'success' => true,
+                    'message' => 'Data bibit berhasil diupdate',
+                    'data' => $data,
+                ];
+            }
+
+            return [
+                'success' => false,
+                'message' => 'Data bibit gagal diperbarui',
+                'data' => [],
+            ];
+        } catch (\Throwable $e) {
+            Log::error('Terjadi kesalahan saat memperbarui data bibit.', [
+                'source' => __METHOD__,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            return [
+                'success' => false,
+                'message' => 'Gagal memperbarui data bibit.',
+                'data' => []
+            ];
         }
     }
 
-    public function delete($id)
+    /**
+     * Menghapus data bibit
+     *
+     * @param string|int $id Id bibit
+     * @return array
+     */
+    public function delete(string|int $id): array
     {
         try {
-            return $this->bibitRepository->delete($id);
-        } catch (\Throwable $th) {
-            Log::error('Gagal menghapus data bibit: ' . $th->getMessage());
+            $result = $this->bibitRepository->delete($id);
+
+            if ($result) {
+                return [
+                    'success' => true,
+                    'message' => 'Data bibit berhasil dihapus',
+                    'data' => ['id' => $id],
+                ];
+            }
+
+            return [
+                'success' => false,
+                'message' => 'Data bibit gagal dihapus',
+                'data' => [],
+            ];
+        } catch (\Throwable $e) {
+            Log::error('Terjadi kesalahan saat menghapus data bibit.', [
+                'source' => __METHOD__,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            return [
+                'success' => false,
+                'message' => 'Gagal menghapus data bibit.',
+                'data' => []
+            ];
         }
     }
 }

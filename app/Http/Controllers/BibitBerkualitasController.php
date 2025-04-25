@@ -21,7 +21,11 @@ class BibitBerkualitasController extends Controller
      */
     public function index()
     {
-        $datas = $this->bibitService->getAllWithKomoditas();
+        $data = $this->bibitService->getAll(true);
+        $datas = null;
+        if ($data['success']) {
+            $datas = $data['data'];
+        }
 
         return view('pages.bibit.index', compact('datas'));
     }
@@ -31,7 +35,12 @@ class BibitBerkualitasController extends Controller
      */
     public function create(KomoditasService $komoditasService)
     {
-        $datas = $komoditasService->getAll();
+        $data = $komoditasService->getAll();
+        $datas = null;
+        if ($data['success']) {
+            $datas = $data['data'];
+        }
+
         return view('pages.bibit.create', compact('datas'));
     }
 
@@ -42,11 +51,11 @@ class BibitBerkualitasController extends Controller
     {
         $result = $this->bibitService->create($request->validated());
 
-        if ($result) {
+        if ($result['success']) {
             return redirect()->route('bibit.index')->with('success', 'Data berhasil disimpan');
         }
 
-        return redirect()->route('bibit.index')->with('failed', 'Data gagal disimpan');
+        return redirect()->route('bibit.index')->with('error', 'Data gagal disimpan');
     }
 
     /**
@@ -62,8 +71,16 @@ class BibitBerkualitasController extends Controller
      */
     public function edit(string $id, KomoditasService $komoditasService)
     {
-        $bibit = $this->bibitService->getById($id);
-        $komoditas = $komoditasService->getAll();
+        $dataBibit = $this->bibitService->getById($id);
+        $dataKomoditas = $komoditasService->getAll();
+
+        $bibit = null;
+        $komoditas = null;
+
+        if ($dataBibit['success'] && $dataKomoditas['data']) {
+            $bibit = $dataBibit['data'];
+            $komoditas = $dataKomoditas['data'];
+        }
 
         return view('pages.bibit.update', compact('bibit', 'komoditas'));
     }
@@ -75,11 +92,11 @@ class BibitBerkualitasController extends Controller
     {
         $result = $this->bibitService->update($id, $request->validated());
 
-        if ($result) {
+        if ($result['success']) {
             return redirect()->route('bibit.index')->with('success', 'Data berhasil diperbarui');
         }
 
-        return redirect()->route('bibit.index')->with('success', 'Data gagal diperbarui');
+        return redirect()->route('bibit.index')->with('error', 'Data gagal diperbarui');
     }
 
     /**
@@ -87,8 +104,12 @@ class BibitBerkualitasController extends Controller
      */
     public function destroy(string $id)
     {
-        $this->bibitService->delete($id);
+        $result = $this->bibitService->delete($id);
 
-        return redirect()->route('bibit.index')->with('success', 'Data berhasil dihapus');
+        if ($result['success']) {
+            return redirect()->route('bibit.index')->with('success', 'Data berhasil dihapus');
+        }
+
+        return redirect()->route('bibit.index')->with('error', 'Data gagal dihapus');
     }
 }
