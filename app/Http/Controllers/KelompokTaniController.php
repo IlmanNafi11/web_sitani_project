@@ -22,7 +22,12 @@ class KelompokTaniController extends Controller
      */
     public function index()
     {
-        $kelompokTanis = $this->kelompokTaniService->getAllWithRelations();
+        $data = $this->kelompokTaniService->getAll(true);
+        $kelompokTanis = null;
+
+        if ($data['success']) {
+            $kelompokTanis = $data['data'];
+        }
         return view('pages.kelompok_tani.index', compact('kelompokTanis'));
     }
 
@@ -31,7 +36,12 @@ class KelompokTaniController extends Controller
      */
     public function create(KecamatanService $kecamatanService)
     {
-        $kecamatans = $kecamatanService->getAll();
+        $data = $kecamatanService->getAll();
+        $kecamatans = null;
+        if ($data['success']) {
+            $kecamatans = $data['data'];
+        }
+
         return view('pages.kelompok_tani.create', compact('kecamatans'));
     }
 
@@ -42,11 +52,11 @@ class KelompokTaniController extends Controller
     {
         $result = $this->kelompokTaniService->create($request->validated());
 
-        if ($result) {
+        if ($result['success']) {
             return redirect()->route('kelompok-tani.index')->with('success', 'Data berhasil disimpan');
         }
 
-        return redirect()->route('kelompok-tani.index')->with('success', 'Data gagal disimpan');
+        return redirect()->route('kelompok-tani.index')->with('error', 'Data gagal disimpan');
     }
 
     /**
@@ -62,8 +72,16 @@ class KelompokTaniController extends Controller
      */
     public function edit(string $id, KecamatanService $kecamatanService)
     {
-        $kelompokTanis = $this->kelompokTaniService->getByIdWithPivot($id);
-        $kecamatans = $kecamatanService->getAll();
+        $kelompokTanis = null;
+        $kecamatans = null;
+        $dataKelompokTanis = $this->kelompokTaniService->getById($id);
+        $dataKecamatans = $kecamatanService->getAll();
+
+        if ($dataKelompokTanis['success'] && $dataKecamatans['success']) {
+            $kelompokTanis = $dataKelompokTanis['data'];
+            $kecamatans = $dataKecamatans['data'];
+        }
+
         return view('pages.kelompok_tani.update', compact('kelompokTanis', 'kecamatans'));
     }
 
@@ -73,11 +91,11 @@ class KelompokTaniController extends Controller
     public function update(KelompokTaniRequest $request, string $id)
     {
         $result = $this->kelompokTaniService->update($id, $request->validated());
-        if ($result) {
+        if ($result['success']) {
             return redirect()->route('kelompok-tani.index')->with('success', 'Data berhasil diperbarui');
         }
 
-        return redirect()->route('kelompok-tani.index')->with('failed', 'Data gagal diperbarui');
+        return redirect()->route('kelompok-tani.index')->with('error', 'Data gagal diperbarui');
     }
 
     /**
@@ -85,18 +103,10 @@ class KelompokTaniController extends Controller
      */
     public function destroy(string $id)
     {
-        $this->kelompokTaniService->delete($id);
-
-        return redirect()->route('kelompok-tani.index')->with('success', 'Data berhasil dihapus');
-    }
-
-    public function getAllByPenyuluh()
-    {
-
-    }
-
-    public function getById($id)
-    {
-        
+        $result = $this->kelompokTaniService->delete($id);
+        if ($result['success']) {
+            return redirect()->route('kelompok-tani.index')->with('success', 'Data berhasil dihapus');
+        }
+        return redirect()->route('kelompok-tani.index')->with('error', 'Data gagal dihapus');
     }
 }

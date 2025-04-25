@@ -25,24 +25,24 @@ class KelompokTaniRepository implements CrudInterface, ManyRelationshipManagemen
                     'desa' => function ($q) {
                         $q->select('id', 'nama');
                     },
-                    'penyuluhTerdaftars' => function($q){
+                    'penyuluhTerdaftars' => function ($q) {
                         $q->select('penyuluh_terdaftars.id', 'nama');
                     }
                 ]);
             }
             return $query->get();
         } catch (QueryException $e) {
-            Log::error('Failed to get all kelompok tani data: ' . $e->getMessage(), [
+            Log::error('Gagal mengambil seluruh data kelompok tani.', [
                 'source' => __METHOD__,
-                'error'  => $e->getMessage(),
-                'sql'    => $e->getSQL(),
+                'error' => $e->getMessage(),
+                'sql' => $e->getSql(),
             ]);
             return Collection::make();
         } catch (Throwable $e) {
-            Log::error('Failed to get all kelompok tani data: ' . $e->getMessage(), [
+            Log::error('Gagal mengambil seluruh data kelompok tani.', [
                 'source' => __METHOD__,
-                'error'  => $e->getMessage(),
-                'trace'  => $e->getTraceAsString(),
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
             ]);
             return Collection::make();
         }
@@ -53,19 +53,19 @@ class KelompokTaniRepository implements CrudInterface, ManyRelationshipManagemen
         try {
             return KelompokTani::create($data);
         } catch (QueryException $e) {
-            Log::error('Failed to create a new kelompok tani: ' . $e->getMessage(), [
+            Log::error('Gagal menyimpan data kelompok tani', [
                 'source' => __METHOD__,
-                'error'  => $e->getMessage(),
-                'sql'    => $e->getSQL(),
-                'data'   => $data,
+                'error' => $e->getMessage(),
+                'sql' => $e->getSql(),
+                'data' => $data,
             ]);
             return null;
         } catch (Throwable $e) {
-            Log::error('Failed to create a new kelompok tani: ' . $e->getMessage(), [
+            Log::error('Gagal menyimpan data kelompok tani', [
                 'source' => __METHOD__,
-                'error'  => $e->getMessage(),
-                'trace'  => $e->getTraceAsString(),
-                'data'   => $data,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'data' => $data,
             ]);
             return null;
         }
@@ -78,23 +78,23 @@ class KelompokTaniRepository implements CrudInterface, ManyRelationshipManagemen
             $model->update($data);
             return $model;
         } catch (QueryException $e) {
-            Log::error('Failed to update kelompok tani data: ' . $e->getMessage(), [
+            Log::error('Gagal memperbarui data kelompok tani.', [
                 'source' => __METHOD__,
-                'error'  => $e->getMessage(),
-                'sql'    => $e->getSQL(),
-                'data'   => [
-                    'id'   => $id,
+                'error' => $e->getMessage(),
+                'sql' => $e->getSql(),
+                'data' => [
+                    'id' => $id,
                     'data' => $data,
                 ],
             ]);
             return false;
         } catch (Throwable $e) {
-            Log::error('Failed to update kelompok tani data: ' . $e->getMessage(), [
+            Log::error('Gagal memperbarui data kelompok tani.', [
                 'source' => __METHOD__,
-                'error'  => $e->getMessage(),
-                'trace'  => $e->getTraceAsString(),
-                'data'   => [
-                    'id'   => $id,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'data' => [
+                    'id' => $id,
                     'data' => $data,
                 ],
             ]);
@@ -105,21 +105,30 @@ class KelompokTaniRepository implements CrudInterface, ManyRelationshipManagemen
     public function getById(string|int $id): Model|Collection|array|null
     {
         try {
-            return KelompokTani::findOrFail($id);
+            return KelompokTani::select(['id', 'nama', 'desa_id', 'kecamatan_id'])->where('id', $id)->with([
+                'penyuluhTerdaftars' => function ($q) {
+                    $q->select('penyuluh_terdaftars.id', 'nama');
+                },
+                'kecamatan' => function ($q) {
+                    $q->select('id', 'nama');
+                }, 'desa' => function ($q) {
+                    $q->select('id', 'nama');
+                }
+            ])->first();
         } catch (QueryException $e) {
-            Log::error('Failed to get kelompok tani data by id: ' . $e->getMessage(), [
+            Log::error('Gagal mengambil data kelompok tani berdasarkan id.', [
                 'source' => __METHOD__,
-                'error'  => $e->getMessage(),
-                'sql'    => $e->getSQL(),
-                'data'   => ['id' => $id],
+                'error' => $e->getMessage(),
+                'sql' => $e->getSql(),
+                'data' => ['id' => $id],
             ]);
             return null;
         } catch (Throwable $e) {
-            Log::error('Failed to get kelompok tani data by id: ' . $e->getMessage(), [
+            Log::error('Gagal mengambil data kelompok tani berdasarkan id.', [
                 'source' => __METHOD__,
-                'error'  => $e->getMessage(),
-                'trace'  => $e->getTraceAsString(),
-                'data'   => ['id' => $id],
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'data' => ['id' => $id],
             ]);
             return null;
         }
@@ -132,19 +141,19 @@ class KelompokTaniRepository implements CrudInterface, ManyRelationshipManagemen
             $model->delete();
             return $model;
         } catch (QueryException $e) {
-            Log::error('Failed to delete kelompok tani data: ' . $e->getMessage(), [
+            Log::error('Gagal menghapus data kelompok tani.', [
                 'source' => __METHOD__,
-                'error'  => $e->getMessage(),
-                'sql'    => $e->getSQL(),
-                'data'   => ['id' => $id],
+                'error' => $e->getMessage(),
+                'sql' => $e->getSql(),
+                'data' => ['id' => $id],
             ]);
             return false;
         } catch (Throwable $e) {
-            Log::error('Failed to delete kelompok tani data: ' . $e->getMessage(), [
+            Log::error('Gagal menghapus data kelompok tani.', [
                 'source' => __METHOD__,
-                'error'  => $e->getMessage(),
-                'trace'  => $e->getTraceAsString(),
-                'data'   => ['id' => $id],
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'data' => ['id' => $id],
             ]);
             return false;
         }
@@ -159,26 +168,26 @@ class KelompokTaniRepository implements CrudInterface, ManyRelationshipManagemen
             }
             return false;
         } catch (QueryException $e) {
-            Log::error('Failed to attach penyuluh to kelompok tani: ' . $e->getMessage(), [
+            Log::error('Gagal attach penyuluh ke kelompok tani.', [
                 'source' => __METHOD__,
-                'error'  => $e->getMessage(),
-                'sql'    => $e->getSQL(),
-                'data'   => [
-                    'model_id'      => $model->id,
-                    'related_ids'   => $ids,
-                    'attributes'    => $attributes,
+                'error' => $e->getMessage(),
+                'sql' => $e->getSql(),
+                'data' => [
+                    'model_id' => $model->id,
+                    'related_ids' => $ids,
+                    'attributes' => $attributes,
                 ],
             ]);
             return false;
         } catch (Throwable $e) {
-            Log::error('Failed to attach penyuluh to kelompok tani: ' . $e->getMessage(), [
+            Log::error('Gagal attach penyuluh ke kelompok tani.', [
                 'source' => __METHOD__,
-                'error'  => $e->getMessage(),
-                'trace'  => $e->getTraceAsString(),
-                'data'   => [
-                    'model_id'    => $model->id,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'data' => [
+                    'model_id' => $model->id,
                     'related_ids' => $ids,
-                    'attributes'  => $attributes,
+                    'attributes' => $attributes,
                 ],
             ]);
             return false;
@@ -193,23 +202,23 @@ class KelompokTaniRepository implements CrudInterface, ManyRelationshipManagemen
             }
             return null;
         } catch (QueryException $e) {
-            Log::error('Failed to detach penyuluh from kelompok tani: ' . $e->getMessage(), [
+            Log::error('Gagal detach penyuluh dari kelompok tani.', [
                 'source' => __METHOD__,
-                'error'  => $e->getMessage(),
-                'sql'    => $e->getSQL(),
-                'data'   => [
-                    'model_id'    => $model->id,
+                'error' => $e->getMessage(),
+                'sql' => $e->getSql(),
+                'data' => [
+                    'model_id' => $model->id,
                     'related_ids' => $ids,
                 ],
             ]);
             return null;
         } catch (Throwable $e) {
-            Log::error('Failed to detach penyuluh from kelompok tani: ' . $e->getMessage(), [
+            Log::error('Gagal detach penyuluh dari kelompok tani.', [
                 'source' => __METHOD__,
-                'error'  => $e->getMessage(),
-                'trace'  => $e->getTraceAsString(),
-                'data'   => [
-                    'model_id'    => $model->id,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'data' => [
+                    'model_id' => $model->id,
                     'related_ids' => $ids,
                 ],
             ]);
@@ -225,24 +234,24 @@ class KelompokTaniRepository implements CrudInterface, ManyRelationshipManagemen
             }
             return null;
         } catch (QueryException $e) {
-            Log::error('Failed to sync penyuluh with kelompok tani: ' . $e->getMessage(), [
+            Log::error('Gagal sync penyuluh dengan kelompok tani', [
                 'source' => __METHOD__,
-                'error'  => $e->getMessage(),
-                'sql'    => $e->getSQL(),
-                'data'   => [
-                    'model_id'  => $model->id,
+                'error' => $e->getMessage(),
+                'sql' => $e->getSql(),
+                'data' => [
+                    'model_id' => $model->id,
                     'relations' => $relations,
                     'detaching' => $detaching,
                 ],
             ]);
             return null;
         } catch (Throwable $e) {
-            Log::error('Failed to sync penyuluh with kelompok tani: ' . $e->getMessage(), [
+            Log::error('Gagal sync penyuluh dengan kelompok tani', [
                 'source' => __METHOD__,
-                'error'  => $e->getMessage(),
-                'trace'  => $e->getTraceAsString(),
-                'data'   => [
-                    'model_id'  => $model->id,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'data' => [
+                    'model_id' => $model->id,
                     'relations' => $relations,
                     'detaching' => $detaching,
                 ],
