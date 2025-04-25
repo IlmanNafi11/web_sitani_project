@@ -2,8 +2,10 @@
 
 namespace App\Http\Requests;
 
+use App\Models\Admin;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class AdminRequest extends FormRequest
 {
@@ -22,12 +24,22 @@ class AdminRequest extends FormRequest
      */
     public function rules(): array
     {
+        $email = [];
+        $admin = null;
+        if (request()->method() === 'POST') {
+            $email = ['required', 'email', 'unique:users,email'];
+        } else if (request()->method() === 'PUT') {
+            $id = request()->segment('3');
+            $admin = Admin::findOrFail($id);
+            $email = ['required', 'email', Rule::unique('users')->ignore($admin->user_id)];
+        }
+
         return [
-            'nama' => 'required|min:3|max:255|regex:/^[A-Za-z\s\',\.]+$/',
-            'no_hp' => 'required|starts_with:08|digits_between:11,13',
-            'alamat' => 'required|min:3|max:255',
-            'email' => 'required|email',
-            'role' => 'required',
+            'nama' => ['required', 'min:3', 'max:255', 'regex:/^[A-Za-z\s\',\.]+$/'],
+            'no_hp' => ['required', 'starts_with:08', 'digits_between:11,13'],
+            'alamat' => ['required', 'min:3', 'max:255'],
+            'email' => $email,
+            'role' => ['required'],
         ];
     }
 
@@ -46,6 +58,7 @@ class AdminRequest extends FormRequest
             'alamat.max' => 'Alamat maksimal terdiri dari :max karakter.',
             'email.required' => 'Email wajib diisi!',
             'email.email' => 'Email harus berupa alamat email yang valid.',
+            'email.unique' => 'Email sudah terdaftar.',
             'role.required' => 'Pilih opsi role yang tersedia!',
         ];
     }
