@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Http\Requests\PenyuluhTerdaftarRequest;
 use App\Services\KecamatanService;
 use App\Services\PenyuluhTerdaftarService;
-use Illuminate\Http\Request;
 
 class PenyuluhTerdaftarController extends Controller
 {
@@ -15,12 +14,19 @@ class PenyuluhTerdaftarController extends Controller
     {
         $this->penyuluhService = $penyuluhService;
     }
+
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        $penyuluhs = $this->penyuluhService->getAllWithKecamatan();
+        $data = $this->penyuluhService->getAll(true);
+        $penyuluhs = null;
+
+        if ($data['success']) {
+            $penyuluhs = $data['data'];
+        }
+
         return view('pages.penyuluh_terdaftar.index', compact('penyuluhs'));
     }
 
@@ -29,7 +35,11 @@ class PenyuluhTerdaftarController extends Controller
      */
     public function create(KecamatanService $kecamatanService)
     {
-        $kecamatans = $kecamatanService->getAll();
+        $data = $kecamatanService->getAll();
+        $kecamatans = null;
+        if ($data['success']) {
+            $kecamatans = $data['data'];
+        }
 
         return view('pages.penyuluh_terdaftar.create', compact('kecamatans'));
     }
@@ -41,11 +51,11 @@ class PenyuluhTerdaftarController extends Controller
     {
         $result = $this->penyuluhService->create($request->validated());
 
-        if ($result) {
+        if ($result['success']) {
             return redirect()->route('penyuluh-terdaftar.index')->with('success', 'Data berhasil disimpan');
         }
 
-        return redirect()->route('penyuluh-terdaftar.index')->with('failed', 'Data gagal disimpan');
+        return redirect()->route('penyuluh-terdaftar.index')->with('error', 'Data gagal disimpan');
     }
 
     /**
@@ -61,14 +71,15 @@ class PenyuluhTerdaftarController extends Controller
      */
     public function edit(string $id, KecamatanService $kecamatanService)
     {
-        $resultPenyuluh = $this->penyuluhService->getById($id);
+        $dataPenyuluh = $this->penyuluhService->getById($id);
+        $dataKecamatan = $kecamatanService->getAll();
         $penyuluh = null;
+        $kecamatans = null;
 
-        if ($resultPenyuluh['success']) {
-            $penyuluh = $resultPenyuluh['data'];
+        if ($dataPenyuluh['success'] && $dataKecamatan['data']) {
+            $penyuluh = $dataPenyuluh['data'];
+            $kecamatans = $dataKecamatan['data'];
         }
-
-        $kecamatans = $kecamatanService->getAll();
 
         return view('pages.penyuluh_terdaftar.update', compact('penyuluh', 'kecamatans'));
     }
@@ -84,7 +95,7 @@ class PenyuluhTerdaftarController extends Controller
             return redirect()->route('penyuluh-terdaftar.index')->with('success', 'Data berhasil diperbarui');
         }
 
-        return redirect()->route('penyuluh-terdaftar.index')->with('failed', 'Data gagal diperbarui');
+        return redirect()->route('penyuluh-terdaftar.index')->with('error', 'Data gagal diperbarui');
     }
 
     /**
@@ -92,21 +103,22 @@ class PenyuluhTerdaftarController extends Controller
      */
     public function destroy(string $id)
     {
-        $this->penyuluhService->delete($id);
+        $result = $this->penyuluhService->delete($id);
 
-        return redirect()->route('penyuluh-terdaftar.index')->with('success', 'Data berhasil dihapus');
+        if ($result['success']) {
+            return redirect()->route('penyuluh-terdaftar.index')->with('success', 'Data berhasil dihapus');
+        }
+        return redirect()->route('penyuluh-terdaftar.index')->with('error', 'Data gagal dihapus');
     }
 
     public function getByKecamatanId($id)
     {
-        $penyuluhs = $this->penyuluhService->getByKecamatanId($id);
+        $result = $this->penyuluhService->getByKecamatanId($id);
 
-        if ($penyuluhs->isNotEmpty()) {
-            return response()->json($penyuluhs);
+        if ($result['success']) {
+            return response()->json($result['data']);
         }
 
-        return response()->json([
-            "message" => "Penyuluh tidak tersedia",
-        ]);
+        return response()->json($result['message']);
     }
 }

@@ -17,34 +17,93 @@ class PenyuluhTerdaftarService
         $this->penyuluhTerdaftarCustomQuery = $penyuluhTerdaftarCustomQuery;
     }
 
-    public function getAll()
+    /**
+     * Mengambil seluruh data penyuluh terdaftar
+     *
+     * @param bool $withRelations Default false, set true untuk mengambil data beserta relasi
+     * @return array
+     */
+    public function getAll(bool $withRelations = false): array
     {
         try {
-            return $this->penyuluhRepository->getAll();
+            $penyuluhs = $this->penyuluhRepository->getAll($withRelations);
+
+            if ($penyuluhs->isNotEmpty()) {
+                return [
+                    'success' => true,
+                    'message' => 'Berhasil mengambil seluruh data penyuluh terdaftar',
+                    'data' => $penyuluhs,
+                ];
+            }
+
+            return [
+                'success' => false,
+                'message' => 'Gagal mengambil seluruh data penyuluh terdaftar',
+                'data' => [],
+            ];
         } catch (\Throwable $th) {
-            Log::error('Gagal mengambil seluruh data penyuluh terdaftar', [
+            Log::error('Gagal mengambil seluruh data penyuluh terdaftar.', [
                 'source' => __METHOD__,
                 'error' => $th->getMessage(),
                 'trace' => $th->getTraceAsString(),
             ]);
 
-            return null;
+            return [
+                'success' => false,
+                'message' => 'Gagal mengambil seluruh data penyuluh terdaftar',
+                'data' => [],
+            ];
         }
     }
 
-    public function getAllWithKecamatan()
+    /**
+     * Mengambil seluruh data penyuluh terdaftar beserta kecamatan
+     * @deprecated Ganti dengan getAll() dan set param true untuk mengambil data beserta relasi
+     * @return array
+     */
+    public function getAllWithKecamatan(): array
     {
         try {
-            return $this->penyuluhRepository->getAll(true);
+            $penyuluhs = $this->penyuluhRepository->getAll(true);
+
+            if ($penyuluhs->isNotEmpty()) {
+                return [
+                    'success' => true,
+                    'message' => 'Berhasil mengambil seluruh data penyuluh terdaftar beserta kecamatan',
+                    'data' => $penyuluhs,
+                ];
+            }
+
+            return [
+                'success' => false,
+                'message' => 'Gagal mengambil seluruh data penyuluh terdaftar beserta kecamatan',
+                'data' => [],
+            ];
         } catch (\Throwable $th) {
-            Log::error('Gagal mengambil seluruh data penyuluh terdaftar beserta kecamatan: ' . $th->getMessage());
+            Log::error('Gagal mengambil seluruh data penyuluh terdaftar beserta kecamatan.', [
+                'source' => __METHOD__,
+                'error' => $th->getMessage(),
+                'trace' => $th->getTraceAsString(),
+            ]);
+
+            return [
+                'success' => false,
+                'message' => 'Gagal mengambil seluruh data penyuluh terdaftar beserta kecamatan',
+                'data' => [],
+            ];
         }
     }
 
-    public function getById($id)
+    /**
+     * Mengambil data penyuluh terdaftar berdasarkan id
+     *
+     * @param string|int $id Id penyuluh terdaftar
+     * @return array
+     */
+    public function getById(string|int $id): array
     {
         try {
-            $penyuluh = $this->penyuluhRepository->find($id);
+            $penyuluh = $this->penyuluhRepository->getById($id);
 
             if (!empty($penyuluh)) {
                 return [
@@ -71,22 +130,60 @@ class PenyuluhTerdaftarService
 
             return [
                 'success' => false,
-                'message' => 'Gagal mengambil data penyuluh terdaftar',
+                'message' => 'Gagal mengambil data penyuluh terdaftar berdasarkan id',
                 'data' => [],
             ];
         }
     }
 
-    public function create(array $data)
+    /**
+     * Membuat data penyuluh terdaftar
+     *
+     * @param array $data
+     * @return array
+     */
+    public function create(array $data): array
     {
         try {
-            return $this->penyuluhRepository->create($data);
+            $peyuluh = $this->penyuluhRepository->create($data);
+
+            if (!empty($peyuluh)) {
+                return [
+                    'success' => true,
+                    'message' => 'Berhasil menyimpan data penyuluh terdaftar',
+                    'data' => $peyuluh
+                ];
+            }
+
+            return [
+                'success' => false,
+                'message' => 'Gagal menyimpan data penyuluh terdaftar',
+                'data' => [],
+            ];
         } catch (\Throwable $th) {
-            Log::error('Gagal menyimpan data penyuluh terdaftar: ' . $th->getMessage());
+            Log::error('Gagal menyimpan data penyuluh terdaftar', [
+                'source' => __METHOD__,
+                'error' => $th->getMessage(),
+                'trace' => $th->getTraceAsString(),
+                'data' => $data,
+            ]);
+
+            return [
+                'success' => false,
+                'message' => 'Gagal menyimpan data penyuluh terdaftar',
+                'data' => [],
+            ];
         }
     }
 
-    public function update($id, array $data)
+    /**
+     * Memperbarui data penyuluh terdaftar berdasarkan id
+     *
+     * @param string|int $id Id penyuluh terdaftar
+     * @param array $data Data penyuluh terdaftar yang baru
+     * @return array
+     */
+    public function update(string|int $id, array $data): array
     {
         try {
             $result = $this->penyuluhRepository->update($id, $data);
@@ -94,14 +191,14 @@ class PenyuluhTerdaftarService
             if ($result) {
                 return [
                     'success' => true,
-                    'message' => 'Data penyuluh berhasil diperbarui',
+                    'message' => 'Data penyuluh terdaftar berhasil diperbarui',
                     'data' => $data,
                 ];
             }
 
             return [
                 'success' => false,
-                'message' => 'Data penyuluh gagal diperbarui',
+                'message' => 'Data penyuluh terdaftar gagal diperbarui',
                 'data' => $data,
             ];
         } catch (\Throwable $th) {
@@ -117,27 +214,93 @@ class PenyuluhTerdaftarService
 
             return [
                 'success' => false,
-                'message' => 'Data penyuluh gagal diperbarui',
+                'message' => 'Data penyuluh terdaftar gagal diperbarui',
                 'data' => $data,
             ];
         }
     }
 
-    public function delete($id)
+    /**
+     * Menghapus data penyuluh terdaftar berdasarkan id
+     *
+     * @param string|int $id Id penyuluh terdaftar
+     * @return array
+     */
+    public function delete(string|int $id): array
     {
         try {
-            return $this->penyuluhRepository->delete($id);
+            $result = $this->penyuluhRepository->delete($id);
+
+            if ($result) {
+                return [
+                    'success' => true,
+                    'message' => 'Data penyuluh terdaftar berhasil dihapus',
+                    'data' => ['id' => $id],
+                ];
+            }
+
+            return [
+                'success' => false,
+                'message' => 'Data penyuluh terdaftar gagal dihapus',
+                'data' => ['id' => $id],
+            ];
         } catch (\Throwable $th) {
-            Log::error('Gagal menghapus data penyuluh terdaftar: ' . $th->getMessage());
+            Log::error('Gagal memperbarui data penyuluh terdaftar', [
+                'source' => __METHOD__,
+                'error' => $th->getMessage(),
+                'trace' => $th->getTraceAsString(),
+                'data' => [
+                    'id' => $id,
+                ],
+            ]);
+
+            return [
+                'success' => false,
+                'message' => 'Data penyuluh gagal diperbarui',
+                'data' => ['id' => $id],
+            ];
         }
     }
 
-    public function getByKecamatanId($id)
+    /**
+     * Mengambil data penyuluh terdaftar berdasarkan kecamatan id
+     *
+     * @param string|int $id Id kecamatan
+     * @return array
+     */
+    public function getByKecamatanId(string|int $id): array
     {
         try {
-            return $this->penyuluhTerdaftarCustomQuery->getByKecamatanId($id);
+            $penyuluhs = $this->penyuluhTerdaftarCustomQuery->getByKecamatanId($id);
+
+            if ($penyuluhs->isNotEmpty()) {
+                return [
+                    'success' => true,
+                    'message' => 'Data penyuluh terdaftar berdasarkan kecamatan id berhasil diambil',
+                    'data' => $penyuluhs,
+                ];
+            }
+
+            return [
+                'success' => false,
+                'message' => 'Data penyuluh terdaftar tidak ditemukan pada kecamatan id: ' . $id,
+                'data' => [],
+            ];
         } catch (\Throwable $th) {
-            Log::error('Gagal mengambil data penyuluh terdaftar berdasarkan id kecamatan: ' . $th->getMessage());
+            Log::error('Gagal mengambil data penyuluh terdaftar berdasarkan kecamatan id', [
+                'source' => __METHOD__,
+                'error' => $th->getMessage(),
+                'trace' => $th->getTraceAsString(),
+                'data' => [
+                    'kecamatan_id' => $id,
+                ],
+            ]);
+
+            return [
+                'success' => false,
+                'message' => 'Gagal mengambil data penyuluh terdaftar berdasarkan kecamatan id: ' . $id,
+                'data' => ['kecamatan_id' => $id],
+            ];
         }
     }
 
@@ -147,7 +310,7 @@ class PenyuluhTerdaftarService
      * @param string $phone No Hp penyuluh terdaftar di dinas
      * @return array
      */
-    public function getByPhone(string $phone)
+    public function getByPhone(string $phone): array
     {
         try {
             $penyuluh = $this->penyuluhTerdaftarCustomQuery->getByPhone($phone);
