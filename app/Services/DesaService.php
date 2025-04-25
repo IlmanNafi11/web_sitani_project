@@ -17,68 +17,271 @@ class DesaService
         $this->desaCustomQuery = $desaCustomQuery;
     }
 
-    public function getAll()
+    /**
+     * Mengambil seluruh data desa
+     *
+     * @param bool $withRelations Default false, set true untuk mengambil data beserta relasinya
+     * @return array
+     */
+    public function getAll(bool $withRelations = false): array
     {
         try {
-            return $this->desaRepository->getAll();
-        } catch (\Throwable $th) {
-            Log::error('Gagal mengambil seluruh data desa: ' . $th->getMessage());
+            $desas = $this->desaRepository->getAll($withRelations);
+
+            if ($desas->isNotEmpty()) {
+                return [
+                    'success' => true,
+                    'message' => 'Semua data desa berhasil diambil',
+                    'data' => $desas,
+                ];
+            }
+
+            return [
+                'success' => false,
+                'message' => 'Data desa tidak ditemukan',
+                'data' => [],
+            ];
+        } catch (\Throwable $e) {
+            Log::error('Gagal mengambil seluruh data desa.', [
+                'source' => __METHOD__,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+            return [
+                'success' => false,
+                'message' => 'Terjadi kesalahan saat mengambil data desa.',
+                'data' => [],
+            ];
         }
     }
 
-    public function getAllWithKecamatan()
+    /**
+     * Mengambil seluruh data desa beserta kecamatannya
+     *
+     * @deprecated Ganti dengan getAll() dan set param true.
+     * @return array
+     */
+    public function getAllWithKecamatan(): array
     {
         try {
-            $desas = $this->desaRepository->getAll();
+            $desa = $this->desaRepository->getAll(true);
 
-            return $desas->load('kecamatan');
-        } catch (\Throwable $th) {
-            Log::error('Gagal mengambil seluruh data desa dengan kecamatan: ' . $th->getMessage());
+            if ($desa->isNotEmpty()) {
+                return [
+                    'success' => true,
+                    'message' => 'Data desa dan kecamatan berhasil diambil',
+                    'data' => $desa,
+                ];
+            }
+
+            return [
+                'success' => false,
+                'message' => 'Data desa tidak ditemukan',
+                'data' => [],
+            ];
+        } catch (\Throwable $e) {
+            Log::error('Gagal mengambil data desa dengan kecamatan.', [
+                'source' => __METHOD__,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+            return [
+                'success' => false,
+                'message' => 'Terjadi kesalahan saat mengambil data desa dengan kecamatan.',
+                'data' => [],
+            ];
         }
     }
 
-    public function create(array $data)
+    /**
+     * Membuat data desa baru
+     *
+     * @param array $data Data desa baru
+     * @return array
+     */
+    public function create(array $data): array
     {
         try {
-            return $this->desaRepository->create($data);
-        } catch (\Throwable $th) {
-            Log::error('Gagal menyimpan data desa: ' . $th->getMessage());
+            $desa = $this->desaRepository->create($data);
+
+            if (!empty($desa)) {
+                return [
+                    'success' => true,
+                    'message' => 'Data desa berhasil disimpan',
+                    'data' => $desa,
+                ];
+            }
+
+            return [
+                'success' => false,
+                'message' => 'Data desa gagal disimpan',
+                'data' => [],
+            ];
+        } catch (\Throwable $e) {
+            Log::error('Gagal menyimpan data desa.', [
+                'source' => __METHOD__,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+            return [
+                'success' => false,
+                'message' => 'Terjadi kesalahan saat menyimpan data desa.',
+                'data' => [],
+            ];
         }
     }
 
-    public function getById($id)
+    /**
+     * Mengambil data desa berdasarkan id
+     *
+     * @param string|int $id Id desa
+     * @return array
+     */
+    public function getById(string|int $id): array
     {
         try {
-            return $this->desaRepository->find($id);
-        } catch (\Throwable $th) {
-            Log::error('Gagal mengambil data desa berdasarkan id: ' . $th->getMessage());
+            $desa = $this->desaRepository->getById($id);
+
+            if (!empty($desa)) {
+                return [
+                    'success' => true,
+                    'message' => 'Data desa berhasil diambil',
+                    'data' => $desa,
+                ];
+            }
+
+            return [
+                'success' => false,
+                'message' => 'Data desa tidak ditemukan',
+                'data' => [],
+            ];
+        } catch (\Throwable $e) {
+            Log::error('Gagal mengambil data desa berdasarkan id.', [
+                'source' => __METHOD__,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+            return [
+                'success' => false,
+                'message' => 'Terjadi kesalahan saat mengambil data desa.',
+                'data' => [],
+            ];
         }
     }
 
-    public function update($id, array $data)
+    /**
+     * Memperbarui data desa
+     *
+     * @param string|int $id Id desa
+     * @param array $data
+     * @return array
+     */
+    public function update(string|int $id, array $data): array
     {
         try {
-            return $this->desaRepository->update($id, $data);
-        } catch (\Throwable $th) {
-            Log::error('Gagal memperbarui data desa: ' . $th->getMessage());
+            $updated = $this->desaRepository->update($id, $data);
+
+            if ($updated) {
+                return [
+                    'success' => true,
+                    'message' => 'Data desa berhasil diperbarui',
+                    'data' => $data,
+                ];
+            }
+
+            return [
+                'success' => false,
+                'message' => 'Data desa gagal diperbarui',
+                'data' => [],
+            ];
+        } catch (\Throwable $e) {
+            Log::error('Gagal memperbarui data desa.', [
+                'source' => __METHOD__,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+            return [
+                'success' => false,
+                'message' => 'Terjadi kesalahan saat memperbarui data desa.',
+                'data' => [],
+            ];
         }
     }
 
-    public function delete($id)
+    /**
+     * Menghapus data desa
+     *
+     * @param string|int $id Id desa
+     * @return array
+     */
+    public function delete(string|int $id): array
     {
         try {
-            return $this->desaRepository->delete($id);
-        } catch (\Throwable $th) {
-            Log::error('Gagal menghapus data desa: ' . $th->getMessage());
+            $deleted = $this->desaRepository->delete($id);
+
+            if ($deleted) {
+                return [
+                    'success' => true,
+                    'message' => 'Data desa berhasil dihapus',
+                    'data' => ['id' => $id],
+                ];
+            }
+
+            return [
+                'success' => false,
+                'message' => 'Data desa gagal dihapus',
+                'data' => [],
+            ];
+        } catch (\Throwable $e) {
+            Log::error('Gagal menghapus data desa.', [
+                'source' => __METHOD__,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+            return [
+                'success' => false,
+                'message' => 'Terjadi kesalahan saat menghapus data desa.',
+                'data' => [],
+            ];
         }
     }
 
-    public function getByKecamatanId($id)
+    /**
+     * Mengambil data desa berdasarkan kecamatan id,
+     * Gunakan ketika butuh data seluruh data desa pada kecamatan tertentu
+     *
+     * @param string|int $id Id kecamatan
+     * @return array
+     */
+    public function getByKecamatanId(string|int $id): array
     {
         try {
-            return $this->desaCustomQuery->getByKecamatanId($id);
-        } catch (\Throwable $th) {
-            Log::error('Gagal mengambil data desa berdasarkan kecamatan id: ' . $th->getMessage());
+            $desas = $this->desaCustomQuery->getByKecamatanId($id);
+
+            if ($desas->isNotEmpty()) {
+                return [
+                    'success' => true,
+                    'message' => 'Data desa berdasarkan kecamatan berhasil diambil',
+                    'data' => $desas,
+                ];
+            }
+
+            return [
+                'success' => false,
+                'message' => 'Data desa untuk kecamatan ini tidak ditemukan',
+                'data' => [],
+            ];
+        } catch (\Throwable $e) {
+            Log::error('Gagal mengambil data desa berdasarkan kecamatan id.', [
+                'source' => __METHOD__,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+            return [
+                'success' => false,
+                'message' => 'Terjadi kesalahan saat mengambil data desa berdasarkan kecamatan.',
+                'data' => [],
+            ];
         }
     }
 }

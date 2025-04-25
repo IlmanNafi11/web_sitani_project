@@ -21,7 +21,13 @@ class DesaController extends Controller
      */
     public function index()
     {
-        $desas = $this->desaService->getAllWithKecamatan();
+        $data = $this->desaService->getAll(true);
+        $desas = null;
+
+        if ($data['success']) {
+            $desas = $data['data'];
+        }
+
         return view('pages.desa.index', compact('desas'));
     }
 
@@ -30,7 +36,13 @@ class DesaController extends Controller
      */
     public function create(KecamatanService $kecamatanService)
     {
-        $kecamatans = $kecamatanService->getAll();
+        $data = $kecamatanService->getAll();
+        $kecamatans = null;
+
+        if ($data['success']) {
+            $kecamatans = $data['data'];
+        }
+
         return view('pages.desa.create', compact('kecamatans'));
     }
 
@@ -41,11 +53,11 @@ class DesaController extends Controller
     {
         $result = $this->desaService->create($request->validated());
 
-        if ($result) {
+        if ($result['success']) {
             return redirect()->route('desa.index')->with('success', 'Data berhasil disimpan');
         }
 
-        return redirect()->route('desa.index')->with('failed', 'Data gagal disimpan');
+        return redirect()->route('desa.index')->with('error', 'Data gagal disimpan');
     }
 
     /**
@@ -61,8 +73,15 @@ class DesaController extends Controller
      */
     public function edit(string $id, KecamatanService $kecamatanService)
     {
-        $kecamatans = $kecamatanService->getAll();
-        $desa = $this->desaService->getById($id);
+        $kecamatans = null;
+        $desa = null;
+        $dataKecamatans = $kecamatanService->getAll();
+        $dataDesa = $this->desaService->getById($id);
+
+        if ($dataKecamatans['success'] && $dataDesa['success']) {
+            $kecamatans = $dataKecamatans['data'];
+            $desa = $dataDesa['data'];
+        }
         return view('pages.desa.update', compact('kecamatans', 'desa'));
     }
 
@@ -73,11 +92,11 @@ class DesaController extends Controller
     {
         $result = $this->desaService->update($id, $request->validated());
 
-        if ($result) {
+        if ($result['success']) {
             return redirect()->route('desa.index')->with('success', 'Data berhasil diperbarui');
         }
 
-        return redirect()->route('desa.index')->with('failed', 'Gagal memperbarui data desa');
+        return redirect()->route('desa.index')->with('error', 'Gagal memperbarui data desa');
     }
 
     /**
@@ -85,20 +104,20 @@ class DesaController extends Controller
      */
     public function destroy(string $id)
     {
-        $this->desaService->delete($id);
-
-        return redirect()->route('desa.index')->with('success', 'Data berhasil dihapus');
+        $result = $this->desaService->delete($id);
+        if ($result['success']) {
+            return redirect()->route('desa.index')->with('success', 'Data berhasil dihapus');
+        }
+        return redirect()->route('desa.index')->with('error', 'Data gagal dihapus');
     }
 
     public function getByKecamatanId($id)
     {
         $desas = $this->desaService->getByKecamatanId($id);
-        if ($desas->isNotEmpty()) {
-            return response()->json($desas);
+        if ($desas['success']) {
+            return response()->json($desas['data'], 200);
         }
 
-        return response()->json([
-            "message" => "Data desa kosong",
-        ]);
+        return response()->json($desas['message']);
     }
 }
