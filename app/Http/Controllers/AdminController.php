@@ -5,8 +5,6 @@ namespace App\Http\Controllers;
 use App\Http\Requests\AdminRequest;
 use App\Services\AdminService;
 use App\Services\RoleService;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
 
 class AdminController extends Controller
 {
@@ -22,7 +20,12 @@ class AdminController extends Controller
      */
     public function index()
     {
-        $admins = $this->service->getAll();
+        $data = $this->service->getAll();
+        $admins = null;
+        if ($data['success']) {
+            $admins = $data['data'];
+        }
+
         return view('pages.admin.index', compact('admins'));
     }
 
@@ -31,7 +34,12 @@ class AdminController extends Controller
      */
     public function create(RoleService $roleService)
     {
-        $roles = $roleService->getAll();
+        $data = $roleService->getAll();
+        $roles = null;
+        if ($data['success']) {
+            $roles = $data['data'];
+        }
+
         return view('pages.admin.create', compact('roles'));
     }
 
@@ -42,7 +50,7 @@ class AdminController extends Controller
     {
         $result = $this->service->create($request->validated());
 
-        if ($result) {
+        if ($result['success']) {
             return redirect()->route('admin.index')->with('success', 'Data berhasil disimpan');
         }
         return redirect()->route('admin.index')->with('error', 'Data gagal disimpan');
@@ -61,17 +69,17 @@ class AdminController extends Controller
      */
     public function edit($id, RoleService $roleService)
     {
-        try {
-            $admin = $this->service->getById($id);
-            if (!$admin) {
-                return redirect()->route('admin.index')->withErrors(['error' =>'Data admin tidak ditemukan.']);
-            }
-            $roles = $roleService->getAll();
-            return view('pages.admin.update', compact('admin', 'roles'));
-        } catch (\Throwable $e) {
-            Log::error('Gagal memuat halaman edit admin', ['id' => $id, 'error' => $e->getMessage()]);
-            return redirect()->route('admin.index')->withErrors(['error' =>'Gagal memuat data admin.']);
+        $dataAdmin = $this->service->getById($id);
+        $dataRole = $roleService->getAll();
+        $admin = null;
+        $roles = null;
+
+        if ($dataAdmin['success'] && $dataRole['data']) {
+            $admin = $dataAdmin['data'];
+            $roles = $dataRole['data'];
         }
+
+        return view('pages.admin.update', compact('admin', 'roles'));
     }
 
     /**
@@ -80,21 +88,12 @@ class AdminController extends Controller
     public function update(AdminRequest $request, $id)
     {
         $validated = $request->validated();
-        try {
-            $result = $this->service->update($id, $validated);
+        $result = $this->service->update($id, $validated);
 
-            if ($result) {
-                return redirect()->route('admin.index')->with('success', 'Data admin berhasil diperbarui');
-            }
-
-            return back()->withErrors(['error' => 'Gagal memperbarui data admin.'])->withInput();
-
-        } catch (\Throwable $e) {
-            Log::error('Gagal update data admin', [
-                'id' => $id, 'error' => $e->getMessage(), 'trace' => $e->getTraceAsString()
-            ]);
-            return back()->withErrors(['error' => 'Terjadi kesalahan saat memperbarui data admin.'])->withInput();
+        if ($result['success']) {
+            return redirect()->route('admin.index')->with('success', 'Data admin berhasil diperbarui');
         }
+        return back()->withErrors(['error' => 'Gagal memperbarui data admin.'])->withInput();
     }
 
     /**
@@ -102,19 +101,10 @@ class AdminController extends Controller
      */
     public function destroy(string $id)
     {
-        try {
-            $success = $this->service->delete($id);
-            if ($success) {
-                return redirect()->route('admin.index')->with('success', 'Data berhasil dihapus');
-            }
-            return redirect()->route('admin.index')->with('error', 'Data gagal dihapus');
-        } catch (\Throwable $e) {
-            Log::error('Gagal hapus data admin', [
-                'id' => $id,
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
-            ]);
-            return redirect()->route('admin.index')->with('error', 'Terjadi kesalahan saat menghapus data admin.');
+        $result = $this->service->delete($id);
+        if ($result['success']) {
+            return redirect()->route('admin.index')->with('success', 'Data berhasil dihapus');
         }
+        return redirect()->route('admin.index')->with('error', 'Data gagal dihapus');
     }
 }
