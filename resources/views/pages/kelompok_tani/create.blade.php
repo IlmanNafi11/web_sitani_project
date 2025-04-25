@@ -19,7 +19,7 @@
             </div>
             <div class="flex gap-2.5">
                 <x-ui.button.back-button :style="'btn-soft'" :title="'Kembali'" />
-                <x-ui.button-save formId="form-tambah-kelompok-tani" />
+                <x-ui.button.save-button formId="form-tambah-kelompok-tani" :style="'btn-soft'" />
             </div>
         </form>
     </x-ui.card>
