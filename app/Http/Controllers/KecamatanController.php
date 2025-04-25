@@ -14,12 +14,19 @@ class KecamatanController extends Controller
     {
         $this->kecamatanService = $kecamatanService;
     }
+
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        $kecamatans = $this->kecamatanService->getAll();
+        $data = $this->kecamatanService->getAll();
+        $kecamatans = null;
+
+        if ($data['success']) {
+            $kecamatans = $data['data'];
+        }
+
         return view('pages.kecamatan.index', compact('kecamatans'));
     }
 
@@ -37,11 +44,11 @@ class KecamatanController extends Controller
     public function store(KecamatanRequest $request)
     {
         $result = $this->kecamatanService->create($request->validated());
-        if ($result) {
+        if ($result['success']) {
             return redirect()->route('kecamatan.index')->with('success', 'Data Berhasil disimpan');
         }
 
-        return redirect()->route('kecamatan.create')->with('failed', 'Data Gagal disimpan');
+        return redirect()->route('kecamatan.create')->with('error', 'Data Gagal disimpan');
     }
 
     /**
@@ -57,7 +64,12 @@ class KecamatanController extends Controller
      */
     public function edit(string $id)
     {
-        $kecamatan = $this->kecamatanService->findById($id);
+        $data = $this->kecamatanService->getById($id);
+        $kecamatan = null;
+
+        if ($data['success']) {
+            $kecamatan = $data['data'];
+        }
         return view('pages.kecamatan.update', compact('kecamatan'));
     }
 
@@ -68,11 +80,11 @@ class KecamatanController extends Controller
     {
         $result = $this->kecamatanService->update($id, $request->validated());
 
-        if ($result) {
+        if ($result['success']) {
             return redirect()->route('kecamatan.index')->with('success', 'Data berhasil diperbarui');
         }
 
-        return redirect()->route('kecamatan.index')->with('failed','Data gagal diperbarui');
+        return redirect()->route('kecamatan.index')->with('error', 'Data gagal diperbarui');
     }
 
     /**
@@ -80,7 +92,10 @@ class KecamatanController extends Controller
      */
     public function destroy(string $id)
     {
-        $this->kecamatanService->delete($id);
-        return redirect()->route('kecamatan.index')->with('success', 'Data berhasil dihapus!');
+        $result = $this->kecamatanService->delete($id);
+        if ($result['success']) {
+            return redirect()->route('kecamatan.index')->with('success', 'Data berhasil dihapus');
+        }
+        return redirect()->route('kecamatan.index')->with('error', 'Data gagal dihapus');
     }
 }

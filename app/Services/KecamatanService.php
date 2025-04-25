@@ -1,10 +1,12 @@
 <?php
+
 namespace App\Services;
 
 use App\Repositories\Interfaces\CrudInterface;
 use Illuminate\Support\Facades\Log;
 
-class KecamatanService {
+class KecamatanService
+{
     protected CrudInterface $kecamatanRepository;
 
     public function __construct(CrudInterface $kecamatanRepository)
@@ -12,49 +14,203 @@ class KecamatanService {
         $this->kecamatanRepository = $kecamatanRepository;
     }
 
-    public function getAll()
+    /**
+     * Mengambil seluruh data kecamatan
+     *
+     * @return array
+     */
+    public function getAll(): array
     {
         try {
-            return $this->kecamatanRepository->getAll();
-        } catch (\Throwable $th) {
-            Log::error('Gagal mengambil seluruh data kecamatan: ' . $th->getMessage());
+            $kecamatans = $this->kecamatanRepository->getAll();
+
+            if ($kecamatans->isNotEmpty()) {
+                return [
+                    'success' => true,
+                    'message' => 'Data kecamatan berhasil diambil.',
+                    'data' => $kecamatans,
+                ];
+            }
+
+            return [
+                'success' => false,
+                'message' => 'Tidak ada data kecamatan yang ditemukan.',
+                'data' => [],
+            ];
+        } catch (\Throwable $e) {
+            Log::error('Gagal mengambil seluruh data kecamatan.', [
+                'source' => __METHOD__,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            return [
+                'success' => false,
+                'message' => 'Terjadi kesalahan saat mengambil data kecamatan.',
+                'data' => [],
+            ];
         }
     }
 
-    public function findById($id)
+    /**
+     * Mengambil data kecamatan berdasarkan ID
+     *
+     * @param string|int $id
+     * @return array
+     */
+    public function getById(string|int $id): array
     {
         try {
-            return $this->kecamatanRepository->find($id);
-        } catch (\Throwable $th) {
-            Log::error('Gagal dalam mencari data kecamatan: ' . $th->getMessage());
+            $kecamatan = $this->kecamatanRepository->getById($id);
+
+            if (!empty($kecamatan)) {
+                return [
+                    'success' => true,
+                    'message' => 'Data kecamatan berhasil ditemukan.',
+                    'data' => $kecamatan,
+                ];
+            }
+
+            return [
+                'success' => false,
+                'message' => 'Data kecamatan tidak ditemukan.',
+                'data' => [],
+            ];
+        } catch (\Throwable $e) {
+            Log::error('Gagal mengambil data kecamatan berdasarkan ID.', [
+                'source' => __METHOD__,
+                'id' => $id,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            return [
+                'success' => false,
+                'message' => 'Terjadi kesalahan saat mengambil data kecamatan.',
+                'data' => [],
+            ];
         }
     }
 
-    public function create(array $data)
+    /**
+     * Menyimpan data kecamatan baru
+     *
+     * @param array $data
+     * @return array
+     */
+    public function create(array $data): array
     {
         try {
-            return $this->kecamatanRepository->create($data);
-        } catch (\Throwable $th) {
-            Log::error('Gagal Menyimpan kecamatan: ' . $th->getMessage());
-        }
+            $kecamatan = $this->kecamatanRepository->create($data);
 
+            if (!empty($kecamatan)) {
+                return [
+                    'success' => true,
+                    'message' => 'Data kecamatan berhasil disimpan.',
+                    'data' => $kecamatan,
+                ];
+            }
+
+            return [
+                'success' => false,
+                'message' => 'Data kecamatan gagal disimpan.',
+                'data' => [],
+            ];
+        } catch (\Throwable $e) {
+            Log::error('Gagal menyimpan data kecamatan.', [
+                'source' => __METHOD__,
+                'data' => $data,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            return [
+                'success' => false,
+                'message' => 'Terjadi kesalahan saat menyimpan data kecamatan.',
+                'data' => [],
+            ];
+        }
     }
 
-    public function update($id, $data)
+    /**
+     * Memperbarui data kecamatan berdasarkan ID
+     *
+     * @param string|int $id
+     * @param array $data
+     * @return array
+     */
+    public function update(string|int $id, array $data): array
     {
         try {
-            return $this->kecamatanRepository->update($id, $data);
-        } catch (\Throwable $th) {
-            Log::error('Gagal memperbarui kecamatan' . $th->getMessage());
+            $result = $this->kecamatanRepository->update($id, $data);
+
+            if ($result) {
+                return [
+                    'success' => true,
+                    'message' => 'Data kecamatan berhasil diperbarui.',
+                    'data' => $data,
+                ];
+            }
+
+            return [
+                'success' => false,
+                'message' => 'Data kecamatan gagal diperbarui.',
+                'data' => [],
+            ];
+        } catch (\Throwable $e) {
+            Log::error('Gagal memperbarui data kecamatan.', [
+                'source' => __METHOD__,
+                'id' => $id,
+                'data' => $data,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            return [
+                'success' => false,
+                'message' => 'Terjadi kesalahan saat memperbarui data kecamatan.',
+                'data' => [],
+            ];
         }
     }
 
-    public function delete($id)
+    /**
+     * Menghapus data kecamatan berdasarkan ID
+     *
+     * @param string|int $id
+     * @return array
+     */
+    public function delete(string|int $id): array
     {
         try {
-            return $this->kecamatanRepository->delete($id);
-        } catch (\Throwable $th) {
-            Log::error('Gagal menghapus kecamatan: ' . $th->getMessage());
+            $result = $this->kecamatanRepository->delete($id);
+
+            if ($result) {
+                return [
+                    'success' => true,
+                    'message' => 'Data kecamatan berhasil dihapus.',
+                    'data' => ['id' => $id],
+                ];
+            }
+
+            return [
+                'success' => false,
+                'message' => 'Data kecamatan gagal dihapus.',
+                'data' => [],
+            ];
+        } catch (\Throwable $e) {
+            Log::error('Gagal menghapus data kecamatan.', [
+                'source' => __METHOD__,
+                'id' => $id,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            return [
+                'success' => false,
+                'message' => 'Terjadi kesalahan saat menghapus data kecamatan.',
+                'data' => [],
+            ];
         }
     }
 }
