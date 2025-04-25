@@ -21,7 +21,11 @@ class KomoditasController extends Controller
      */
     public function index()
     {
-        $datas = $this->komoditasService->getAll();
+        $data = $this->komoditasService->getAll();
+        $datas = null;
+        if ($data['success']) {
+            $datas = $data['data'];
+        }
 
         return view('pages.komoditas.index', compact('datas'));
     }
@@ -41,11 +45,11 @@ class KomoditasController extends Controller
     {
         $result = $this->komoditasService->create($request->validated());
 
-        if ($result) {
+        if ($result['success']) {
             return redirect()->route('komoditas.index')->with('success', 'Data berhasil disimpan');
         }
 
-        return redirect()->route('komoditas.index')->with('failed', 'Data gagal disimpan');
+        return redirect()->route('komoditas.index')->with('error', 'Data gagal disimpan');
     }
 
     /**
@@ -61,7 +65,11 @@ class KomoditasController extends Controller
      */
     public function edit(string $id)
     {
-        $komoditas = $this->komoditasService->getById($id);
+        $data = $this->komoditasService->getById($id);
+        $komoditas = null;
+        if ($data['success']) {
+            $komoditas = $data['data'];
+        }
 
         return view('pages.komoditas.update', compact('komoditas'));
     }
@@ -73,11 +81,11 @@ class KomoditasController extends Controller
     {
         $result = $this->komoditasService->update($id, $request->validated());
 
-        if ($result) {
+        if ($result['success']) {
             return redirect()->route('komoditas.index')->with('success', 'Data berhasil diperbarui');
         }
 
-        return redirect()->route('komoditas.index')->with('failed', 'Data gagal diperbarui');
+        return redirect()->route('komoditas.index')->with('error', 'Data gagal diperbarui');
     }
 
     /**
@@ -85,18 +93,10 @@ class KomoditasController extends Controller
      */
     public function destroy(string $id)
     {
-        $this->komoditasService->delete($id);
-
-        return redirect()->route('komoditas.index')->with('success', 'Data berhasil dihapus');
-    }
-
-    public function getAll()
-    {
-
-    }
-
-    public function getById($id)
-    {
-
+        $result = $this->komoditasService->delete($id);
+        if ($result['success']) {
+            return redirect()->route('komoditas.index')->with('success', 'Data berhasil dihapus');
+        }
+        return redirect()->route('komoditas.index')->with('error', 'Data Gagal dihapus');
     }
 }

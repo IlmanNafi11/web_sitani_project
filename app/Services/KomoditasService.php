@@ -1,10 +1,12 @@
 <?php
+
 namespace App\Services;
 
 use App\Repositories\Interfaces\CrudInterface;
 use Illuminate\Support\Facades\Log;
 
-class KomoditasService {
+class KomoditasService
+{
 
     protected CrudInterface $komoditasRepository;
 
@@ -13,48 +15,198 @@ class KomoditasService {
         $this->komoditasRepository = $komoditasRepository;
     }
 
-    public function getAll()
+    /**
+     * Mengambil semua data komoditas
+     *
+     * @return array
+     */
+    public function getAll(): array
     {
         try {
-            return $this->komoditasRepository->getAll();
-        } catch (\Throwable $th) {
-            Log::error('Gagal mengambil seluruh data komoditas: ' . $th->getMessage());
+            $komoditas = $this->komoditasRepository->getAll();
+
+            if ($komoditas->isNotEmpty()) {
+                return [
+                    'success' => true,
+                    'message' => 'Semua data komoditas berhasil diambil',
+                    'data' => $komoditas
+                ];
+            }
+
+            return [
+                'success' => false,
+                'message' => 'Data komoditas tidak ditemukan',
+                'data' => []
+            ];
+        } catch (\Throwable $e) {
+            Log::error('Terjadi kesalahan saat mengambil data komoditas.', [
+                'source' => __METHOD__,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            return [
+                'success' => false,
+                'message' => 'Gagal mengambil data komoditas.',
+                'data' => []
+            ];
         }
     }
 
-    public function create(array $data)
+    /**
+     * Mengambil data komoditas berdasarkan ID
+     *
+     * @param string|int $id Id komoditas
+     * @return array
+     */
+    public function getById(string|int $id): array
     {
         try {
-            return $this->komoditasRepository->create($data);
-        } catch (\Throwable $th) {
-            Log::error('Gagal menyimpan data komoditas: ' . $th->getMessage());
+            $komoditas = $this->komoditasRepository->getById($id);
+
+            if (!empty($komoditas)) {
+                return [
+                    'success' => true,
+                    'message' => 'Data komoditas berhasil diambil',
+                    'data' => $komoditas
+                ];
+            }
+
+            return [
+                'success' => false,
+                'message' => 'Data komoditas tidak ditemukan',
+                'data' => []
+            ];
+        } catch (\Throwable $e) {
+            Log::error('Terjadi kesalahan saat mengambil data komoditas berdasarkan ID.', [
+                'source' => __METHOD__,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            return [
+                'success' => false,
+                'message' => 'Gagal mengambil data komoditas.',
+                'data' => []
+            ];
         }
     }
 
-    public function getById($id)
+    /**
+     * Membuat data komoditas
+     *
+     * @param array $data Data komoditas
+     * @return array
+     */
+    public function create(array $data): array
     {
         try {
-            return $this->komoditasRepository->find($id);
-        } catch (\Throwable $th) {
-            Log::error('Gagal mengambil data komoditas berdasarkan id: ' . $th->getMessage());
+            $komoditas = $this->komoditasRepository->create($data);
+
+            if (!empty($komoditas)) {
+                return [
+                    'success' => true,
+                    'message' => 'Data komoditas berhasil disimpan',
+                    'data' => $komoditas
+                ];
+            }
+
+            return [
+                'success' => false,
+                'message' => 'Data komoditas gagal disimpan',
+                'data' => []
+            ];
+        } catch (\Throwable $e) {
+            Log::error('Terjadi kesalahan saat menyimpan data komoditas.', [
+                'source' => __METHOD__,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            return [
+                'success' => false,
+                'message' => 'Gagal menyimpan data komoditas.',
+                'data' => []
+            ];
         }
     }
 
-    public function update($id, array $data)
+    /**
+     * Memperbarui data komoditas
+     *
+     * @param string|int $id Id komoditas
+     * @param array $data Data komoditas baru
+     * @return array
+     */
+    public function update(string|int $id, array $data): array
     {
         try {
-            return $this->komoditasRepository->update($id, $data);
-        } catch (\Throwable $th) {
-            Log::error('Gagal memperbarui data komoditas: ' . $th->getMessage());
+            $result = $this->komoditasRepository->update($id, $data);
+
+            if ($result) {
+                return [
+                    'success' => true,
+                    'message' => 'Data komoditas berhasil diperbarui',
+                    'data' => $data
+                ];
+            }
+
+            return [
+                'success' => false,
+                'message' => 'Data komoditas gagal diperbarui',
+                'data' => []
+            ];
+        } catch (\Throwable $e) {
+            Log::error('Terjadi kesalahan saat memperbarui data komoditas.', [
+                'source' => __METHOD__,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            return [
+                'success' => false,
+                'message' => 'Gagal memperbarui data komoditas.',
+                'data' => []
+            ];
         }
     }
 
-    public function delete($id)
+    /**
+     * Menghapus data komoditas
+     *
+     * @param string|int $id Id komoditas
+     * @return array
+     */
+    public function delete(string|int $id): array
     {
         try {
-            return $this->komoditasRepository->delete($id);
-        } catch (\Throwable $th) {
-            Log::error('Gagal menghapus data komoditas: ' . $th->getMessage());
+            $result = $this->komoditasRepository->delete($id);
+
+            if ($result) {
+                return [
+                    'success' => true,
+                    'message' => 'Data komoditas berhasil dihapus',
+                    'data' => ['id' => $id]
+                ];
+            }
+
+            return [
+                'success' => false,
+                'message' => 'Data komoditas gagal dihapus',
+                'data' => []
+            ];
+        } catch (\Throwable $e) {
+            Log::error('Terjadi kesalahan saat menghapus data komoditas.', [
+                'source' => __METHOD__,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            return [
+                'success' => false,
+                'message' => 'Gagal menghapus data komoditas.',
+                'data' => []
+            ];
         }
     }
 }
