@@ -66,7 +66,7 @@ class PenyuluhService
     public function find(string|int $id): array
     {
         try {
-            $penyuluh = $this->repository->find($id);
+            $penyuluh = $this->repository->getById($id);
 
             if (!empty($penyuluh)) {
                 return [
@@ -111,6 +111,7 @@ class PenyuluhService
             $penyuluh = $this->repository->create($data);
 
             if (!empty($penyuluh)) {
+                $penyuluh->makeHidden(['created_at', 'updated_at', 'user_id', 'penyuluh_terdaftar_id']);
                 return [
                     'success' => true,
                     'message' => 'Data penyuluh berhasil disimpan',
