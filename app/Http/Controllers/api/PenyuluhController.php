@@ -4,6 +4,7 @@ namespace App\Http\Controllers\api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\UpdatePenyuluhTerdaftarApiRequest;
+use App\Http\Resources\PenyuluhTerdaftarResource;
 use App\Services\PenyuluhService;
 use App\Services\PenyuluhTerdaftarService;
 use App\Trait\ApiResponse;
@@ -39,7 +40,7 @@ class PenyuluhController extends Controller
 
         if ($result['success']) {
             $data = $this->penyuluhTerdaftarService->getById($validated['id']);
-            return $this->successResponse($data['data'], 'Data penyuluh berhasil diperbarui');
+            return $this->successResponse(new PenyuluhTerdaftarResource($data['data']), 'Data penyuluh berhasil diperbarui');
         }
 
         return $this->errorResponse('Data penyuluh gagal diperbarui', 500);
