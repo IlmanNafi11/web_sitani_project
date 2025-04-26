@@ -67,7 +67,7 @@ class KomoditasService
             if (!empty($komoditas)) {
                 return [
                     'success' => true,
-                    'message' => 'Data komoditas berhasil diambil',
+                    'message' => 'Data komoditas ditemukan',
                     'data' => $komoditas
                 ];
             }

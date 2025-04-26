@@ -19,7 +19,12 @@ class LaporanBibitController extends Controller
      */
     public function index()
     {
-        $laporans = $this->laporanService->getAll();
+        $laporans = null;
+        $data = $this->laporanService->getAll(true);
+
+        if ($data['success']) {
+            $laporans = $data['data'];
+        }
         return view('pages.laporan_bibit.index', compact('laporans'));
     }
 
@@ -36,20 +41,16 @@ class LaporanBibitController extends Controller
      */
     public function store(LaporanBibitRequest $request)
     {
-        $validated = $request->validated();
+        $result = $this->laporanService->create($request->validated());
 
-        $laporan = $this->laporanService->create($validated);
-
-        if ($laporan) {
+        if ($result['success']) {
             return response()->json([
                 'message' => 'Report sent successfully',
-                'data' => $laporan,
+                'data' => $result['data'],
             ], 201);
         }
 
-        return response()->json([
-            'message' => 'Laporan gagal disimpan'
-        ], 400);
+        return response()->json($result, 400);
     }
 
     /**
@@ -65,26 +66,27 @@ class LaporanBibitController extends Controller
      */
     public function edit(string $id)
     {
-        $laporan = $this->laporanService->getById($id);
+        $laporan = null;
+        $data = $this->laporanService->getById($id);
+        if ($data['success']) {
+            $laporan = $data['data'];
+        }
+
         return view('pages.laporan_bibit.verifikasi-bibit', compact('laporan'));
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(LaporanBibitRequest $request, string $id)
     {
-        $request->validate([
-            'status' => 'required'
-        ], ['status.required' => 'Silahkan pilih opsi kualitas bibit yang tersedia']);
-        // dd($request->status);
-        $result = $this->laporanService->update($id, ['status' => $request->status]);
+        $validated = $request->validated();
+        $result = $this->laporanService->update($id, ['status' => $validated['status']]);
 
-        if ($result) {
+        if ($result['success']) {
             return redirect()->route('laporan-bibit.index')->with('success', 'Laporan berhasil diverifikasi');
         }
-
-        return redirect()->route('laporan-bibit.index')->with('failed', 'Laporan gagal diverifikasi');
+        return redirect()->route('laporan-bibit.index')->with('error', 'Laporan gagal diverifikasi');
     }
 
     /**
@@ -92,8 +94,10 @@ class LaporanBibitController extends Controller
      */
     public function destroy(string $id)
     {
-        $this->laporanService->delete($id);
-
-        return redirect()->route('laporan-bibit.index')->with('success', 'Data berhasil dihapus');
+        $result = $this->laporanService->delete($id);
+        if ($result['success']) {
+            return redirect()->route('laporan-bibit.index')->with('success', 'Laporan berhasil dihapus');
+        }
+        return redirect()->route('laporan-bibit.index')->with('error', 'Laporan gagal dihapus');
     }
 }
