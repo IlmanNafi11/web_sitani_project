@@ -4,6 +4,7 @@ namespace App\Repositories;
 
 use App\Models\KelompokTani;
 use App\Repositories\Interfaces\CrudInterface;
+use App\Repositories\Interfaces\KelompokTaniCustomQueryInterface;
 use App\Repositories\Interfaces\ManyRelationshipManagement;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
@@ -11,7 +12,7 @@ use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Log;
 use Throwable;
 
-class KelompokTaniRepository implements CrudInterface, ManyRelationshipManagement
+class KelompokTaniRepository implements CrudInterface, ManyRelationshipManagement, KelompokTaniCustomQueryInterface
 {
     public function getAll(bool $withRelations = false): Collection|array
     {
@@ -107,7 +108,7 @@ class KelompokTaniRepository implements CrudInterface, ManyRelationshipManagemen
         try {
             return KelompokTani::select(['id', 'nama', 'desa_id', 'kecamatan_id'])->where('id', $id)->with([
                 'penyuluhTerdaftars' => function ($q) {
-                    $q->select('penyuluh_terdaftars.id', 'nama');
+                    $q->select('penyuluh_terdaftars.id', 'nama', 'no_hp', 'alamat');
                 },
                 'kecamatan' => function ($q) {
                     $q->select('id', 'nama');
@@ -257,6 +258,41 @@ class KelompokTaniRepository implements CrudInterface, ManyRelationshipManagemen
                 ],
             ]);
             return null;
+        }
+    }
+
+    public function getByPenyuluhId(array $id): Collection|array
+    {
+        try {
+            return KelompokTani::whereHas('penyuluhTerdaftars', function ($query) use ($id) {
+                $query->whereIn('penyuluh_terdaftar_id', $id);
+            })
+                ->with([
+                    'desa:id,nama,kecamatan_id',
+                    'desa.kecamatan:id,nama',
+                    'penyuluhTerdaftars:id,nama,no_hp,alamat',
+                ])
+                ->get();
+        } catch (QueryException $e) {
+            Log::error('Gagal mengambil data kelompok tani', [
+                'source' => __METHOD__,
+                'error' => $e->getMessage(),
+                'sql' => $e->getSql(),
+                'data' => [
+                    'id' => $id,
+                ],
+            ]);
+            return Collection::make();
+        } catch (Throwable $e) {
+            Log::error('Gagal mengambil data kelompok tani', [
+                'source' => __METHOD__,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'data' => [
+                    'id' => $id,
+                ],
+            ]);
+            return Collection::make();
         }
     }
 }
