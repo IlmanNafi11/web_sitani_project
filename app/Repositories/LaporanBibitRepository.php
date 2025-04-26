@@ -4,13 +4,14 @@ namespace App\Repositories;
 
 use App\Models\LaporanKondisi;
 use App\Repositories\Interfaces\CrudInterface;
+use App\Repositories\Interfaces\LaporanCustomQueryInterface;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Log;
 use Throwable;
 
-class LaporanBibitRepository implements CrudInterface
+class LaporanBibitRepository implements CrudInterface, LaporanCustomQueryInterface
 {
     public function getAll(bool $withRelations = false): Collection|array
     {
@@ -37,15 +38,15 @@ class LaporanBibitRepository implements CrudInterface
         } catch (QueryException $e) {
             Log::error('Failed to get all laporan kondisi bibit: ' . $e->getMessage(), [
                 'source' => __METHOD__,
-                'error'  => $e->getMessage(),
-                'sql'    => $e->getSQL(),
+                'error' => $e->getMessage(),
+                'sql' => $e->getSql(),
             ]);
             return Collection::make();
         } catch (Throwable $e) {
             Log::error('Failed to get all laporan kondisi bibit: ' . $e->getMessage(), [
                 'source' => __METHOD__,
-                'error'  => $e->getMessage(),
-                'trace'  => $e->getTraceAsString(),
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
             ]);
             return Collection::make();
         }
@@ -85,17 +86,17 @@ class LaporanBibitRepository implements CrudInterface
         } catch (QueryException $e) {
             Log::error('Gagal mengambil laporan bibit berdasarkan id', [
                 'source' => __METHOD__,
-                'error'  => $e->getMessage(),
-                'sql'    => $e->getSQL(),
-                'data'   => ['id' => $id],
+                'error' => $e->getMessage(),
+                'sql' => $e->getSql(),
+                'data' => ['id' => $id],
             ]);
             return null;
         } catch (Throwable $e) {
             Log::error('Gagal mengambil laporan bibit berdasarkan id', [
                 'source' => __METHOD__,
-                'error'  => $e->getMessage(),
-                'trace'  => $e->getTraceAsString(),
-                'data'   => ['id' => $id],
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'data' => ['id' => $id],
             ]);
             return null;
         }
@@ -108,17 +109,17 @@ class LaporanBibitRepository implements CrudInterface
         } catch (QueryException $e) {
             Log::error('Gagal menyimpan laporan bibit baru', [
                 'source' => __METHOD__,
-                'error'  => $e->getMessage(),
-                'sql'    => $e->getSQL(),
-                'data'   => $data,
+                'error' => $e->getMessage(),
+                'sql' => $e->getSql(),
+                'data' => $data,
             ]);
             return null;
         } catch (Throwable $e) {
             Log::error('Gagal menyimpan laporan bibit baru', [
                 'source' => __METHOD__,
-                'error'  => $e->getMessage(),
-                'trace'  => $e->getTraceAsString(),
-                'data'   => $data,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'data' => $data,
             ]);
             return null;
         }
@@ -133,10 +134,10 @@ class LaporanBibitRepository implements CrudInterface
         } catch (QueryException $e) {
             Log::error('Gagal memperbarui laporan bibit', [
                 'source' => __METHOD__,
-                'error'  => $e->getMessage(),
-                'sql'    => $e->getSQL(),
-                'data'   => [
-                    'id'   => $id,
+                'error' => $e->getMessage(),
+                'sql' => $e->getSql(),
+                'data' => [
+                    'id' => $id,
                     'data' => $data,
                 ],
             ]);
@@ -144,10 +145,10 @@ class LaporanBibitRepository implements CrudInterface
         } catch (Throwable $e) {
             Log::error('Gagal memperbarui laporan bibit', [
                 'source' => __METHOD__,
-                'error'  => $e->getMessage(),
-                'trace'  => $e->getTraceAsString(),
-                'data'   => [
-                    'id'   => $id,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'data' => [
+                    'id' => $id,
                     'data' => $data,
                 ],
             ]);
@@ -164,19 +165,50 @@ class LaporanBibitRepository implements CrudInterface
         } catch (QueryException $e) {
             Log::error('Gagal menghapus laporan bibit', [
                 'source' => __METHOD__,
-                'error'  => $e->getMessage(),
-                'sql'    => $e->getSQL(),
-                'data'   => ['id' => $id],
+                'error' => $e->getMessage(),
+                'sql' => $e->getSql(),
+                'data' => ['id' => $id],
             ]);
             return false;
         } catch (Throwable $e) {
             Log::error('Gagal menghapus laporan bibit', [
                 'source' => __METHOD__,
-                'error'  => $e->getMessage(),
-                'trace'  => $e->getTraceAsString(),
-                'data'   => ['id' => $id],
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'data' => ['id' => $id],
             ]);
             return false;
+        }
+    }
+
+    public function getByPenyuluhId(array $conditions = [], array $relations = []): Collection|array
+    {
+        try {
+            $query = LaporanKondisi::query();
+
+            if (!empty($relations)) {
+                $query->with($relations);
+            }
+
+            foreach ($conditions as $column => $value) {
+                $query->where($column, $value);
+            }
+
+            return $query->get();
+        } catch (QueryException $e) {
+            Log::error('Gagal mengambil seluruh laporan bibit berdasarkan penyuluh id', [
+                'source' => __METHOD__,
+                'error' => $e->getMessage(),
+                'sql' => $e->getSql(),
+            ]);
+            return Collection::make();
+        } catch (Throwable $e) {
+            Log::error('Gagal mengambil seluruh laporan bibit berdasarkan penyuluh id', [
+                'source' => __METHOD__,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+            return Collection::make();
         }
     }
 }
