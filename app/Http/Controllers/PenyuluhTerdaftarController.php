@@ -5,6 +5,9 @@ namespace App\Http\Controllers;
 use App\Http\Requests\PenyuluhTerdaftarRequest;
 use App\Services\KecamatanService;
 use App\Services\PenyuluhTerdaftarService;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\View\View;
 
 class PenyuluhTerdaftarController extends Controller
 {
@@ -18,10 +21,10 @@ class PenyuluhTerdaftarController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(): View
     {
         $data = $this->penyuluhService->getAll(true);
-        $penyuluhs = null;
+        $penyuluhs = [];
 
         if ($data['success']) {
             $penyuluhs = $data['data'];
@@ -33,10 +36,10 @@ class PenyuluhTerdaftarController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create(KecamatanService $kecamatanService)
+    public function create(KecamatanService $kecamatanService): View
     {
         $data = $kecamatanService->getAll();
-        $kecamatans = null;
+        $kecamatans = [];
         if ($data['success']) {
             $kecamatans = $data['data'];
         }
@@ -47,7 +50,7 @@ class PenyuluhTerdaftarController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(PenyuluhTerdaftarRequest $request)
+    public function store(PenyuluhTerdaftarRequest $request): RedirectResponse
     {
         $result = $this->penyuluhService->create($request->validated());
 
@@ -59,22 +62,14 @@ class PenyuluhTerdaftarController extends Controller
     }
 
     /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
-
-    /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id, KecamatanService $kecamatanService)
+    public function edit(string $id, KecamatanService $kecamatanService): View
     {
         $dataPenyuluh = $this->penyuluhService->getById($id);
         $dataKecamatan = $kecamatanService->getAll();
-        $penyuluh = null;
-        $kecamatans = null;
+        $penyuluh = [];
+        $kecamatans = [];
 
         if ($dataPenyuluh['success'] && $dataKecamatan['data']) {
             $penyuluh = $dataPenyuluh['data'];
@@ -87,7 +82,7 @@ class PenyuluhTerdaftarController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(PenyuluhTerdaftarRequest $request, string $id)
+    public function update(PenyuluhTerdaftarRequest $request, string $id): RedirectResponse
     {
         $result = $this->penyuluhService->update($id, $request->validated());
 
@@ -101,7 +96,7 @@ class PenyuluhTerdaftarController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(string $id): RedirectResponse
     {
         $result = $this->penyuluhService->delete($id);
 
@@ -111,7 +106,13 @@ class PenyuluhTerdaftarController extends Controller
         return redirect()->route('penyuluh-terdaftar.index')->with('error', 'Data gagal dihapus');
     }
 
-    public function getByKecamatanId($id)
+    /**
+     * Mengambil data penyuluh terdaftar berdasarkan kecamatan id
+     *
+     * @param string|int $id
+     * @return JsonResponse
+     */
+    public function getByKecamatanId(string|int $id): JsonResponse
     {
         $result = $this->penyuluhService->getByKecamatanId($id);
 

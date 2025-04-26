@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Http\Requests\AdminRequest;
 use App\Services\AdminService;
 use App\Services\RoleService;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\View\View;
 
 class AdminController extends Controller
 {
@@ -18,10 +20,10 @@ class AdminController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(): View
     {
         $data = $this->service->getAll();
-        $admins = null;
+        $admins = [];
         if ($data['success']) {
             $admins = $data['data'];
         }
@@ -32,10 +34,10 @@ class AdminController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create(RoleService $roleService)
+    public function create(RoleService $roleService): View
     {
         $data = $roleService->getAll();
-        $roles = null;
+        $roles = [];
         if ($data['success']) {
             $roles = $data['data'];
         }
@@ -46,7 +48,7 @@ class AdminController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(AdminRequest $request)
+    public function store(AdminRequest $request): RedirectResponse
     {
         $result = $this->service->create($request->validated());
 
@@ -57,22 +59,14 @@ class AdminController extends Controller
     }
 
     /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
-
-    /**
      * Show the form for editing the specified resource.
      */
-    public function edit($id, RoleService $roleService)
+    public function edit($id, RoleService $roleService): View
     {
         $dataAdmin = $this->service->getById($id);
         $dataRole = $roleService->getAll();
-        $admin = null;
-        $roles = null;
+        $admin = [];
+        $roles = [];
 
         if ($dataAdmin['success'] && $dataRole['data']) {
             $admin = $dataAdmin['data'];
@@ -85,7 +79,7 @@ class AdminController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(AdminRequest $request, $id)
+    public function update(AdminRequest $request, $id): RedirectResponse
     {
         $validated = $request->validated();
         $result = $this->service->update($id, $validated);
@@ -99,7 +93,7 @@ class AdminController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(string $id): RedirectResponse
     {
         $result = $this->service->delete($id);
         if ($result['success']) {

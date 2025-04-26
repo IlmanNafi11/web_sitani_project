@@ -5,7 +5,9 @@ namespace App\Http\Controllers;
 use App\Http\Requests\DesaRequest;
 use App\Services\DesaService;
 use App\Services\KecamatanService;
-use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\View\View;
 
 class DesaController extends Controller
 {
@@ -19,10 +21,10 @@ class DesaController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(): View
     {
         $data = $this->desaService->getAll(true);
-        $desas = null;
+        $desas = [];
 
         if ($data['success']) {
             $desas = $data['data'];
@@ -34,10 +36,10 @@ class DesaController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create(KecamatanService $kecamatanService)
+    public function create(KecamatanService $kecamatanService): View
     {
         $data = $kecamatanService->getAll();
-        $kecamatans = null;
+        $kecamatans = [];
 
         if ($data['success']) {
             $kecamatans = $data['data'];
@@ -49,7 +51,7 @@ class DesaController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(DesaRequest $request)
+    public function store(DesaRequest $request): RedirectResponse
     {
         $result = $this->desaService->create($request->validated());
 
@@ -61,20 +63,12 @@ class DesaController extends Controller
     }
 
     /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
-
-    /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id, KecamatanService $kecamatanService)
+    public function edit(string $id, KecamatanService $kecamatanService): View
     {
-        $kecamatans = null;
-        $desa = null;
+        $kecamatans = [];
+        $desa = [];
         $dataKecamatans = $kecamatanService->getAll();
         $dataDesa = $this->desaService->getById($id);
 
@@ -88,7 +82,7 @@ class DesaController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(DesaRequest $request, string $id)
+    public function update(DesaRequest $request, string $id): RedirectResponse
     {
         $result = $this->desaService->update($id, $request->validated());
 
@@ -102,7 +96,7 @@ class DesaController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(string $id): RedirectResponse
     {
         $result = $this->desaService->delete($id);
         if ($result['success']) {
@@ -111,11 +105,11 @@ class DesaController extends Controller
         return redirect()->route('desa.index')->with('error', 'Data gagal dihapus');
     }
 
-    public function getByKecamatanId($id)
+    public function getByKecamatanId($id): JsonResponse
     {
         $desas = $this->desaService->getByKecamatanId($id);
         if ($desas['success']) {
-            return response()->json($desas['data'], 200);
+            return response()->json($desas['data']);
         }
 
         return response()->json($desas['message']);

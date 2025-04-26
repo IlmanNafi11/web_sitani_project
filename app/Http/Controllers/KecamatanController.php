@@ -4,7 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\KecamatanRequest;
 use App\Services\KecamatanService;
-use Illuminate\Http\Request;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\View\View;
 
 class KecamatanController extends Controller
 {
@@ -18,10 +19,10 @@ class KecamatanController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(): View
     {
         $data = $this->kecamatanService->getAll();
-        $kecamatans = null;
+        $kecamatans = [];
 
         if ($data['success']) {
             $kecamatans = $data['data'];
@@ -33,7 +34,7 @@ class KecamatanController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
+    public function create(): View
     {
         return view('pages.kecamatan.create');
     }
@@ -41,7 +42,7 @@ class KecamatanController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(KecamatanRequest $request)
+    public function store(KecamatanRequest $request): RedirectResponse
     {
         $result = $this->kecamatanService->create($request->validated());
         if ($result['success']) {
@@ -52,20 +53,12 @@ class KecamatanController extends Controller
     }
 
     /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
-
-    /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
+    public function edit(string $id): View
     {
         $data = $this->kecamatanService->getById($id);
-        $kecamatan = null;
+        $kecamatan = [];
 
         if ($data['success']) {
             $kecamatan = $data['data'];
@@ -76,7 +69,7 @@ class KecamatanController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(KecamatanRequest $request, string $id)
+    public function update(KecamatanRequest $request, string $id): RedirectResponse
     {
         $result = $this->kecamatanService->update($id, $request->validated());
 
@@ -90,7 +83,7 @@ class KecamatanController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(string $id): RedirectResponse
     {
         $result = $this->kecamatanService->delete($id);
         if ($result['success']) {

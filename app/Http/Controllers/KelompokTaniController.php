@@ -3,10 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\KelompokTaniRequest;
-use App\Services\DesaService;
 use App\Services\KecamatanService;
 use App\Services\KelompokTaniService;
-use Illuminate\Http\Request;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\View\View;
 
 class KelompokTaniController extends Controller
 {
@@ -20,10 +20,10 @@ class KelompokTaniController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(): View
     {
         $data = $this->kelompokTaniService->getAll(true);
-        $kelompokTanis = null;
+        $kelompokTanis = [];
 
         if ($data['success']) {
             $kelompokTanis = $data['data'];
@@ -34,10 +34,10 @@ class KelompokTaniController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create(KecamatanService $kecamatanService)
+    public function create(KecamatanService $kecamatanService): View
     {
         $data = $kecamatanService->getAll();
-        $kecamatans = null;
+        $kecamatans = [];
         if ($data['success']) {
             $kecamatans = $data['data'];
         }
@@ -48,7 +48,7 @@ class KelompokTaniController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(KelompokTaniRequest $request)
+    public function store(KelompokTaniRequest $request): RedirectResponse
     {
         $result = $this->kelompokTaniService->create($request->validated());
 
@@ -60,20 +60,12 @@ class KelompokTaniController extends Controller
     }
 
     /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
-
-    /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id, KecamatanService $kecamatanService)
+    public function edit(string $id, KecamatanService $kecamatanService): View
     {
-        $kelompokTanis = null;
-        $kecamatans = null;
+        $kelompokTanis = [];
+        $kecamatans = [];
         $dataKelompokTanis = $this->kelompokTaniService->getById($id);
         $dataKecamatans = $kecamatanService->getAll();
 
@@ -88,7 +80,7 @@ class KelompokTaniController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(KelompokTaniRequest $request, string $id)
+    public function update(KelompokTaniRequest $request, string $id): RedirectResponse
     {
         $result = $this->kelompokTaniService->update($id, $request->validated());
         if ($result['success']) {
@@ -101,7 +93,7 @@ class KelompokTaniController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(string $id): RedirectResponse
     {
         $result = $this->kelompokTaniService->delete($id);
         if ($result['success']) {

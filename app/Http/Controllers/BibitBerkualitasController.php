@@ -5,7 +5,8 @@ namespace App\Http\Controllers;
 use App\Http\Requests\BibitRequest;
 use App\Services\BibitService;
 use App\Services\KomoditasService;
-use Illuminate\Http\Request;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\View\View;
 
 class BibitBerkualitasController extends Controller
 {
@@ -19,10 +20,10 @@ class BibitBerkualitasController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(): View
     {
         $data = $this->bibitService->getAll(true);
-        $datas = null;
+        $datas = [];
         if ($data['success']) {
             $datas = $data['data'];
         }
@@ -33,10 +34,10 @@ class BibitBerkualitasController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create(KomoditasService $komoditasService)
+    public function create(KomoditasService $komoditasService): View
     {
         $data = $komoditasService->getAll();
-        $datas = null;
+        $datas = [];
         if ($data['success']) {
             $datas = $data['data'];
         }
@@ -47,7 +48,7 @@ class BibitBerkualitasController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(BibitRequest $request)
+    public function store(BibitRequest $request): RedirectResponse
     {
         $result = $this->bibitService->create($request->validated());
 
@@ -59,23 +60,15 @@ class BibitBerkualitasController extends Controller
     }
 
     /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
-
-    /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id, KomoditasService $komoditasService)
+    public function edit(string $id, KomoditasService $komoditasService): View
     {
         $dataBibit = $this->bibitService->getById($id);
         $dataKomoditas = $komoditasService->getAll();
 
-        $bibit = null;
-        $komoditas = null;
+        $bibit = [];
+        $komoditas = [];
 
         if ($dataBibit['success'] && $dataKomoditas['data']) {
             $bibit = $dataBibit['data'];
@@ -88,7 +81,7 @@ class BibitBerkualitasController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(BibitRequest $request, string $id)
+    public function update(BibitRequest $request, string $id): RedirectResponse
     {
         $result = $this->bibitService->update($id, $request->validated());
 
@@ -102,7 +95,7 @@ class BibitBerkualitasController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(string $id): RedirectResponse
     {
         $result = $this->bibitService->delete($id);
 

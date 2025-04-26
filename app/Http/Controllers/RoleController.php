@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreRoleRequest;
 use App\Http\Requests\UpdateRoleRequest;
 use App\Services\RoleService;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\View\View;
 use Spatie\Permission\Models\Permission;
 
 class RoleController extends Controller
@@ -16,7 +18,7 @@ class RoleController extends Controller
         $this->service = $service;
     }
 
-    public function index()
+    public function index(): View
     {
         $data = $this->service->getAll();
         $roles = [];
@@ -26,13 +28,13 @@ class RoleController extends Controller
         return view('pages.role.index', compact('roles'));
     }
 
-    public function create()
+    public function create(): View
     {
         $permissions = Permission::all();
         return view('pages.role.create', compact('permissions'));
     }
 
-    public function store(StoreRoleRequest $request)
+    public function store(StoreRoleRequest $request): RedirectResponse
     {
         $validated = $request->validated();
         $result = $this->service->createWithPermissions([
@@ -46,7 +48,7 @@ class RoleController extends Controller
         return back()->withErrors(['Gagal membuat role.'])->withInput();
     }
 
-    public function edit($id)
+    public function edit($id): View
     {
         $data = $this->service->getById($id);
         $permissions = Permission::all();
@@ -57,7 +59,7 @@ class RoleController extends Controller
         return view('pages.role.update', compact('role', 'permissions'));
     }
 
-    public function update(UpdateRoleRequest $request, $id)
+    public function update(UpdateRoleRequest $request, $id): RedirectResponse
     {
         $validated = $request->validated();
         $result = $this->service->updateRoleAndPermissions($id, [
@@ -71,7 +73,7 @@ class RoleController extends Controller
         return back()->withErrors(['Gagal memperbarui role.'])->withInput();
     }
 
-    public function destroy($id)
+    public function destroy($id): RedirectResponse
     {
         $deleted = $this->service->delete($id);
         if ($deleted['success']) {
