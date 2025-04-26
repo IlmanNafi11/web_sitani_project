@@ -16,8 +16,9 @@ class InputText extends Component
     public $extraClassOption;
     public $extraClassElement;
     public $defaultValue;
+    public $isDisable;
 
-    public function __construct($keyId, $name, $label, $placeholder, $helperText, $extraClassOption, $extraClassElement, $defaultValue)
+    public function __construct($keyId, $name, $label, $placeholder, $helperText, $extraClassOption, $extraClassElement, $defaultValue, $isDisable)
     {
         $this->keyId = $keyId;
         $this->name = $name;
@@ -27,6 +28,7 @@ class InputText extends Component
         $this->extraClassOption = $extraClassOption;
         $this->extraClassElement = $extraClassElement;
         $this->defaultValue = $defaultValue;
+        $this->isDisable = $isDisable;
     }
 
     /**

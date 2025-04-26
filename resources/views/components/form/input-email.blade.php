@@ -1,5 +1,6 @@
 @php
     $isFloatingLabel = $isFloatingLabel ?? true;
+    $isDisabled = $isDisabled ?? false;
 @endphp
 
 @if($isFloatingLabel)
@@ -11,7 +12,7 @@
                 <input name="{{ $name }}" id="{{ $keyId ?? 'input-email-' . $name }}" type="email"
                        placeholder="{{ $placeholder ?? 'Masukan...' }}"
                        class="ps-3 w-full border-none outline-none focus:outline-none focus:ring-0"
-                       id="leadingIconFloating" value="{{ old($name, $defaultValue ?? '') }}"/>
+                       id="leadingIconFloating" value="{{ old($name, $defaultValue ?? '') }}" {{ $isDisabled === true ? 'disabled' : ''}} />
                 <label class="input-floating-label" for="leadingIconFloating">{{ $label ?? 'Label' }}</label>
             </div>
         </div>
@@ -35,7 +36,7 @@
             <input type="email" class="grow outline-none border-none focus:outline-none focus:ring-0"
                    placeholder="{{ $placeholder ?? 'Masukan...' }}"
                    id="{{ $keyId ?? 'input-phone-' . $name }}" name="{{ $name }}"
-                   value="{{ old($name, $defaultValue ?? '') }}"/>
+                   value="{{ old($name, $defaultValue ?? '') }}" {{ $isDisabled === true ? 'disabled' : ''}} />
         </div>
         @error($name)
         <p class="helper-text">{{ $message }}</p>
