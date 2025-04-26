@@ -12,13 +12,23 @@ use Throwable;
 
 class UserRepository implements AuthInterface
 {
-    public function findUser(array $conditions, bool $multiple = false): ?User
+    public function findUser(array $conditions, bool $multiple = false, array $withRelations = []): ?User
     {
         try {
             $query = User::query();
 
             foreach ($conditions as $field => $value) {
                 $query->where($field, $value);
+            }
+
+            $query->select(['id', 'email', 'created_at']);
+
+            if (!empty($withRelations)) {
+                foreach ($withRelations as $relation => $columns) {
+                    $query->with([$relation => function ($q) use ($columns) {
+                        $q->select($columns);
+                    }]);
+                }
             }
 
             return $query->first();
@@ -37,7 +47,6 @@ class UserRepository implements AuthInterface
             ]);
             return null;
         }
-
     }
 
     public function resetPassword(User $user, string $password): bool
@@ -79,11 +88,13 @@ class UserRepository implements AuthInterface
             $code = str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT);
             $this->invalidateOtps($user);
 
-            OtpCode::create([
+            $otp = OtpCode::create([
                 'user_id'    => $user->id,
                 'code'       => $code,
-                'expires_at' => Carbon::now()->addMinutes(5),
+                'expires_at' => now()->addMinutes((int) config('otp.expires_in_minutes')),
             ]);
+
+            throw_if(!$otp, new \Exception('Gagal menyimpan kode OTP'));
 
             return $code;
         } catch (QueryException $e) {
