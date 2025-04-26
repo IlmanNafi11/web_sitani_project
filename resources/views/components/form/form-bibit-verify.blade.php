@@ -95,12 +95,12 @@
                         <div class="flex flex-wrap gap-2">
                             <div class="flex items-center gap-1">
                                 <input type="radio" name="status" class="radio radio-inset radio-success"
-                                    id="radio-berkualitas" value="1" />
+                                    id="radio-berkualitas" value="1" {{ old('status', $laporan->status) == 1 ? 'checked' : '' }} />
                                 <label class="label-text text-base" for="radio-berkualitas"> Berkualitas </label>
                             </div>
                             <div class="flex items-center gap-1">
                                 <input type="radio" name="status" class="radio radio-inset radio-error"
-                                    id="radio-tidak-berkualitas" value="0"/>
+                                    id="radio-tidak-berkualitas" value="0" {{ old('status', $laporan->status) == 0 ? 'checked' : '' }}/>
                                 <label class="label-text text-base" for="radio-tidak-berkualitas"> Tidak Berkualitas
                                 </label>
                             </div>
@@ -120,7 +120,7 @@
     {{-- action button --}}
     <div class="button-group flex space-x-4">
         <button class="btn btn-soft btn-secondary" onclick="back()">Kembali</button>
-        <x-ui.button.save-button :style="'btn-soft'" :formId="'form-verify-bibit'" :title="'Verifikasi'"/>
+        <x-ui.button.save-button :style="'btn-soft'" :formId="'form-verify-bibit'" :title="$laporan->status == 2 ? 'Verifikasi': 'Perbarui'"/>
     </div>
 </form>
 <script>
