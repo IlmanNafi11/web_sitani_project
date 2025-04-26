@@ -316,9 +316,10 @@ class PenyuluhTerdaftarService
             $penyuluh = $this->penyuluhTerdaftarCustomQuery->getByPhone($phone);
 
             if (!empty($penyuluh)) {
+                $penyuluh->makeHidden('kecamatan_id');
                 return [
                     'success' => true,
-                    'message' => 'Berhasil mengambil data penyuluh terdaftar',
+                    'message' => 'Nomor telepon terverifikasi',
                     'data' => $penyuluh,
                 ];
 
