@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Events\OtpGenerated;
 use App\Models\User;
 use App\Repositories\Interfaces\AuthInterface;
 use Exception;
@@ -17,61 +18,174 @@ class UserService
         $this->repository = $repository;
     }
 
-    public function findUser(array $conditions)
-    {
-        $user = null;
-        try {
-            $user = $this->repository->findUser($conditions);
-        } catch (Exception $th) {
-            Log::error('Gagal mengambil data user: ' . $th->getMessage());
-        }
-
-        return $user;
-    }
-
-    public function resetPassword(User $user, string $password)
+    /**
+     * Mencari data pengguna berdasarkan conditions dan relations
+     *
+     * @param array $conditions Kondisi untuk memfilter pencarian
+     * @param array $relations Relasi, set null jika tidak ingin mengambil beserta relasi
+     * @return array
+     */
+    public function findUser(array $conditions, array $relations = []): array
     {
         try {
-            return $this->repository->resetPassword($user, bcrypt($password));
-        } catch (Exception $th) {
-            Log::error('Gagal mengubah password user: ' . $th->getMessage());
-        }
+            $user = $this->repository->findUser($conditions,false, $relations);
+            if ($user !== null) {
+                return [
+                    'success' => true,
+                    'message' => 'Data pengguna ditemukan',
+                    'data' => $user
+                ];
+            }
 
-        return false;
+            return [
+                'success' => false,
+                'message' => 'Data pengguna tidak ditemukan',
+                'data' => [],
+            ];
+        } catch (\Throwable $e) {
+            Log::error('Terjadi kesalahan saat mencari data pengguna', [
+                'source' => __METHOD__,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+            return [
+                'success' => false,
+                'message' => 'Terjadi kesalahan saat mencari data pengguna.',
+                'data' => [],
+            ];
+        }
     }
 
-    public function sendOtpToEmail(User $user): bool
+    /**
+     * Reset kata sandi pengguna
+     *
+     * @param User $user Model user yang akan diperbarui
+     * @param string $password Password baru
+     * @return array
+     */
+    public function resetPassword(User $user, string $password): array
+    {
+        try {
+            $result = $this->repository->resetPassword($user, bcrypt($password));
+            if ($result) {
+                return [
+                    'success' => true,
+                    'message' => 'Kata sandi berhasil diperbarui',
+                ];
+            }
+
+            return [
+                'success' => false,
+                'message' => 'Gagal memperbarui kata sandi pengguna',
+                'data' => [],
+            ];
+        } catch (\Throwable $e) {
+            Log::error('Terjadi kesalahan saat memperbarui kata sandi pengguna', [
+                'source' => __METHOD__,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+            return [
+                'success' => false,
+                'message' => 'Terjadi kesalahan saat memperbarui kata sandi pengguna',
+                'data' => [],
+            ];
+        }
+    }
+
+    /**
+     * Mengirim kode otp ke email
+     *
+     * @param User $user Model user yang akan dikirim otp
+     * @return array
+     */
+    public function sendOtpToEmail(User $user): array
     {
         try {
             $code = $this->repository->generateAndSaveOtp($user);
+            if ($code !== null) {
+                event(new OtpGenerated($user, $code));
+                return [
+                    'success' => true,
+                    'message' => 'Kode OTP berhasil dibuat',
+                ];
+            }
 
-            Mail::to($user->email)->send(new \App\Mail\SendOtpCode($code));
-            return true;
-        } catch (Exception $e) {
-            Log::error('OTP Email Send Failed', ['user_id' => $user->id, 'error' => $e->getMessage()]);
+            return [
+                'success' => false,
+                'message' => 'Kode OTP gagal dibuat',
+                'data' => [],
+            ];
+
+        } catch (\Throwable $e) {
+            Log::error('Terjadi kesalahan saat generate kode OTP', [
+                'source' => __METHOD__,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+            return [
+                'success' => false,
+                'message' => 'Terjadi kesalahan saat generate kode OTP',
+                'data' => [],
+            ];
         }
-
-        return false;
     }
 
-    public function verifyOtp(User $user, array $data): bool
+    /**
+     * Memverifikasi kode OTP
+     *
+     * @param User $user Model user yang akan divalidasi OTPnya
+     * @param array $data Kode OTP
+     * @return array
+     */
+    public function verifyOtp(User $user, array $data): array
     {
         try {
             $otp = implode('', $data['otp']);
-            return $this->repository->validateOtp($user, $otp);
-        } catch (Exception $e) {
-            Log::error('Gagal mengverifikasi OTP: ' . $e->getMessage());
-        }
+            $result = $this->repository->validateOtp($user, $otp);
+            if ($result) {
+                return [
+                    'success' => true,
+                    'message' => 'Kode OTP terverifikasi',
+                    'data' => ['OTP' => $otp],
+                ];
+            }
 
-        return false;
+            return [
+                'success' => false,
+                'message' => 'Kode OTP gagal diverifikasi',
+                'data' => [],
+            ];
+        } catch (\Throwable $e) {
+            Log::error('Terjadi kesalahan saat memvalidasi kode OTP', [
+                'source' => __METHOD__,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+            return [
+                'success' => false,
+                'message' => 'Terjadi kesalahan saat memvalidasi kode OTP',
+                'data' => [],
+            ];
+        }
     }
 
+    /**
+     * Menghapus kode OTP
+     *
+     * @param User $user Model user yang akan dihapus kode OTPnya
+     * @return void
+     */
     public function invalidateOtps(User $user): void
     {
         try {
             $this->repository->invalidateOtps($user);
-        } catch (Exception $e) {
-            Log::error('Gagal menghapus OTP: ' . $e->getMessage());
+        } catch (\Throwable $e) {
+            Log::error('Terjadi kesalahan saat menghapus kode OTP', [
+                'source' => __METHOD__,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
         }
     }
 }

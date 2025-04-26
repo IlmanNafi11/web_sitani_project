@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\LoginRequest;
 use App\Http\Requests\PenyuluhRequest;
 use App\Http\Requests\PhonePenyuluhRequest;
+use App\Http\Resources\UserLoginResource;
 use App\Services\PenyuluhService;
 use App\Services\PenyuluhTerdaftarService;
 use App\Trait\ApiResponse;
@@ -27,6 +28,12 @@ class AuthApiController extends Controller
         $this->penyuluhTerdaftarService = $penyuluhTerdaftarService;
     }
 
+    /**
+     * Login Penyuluh
+     *
+     * @param LoginRequest $request Form request
+     * @return JsonResponse response
+     */
     public function login(LoginRequest $request)
     {
         $credentials = $request->validated();
@@ -38,12 +45,20 @@ class AuthApiController extends Controller
         $user = Auth::user();
 
         if (!$user->hasRole('penyuluh')) {
-            return $this->errorResponse('Akun ini tidak memiliki izin untuk login sebagai penyuluh.', 403);
+            return $this->errorResponse('Akun ini tidak memiliki izin untuk login sebagai penyuluh.', 403, [
+                'email' => $credentials['email'],
+            ]);
         }
 
         return $this->respondWithToken($token, "Login Berhasil");
     }
 
+    /**
+     * Verifikasi no hp penyuluh saat registrasi
+     *
+     * @param PhonePenyuluhRequest $request Form request
+     * @return JsonResponse response
+     */
     public function validatePhone(PhonePenyuluhRequest $request)
     {
         $result = $this->penyuluhTerdaftarService->getByPhone($request->validated('no_hp'));
@@ -54,12 +69,18 @@ class AuthApiController extends Controller
         return $this->errorResponse($result['message'], $result['data']);
     }
 
+    /**
+     * Registrasi akun penyuluh
+     *
+     * @param PenyuluhRequest $request Form request
+     * @return JsonResponse response
+     */
     public function register(PenyuluhRequest $request)
     {
         $result = $this->service->create($request->validated());
 
         if ($result['success']) {
-            return $this->successResponse($result['data'], $result['message']);
+            return $this->successResponse($result['data'], $result['message'], 201);
         }
 
         return $this->errorResponse($result['message']);
@@ -75,23 +96,17 @@ class AuthApiController extends Controller
      */
     protected function respondWithToken(string $token, string $message) : JsonResponse
     {
-        $user = Auth::user()->load('penyuluh:id,user_id,penyuluh_terdaftar_id', 'penyuluh.penyuluhTerdaftar:id,nama,no_hp,alamat,kecamatan_id');
+        $user = Auth::user()->load([
+            'penyuluh:id,user_id,penyuluh_terdaftar_id',
+            'penyuluh.penyuluhTerdaftar:id,nama,no_hp,alamat,kecamatan_id',
+            'penyuluh.penyuluhTerdaftar.kecamatan:id,nama',
+        ]);
 
-        $userData = $user->only(['id', 'email', 'created_at']);
-        $userData['penyuluh'] = null;
-
-        if ($user->relationLoaded('penyuluh') && $user->penyuluh) {
-            $userData['penyuluh'] = $user->penyuluh->only(['id', 'penyuluh_terdaftar_id', 'user_id']);
-            $userData['penyuluh']['penyuluh_terdaftar'] = null;
-            if ($user->penyuluh->relationLoaded('penyuluhTerdaftar') && $user->penyuluh->penyuluhTerdaftar) {
-                $userData['penyuluh']['penyuluh_terdaftar'] = $user->penyuluh->penyuluhTerdaftar->only(['id', 'nama', 'no_hp', 'alamat', 'kecamatan_id']);
-            }
-        }
         return $this->successResponse([
             'access_token' => $token,
             'token_type' => 'bearer',
             'expires_in' => JWTFactory::getTTL() * 60,
-            'user' => $userData,
+            'user' => new UserLoginResource($user),
         ], $message);
     }
 }

@@ -35,7 +35,7 @@ class AuthWebController extends Controller
 
         $user = $this->service->findUser(['email' => $validated['email']]);
 
-        if (!$user) {
+        if (!$user['success']) {
             return back()->withErrors(['email' => 'Email tidak terdaftar.'])->withInput();
         }
 
@@ -43,7 +43,9 @@ class AuthWebController extends Controller
             return back()->withErrors(['password' => 'Password yang anda masukkan salah.'])->withInput();
         }
 
-        if (!$user->is_password_set) {
+        $data = $user['data'];
+
+        if (!$data->is_password_set) {
             $request->session()->regenerate();
             return redirect()->route('setup-password');
         }
@@ -65,7 +67,7 @@ class AuthWebController extends Controller
 
         $result = $this->service->resetPassword(Auth::user(), $validated['password']);
 
-        if (!$result) {
+        if (!$result['success']) {
             return back()->with('error', 'Gagal memperbarui password.')->withInput();
         }
 
@@ -82,13 +84,19 @@ class AuthWebController extends Controller
     {
         $validated = $request->validated();
 
-        $user = $this->service->findUser(['email' => $validated['email']]);
+        $data = $this->service->findUser(['email' => $validated['email']]);
+        $user = null;
+        if ($data['success']) {
+            $user = $data['data'];
+        }
 
         if (!$user || !$user->can('akses-panel.Akses ke Panel Admin')) {
             return back()->withErrors(['email' => 'Email tidak terdaftar atau tidak punya akses.'])->withInput();
         }
 
-        if (!$this->service->sendOtpToEmail($user)) {
+        $result = $this->service->sendOtpToEmail($user);
+
+        if (!$result['success']) {
             return back()->with('error', 'Gagal mengirim OTP ke email. Silakan coba lagi.');
         }
 
@@ -125,13 +133,16 @@ class AuthWebController extends Controller
     public function verifyOtp(OtpCodeRequest $request): RedirectResponse
     {
         $validated = $request->validated();
-        $user = $this->service->findUser(['id' => session('otp_user_id')]);
+        $data = $this->service->findUser(['id' => session('otp_user_id')]);
 
-        if (!$user) {
+        if (!$data['success']) {
             return redirect()->route('verifikasi-email')->with('error', 'Kesalahan sesi. Silakan mulai ulang proses.');
         }
 
-        if (!$this->service->verifyOtp($user, $validated)) {
+        $user = $data['data'];
+        $result = $this->service->verifyOtp($user, $validated);
+
+        if (!$result['success']) {
             Log::warning('Invalid OTP attempt', ['user_id' => $user->id]);
             return back()->withErrors(['otp' => 'Kode OTP salah atau telah kadaluarsa.'])->withInput();
         }
@@ -146,12 +157,19 @@ class AuthWebController extends Controller
      */
     public function resendOtp(): RedirectResponse
     {
-        $user = $this->service->findUser(['id' => session('otp_user_id')]);
-
-        if (!$user) {
+        $data = $this->service->findUser(['id' => session('otp_user_id')]);
+        $user = null;
+        if (!$data['success']) {
             return redirect()->route('verifikasi-email')->with('failed', 'Kesalahan sesi. Silakan mulai ulang proses.');
         }
-        if (!$this->service->sendOtpToEmail($user)) {
+
+        if ($data['success']) {
+            $user = $data['data'];
+        }
+
+        $result = $this->service->sendOtpToEmail($user);
+
+        if (!$result['success']) {
             return back()->with('error', 'Gagal mengirim ulang OTP.');
         }
         return back()->with('success', 'Kode OTP baru berhasil dikirim!');
@@ -167,14 +185,20 @@ class AuthWebController extends Controller
     {
         $validated = $request->validated();
 
-        $user = $this->service->findUser(['id' => session('otp_user_id')]);
+        $data = $this->service->findUser(['id' => session('otp_user_id')]);
+        $user = null;
 
-        if (!$user) {
+        if ($data['success']) {
+            $user = $data['data'];
+        }
+
+        if (!$data['success']) {
             return redirect()->route('verifikasi-email')->withErrors('Sesi tidak valid.');
         }
 
         $this->service->invalidateOtps($user);
-        if (!$this->service->resetPassword($user, $validated['password'])) {
+        $result = $this->service->resetPassword($user, $validated['password']);
+        if (!$result['success']) {
             Log::error('Password update failed on reset', ['user_id' => $user->id]);
             return back()->with('error', 'Gagal memperbarui password.')->withInput();
         }
