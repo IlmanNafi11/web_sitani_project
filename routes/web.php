@@ -129,7 +129,6 @@ Route::middleware(['active.session', 'panel.admin.permission'])->group(function 
         Route::get('{id}/edit', 'edit')->middleware('permission:admin.ubah')->name('admin.edit');
         Route::put('{id}', 'update')->middleware('permission:admin.ubah')->name('admin.update');
         Route::delete('{id}', 'destroy')->middleware('permission:admin.hapus')->name('admin.destroy');
-        Route::get('profil', 'profile')->name('admin.profile');
     });
 
     // Role & Permission Management
@@ -145,6 +144,10 @@ Route::middleware(['active.session', 'panel.admin.permission'])->group(function 
     // Relasi Kecamatan-Desa/Penyuluh
     Route::get('kecamatan/{id}/desa', [DesaController::class, 'getByKecamatanId']);
     Route::get('kecamatan/{id}/penyuluh', [PenyuluhTerdaftarController::class, 'getByKecamatanId']);
+
+    // Profil
+    Route::get('profil', [AdminController::class, 'viewProfile'])->name('profile.index');
+    Route::put('profil/{id}/edit', [AdminController::class, 'updateProfile'])->name('profile.update');
 
     // Logout
     Route::post('admin/logout', [AuthWebController::class, 'logout'])->name('admin.logout');
