@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Events\OtpGenerated;
+use App\Listeners\SendOtpNotification;
 use App\Models\LaporanKondisi;
 use App\Observers\LaporanBibitObserver;
 use App\Repositories\AdminRepository;
@@ -10,6 +12,7 @@ use App\Repositories\DesaRepository;
 use App\Repositories\Interfaces\AuthInterface;
 use App\Repositories\Interfaces\CrudInterface;
 use App\Repositories\Interfaces\DesaCustomQueryInterface;
+use App\Repositories\Interfaces\KelompokTaniCustomQueryInterface;
 use App\Repositories\Interfaces\ManyRelationshipManagement;
 use App\Repositories\Interfaces\PenyuluhTerdaftarCustomQueryInterface;
 use App\Repositories\Interfaces\RoleRepositoryInterface;
@@ -56,6 +59,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->when(RoleService::class)->needs(CrudInterface::class)->give(RoleRepository::class);
         $this->app->when(RoleService::class)->needs(RoleRepositoryInterface::class)->give(RoleRepository::class);
         $this->app->when(PenyuluhService::class)->needs(CrudInterface::class)->give(PenyuluhRepository::class);
+        $this->app->when(KelompokTaniService::class)->needs(KelompokTaniCustomQueryInterface::class)->give(KelompokTaniRepository::class);
     }
 
     /**
@@ -64,5 +68,8 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         LaporanKondisi::observe(LaporanBibitObserver::class);
+        \Event::listen(
+            OtpGenerated::class, SendOtpNotification::class
+        );
     }
 }
