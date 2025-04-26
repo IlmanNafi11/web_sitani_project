@@ -107,13 +107,14 @@ class UserService
                 event(new OtpGenerated($user, $code));
                 return [
                     'success' => true,
-                    'message' => 'Kode OTP berhasil dibuat',
+                    'message' => 'Kode OTP berhasil dikirim',
+                    'data' => [],
                 ];
             }
 
             return [
                 'success' => false,
-                'message' => 'Kode OTP gagal dibuat',
+                'message' => 'Kode OTP gagal dikirim',
                 'data' => [],
             ];
 
@@ -153,7 +154,7 @@ class UserService
 
             return [
                 'success' => false,
-                'message' => 'Kode OTP gagal diverifikasi',
+                'message' => 'Kode OTP salah atau kadaluarsa',
                 'data' => [],
             ];
         } catch (\Throwable $e) {
