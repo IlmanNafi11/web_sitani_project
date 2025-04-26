@@ -26,7 +26,7 @@ class RoleRepository implements CrudInterface, RoleRepositoryInterface
             Log::error('Gagal mengambil semua data role', [
                 'source' => __METHOD__,
                 'error'  => $e->getMessage(),
-                'sql'    => $e->getSQL(),
+                'sql'    => $e->getSql(),
             ]);
             return Collection::make();
         } catch (Throwable $e) {
@@ -47,7 +47,7 @@ class RoleRepository implements CrudInterface, RoleRepositoryInterface
             Log::error('Gagal mengambil data role berdasarkan id', [
                 'source' => __METHOD__,
                 'error'  => $e->getMessage(),
-                'sql'    => $e->getSQL(),
+                'sql'    => $e->getSql(),
                 'data'   => ['id' => $id],
             ]);
             return null;
@@ -73,7 +73,7 @@ class RoleRepository implements CrudInterface, RoleRepositoryInterface
             Log::error('Gagal menyimpan role baru', [
                 'source' => __METHOD__,
                 'error'  => $e->getMessage(),
-                'sql'    => $e->getSQL(),
+                'sql'    => $e->getSql(),
                 'data'   => $data,
             ]);
             return null;
@@ -92,16 +92,15 @@ class RoleRepository implements CrudInterface, RoleRepositoryInterface
     {
         try {
             $role = Role::findOrFail($id);
-            $role->update([
+            return $role->update([
                 'name'       => $data['name'] ?? $role->name,
                 'guard_name' => $data['guard_name'] ?? $role->guard_name,
             ]);
-            return true;
         } catch (QueryException $e) {
             Log::error('Gagal memperbarui data role', [
                 'source' => __METHOD__,
                 'error'  => $e->getMessage(),
-                'sql'    => $e->getSQL(),
+                'sql'    => $e->getSql(),
                 'data'   => [
                     'id'   => $id,
                     'data' => $data,
@@ -126,13 +125,12 @@ class RoleRepository implements CrudInterface, RoleRepositoryInterface
     {
         try {
             $role = Role::findOrFail($id);
-            $role->delete();
-            return true;
+            return (bool) $role->delete();
         } catch (QueryException $e) {
             Log::error('Gagal menghapus data role', [
                 'source' => __METHOD__,
                 'error'  => $e->getMessage(),
-                'sql'    => $e->getSQL(),
+                'sql'    => $e->getSql(),
                 'data'   => ['id' => $id],
             ]);
             return false;
@@ -171,7 +169,7 @@ class RoleRepository implements CrudInterface, RoleRepositoryInterface
             Log::error('Gagal sync permissions pada role', [
                 'source'         => __METHOD__,
                 'error'          => $e->getMessage(),
-                'sql'            => $e->getSQL(),
+                'sql'            => $e->getSql(),
                 'data'           => [
                     'role_id'      => $roleId,
                     'permission_ids' => $permissionIds,
