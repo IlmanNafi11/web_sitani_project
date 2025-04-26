@@ -3,7 +3,7 @@
        role="dialog" tabindex="-1">
     <div class="drawer-body px-2 pt-4">
         <ul class="menu p-0">
-            @can('dashboard.lihat')
+            @can('akses-panel.Akses ke Panel Admin')
                 <li>
                     <a href="{{ route('dashboard.admin') }}">
                         <span class="icon-[tabler--home] size-5"></span>

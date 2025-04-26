@@ -41,7 +41,6 @@ Route::middleware('otp.session')->controller(AuthWebController::class)->group(fu
 Route::middleware(['active.session', 'panel.admin.permission'])->group(function () {
     // Dashboard
     Route::get('admin/dashboard', fn() => view('pages.dashboard'))
-        ->middleware('permission:dashboard.lihat')
         ->name('dashboard.admin');
 
     // Bibit Berkualitas

@@ -10,7 +10,7 @@
         <table id="role-table" class="table">
             <x-ui.table.header-table :items="[
                 ['title' => 'Nama Role'],
-                ['title' => 'Permission'],
+                ['title' => 'Guard'],
                 ['title' => 'Aksi'],
             ]"/>
             <tbody>
