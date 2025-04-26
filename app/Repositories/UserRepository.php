@@ -21,7 +21,7 @@ class UserRepository implements AuthInterface
                 $query->where($field, $value);
             }
 
-            $query->select(['id', 'email', 'created_at']);
+            $query->select(['id', 'email', 'created_at', 'is_password_set']);
 
             if (!empty($withRelations)) {
                 foreach ($withRelations as $relation => $columns) {
