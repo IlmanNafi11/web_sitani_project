@@ -12,7 +12,7 @@
         <div class="dropdown relative inline-flex [--auto-close:inside] [--offset:8] [--placement:bottom-end]">
             <button id="dropdown-scrollable" type="button" class="dropdown-toggle flex items-center"
                 aria-haspopup="menu" aria-expanded="false" aria-label="Dropdown">
-                <div class="avatar">
+                <div class="avatar cursor-pointer">
                     <div class="size-9.5 rounded-full">
                         <picture>
                             <source srcset="{{ asset('storage/profile/profile.jpg') }}" type="image/jpeg"/>
@@ -33,12 +33,12 @@
                         </div>
                     </div>
                     <div>
-                        <h6 class="text-base-content text-base font-semibold">Afi</h6>
-                        <small class="text-base-content/50">Admin</small>
+                        <h6 class="text-base-content text-base font-semibold">{{ $user->admin->nama ?? $user->email }}</h6>
+                        <small class="text-base-content/50">{{ $role->first() }}</small>
                     </div>
                 </li>
                 <li>
-                    <a class="dropdown-item" href="#">
+                    <a href="{{ route('profile.index') }}" id="btn-profil" class="dropdown-item cursor-pointer">
                         <span class="icon-[tabler--user]"></span>
                         Profil Saya
                     </a>
