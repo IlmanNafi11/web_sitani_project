@@ -14,74 +14,171 @@ use Throwable;
 class RoleService
 {
     protected CrudInterface $repository;
-    protected RoleRepositoryInterface $roleRepository;
+    protected RoleRepositoryInterface $syncPerm;
 
-    public function __construct(CrudInterface $repository, RoleRepositoryInterface $roleRepository)
+    public function __construct(CrudInterface $repository, RoleRepositoryInterface $syncPerm)
     {
         $this->repository = $repository;
-        $this->roleRepository = $roleRepository;
+        $this->syncPerm = $syncPerm;
     }
 
     public function getAll($withRelations = false): Collection|array
     {
-        return $this->repository->getAll($withRelations);
-    }
-
-    public function getById(int|string $id): ?Role
-    {
-        return $this->repository->find($id);
-    }
-
-    public function createWithPermissions(array $data, array $permissionIds = []): Model
-    {
-        return DB::transaction(function () use ($data, $permissionIds) {
-            $role = $this->repository->create($data);
-            $this->roleRepository->syncPermissions($role->id, $permissionIds);
-            return $role;
-        });
-    }
-
-    public function updateRoleAndPermissions(int $id, array $roleData, array $permissionIds): void
-    {
-        DB::transaction(function () use ($id, $roleData, $permissionIds) {
-            $updated = $this->repository->update($id, $roleData);
-
-            if (!$updated) {
-                throw new \Exception('Role not found or failed to update.');
-            }
-            $this->roleRepository->syncPermissions($id, $permissionIds);
-        });
-    }
-
-    public function delete(int $id): bool
-    {
-        DB::beginTransaction();
         try {
-            $deleted = $this->repository->delete($id);
-            if (!$deleted) {
-                DB::rollBack();
-                Log::warning('RoleService@delete - Role not found', ['role_id' => $id]);
-                return false;
+            $roles = $this->repository->getAll($withRelations);
+            if ($roles->isNotEmpty()) {
+                return [
+                    'success' => true,
+                    'message' => 'Data role berhasil diambil',
+                    'data' => $roles,
+                ];
             }
-            DB::commit();
-            return true;
-        } catch (Throwable $e) {
-            DB::rollBack();
-            Log::error('RoleService@delete failed', [
-                'role_id' => $id,
+
+            return [
+                'success' => false,
+                'message' => 'Data role gagal diambil',
+                'data' => [],
+            ];
+        } catch (\Throwable $e) {
+            Log::error('Terjadi kesalahan saat mengambil data role.', [
+                'source' => __METHOD__,
                 'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
             ]);
-            throw $e;
+
+            return [
+                'success' => false,
+                'message' => 'Gagal mengambil data role.',
+                'data' => []
+            ];
         }
     }
 
-    public function syncPermissions(int $roleId, array $permissionIds): void
+    public function getById(int|string $id): array
     {
         try {
-            $this->roleRepository->syncPermissions($roleId, $permissionIds);
+            $role = $this->repository->getById($id);
+            if ($role !== null) {
+                return [
+                    'success' => true,
+                    'message' => 'Data role ditemukan',
+                    'data' => $role,
+                ];
+            }
+            return [
+                'success' => false,
+                'message' => 'Data role tidak ditemukan',
+                'data' => [],
+            ];
+        } catch (\Throwable $e) {
+            Log::error('Terjadi kesalahan saat mengambil data role.', [
+                'source' => __METHOD__,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            return [
+                'success' => false,
+                'message' => 'Gagal mengambil data role.',
+                'data' => []
+            ];
+        }
+    }
+
+    public function createWithPermissions(array $data, array $permissionIds = []): array
+    {
+        try {
+            return DB::transaction(function () use ($data, $permissionIds) {
+                $role = $this->repository->create($data);
+                if ($role !== null) {
+                    $this->syncPerm->syncPermissions($role->id, $permissionIds);
+                    return [
+                        'success' => true,
+                        'message' => 'Data role berhasil ditambahkan',
+                        'data' => $role,
+                    ];
+                }
+                return [
+                    'success' => false,
+                    'message' => 'Data role gagal ditambahkan',
+                    'data' => [],
+                ];
+            });
+        } catch (\Throwable $e) {
+            Log::error('Terjadi kesalahan saat menyimpan data role.', [
+                'source' => __METHOD__,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'data' => $data,
+                'permission_ids' => $permissionIds,
+            ]);
+
+            return [
+                'success' => false,
+                'message' => 'Gagal menyimpan data role.',
+                'data' => []
+            ];
+        }
+    }
+
+    public function updateRoleAndPermissions(int $id, array $roleData, array $permissionIds): array
+    {
+        try {
+            return DB::transaction(function () use ($id, $roleData, $permissionIds) {
+                $updated = $this->repository->update($id, $roleData);
+
+                if (!$updated) {
+                    throw new \Exception('Role gagal diperbarui');
+                }
+                $this->syncPerm->syncPermissions($id, $permissionIds);
+                return [
+                    'success' => true,
+                    'message' => 'Data role berhasil diperbarui',
+                ];
+            });
+        } catch (\Throwable $e) {
+            Log::error('Terjadi kesalahan saat memperbarui data role.', [
+                'source' => __METHOD__,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+            return [
+                'success' => false,
+                'message' => 'Gagal memperbarui data role.',
+                'data' => [],
+            ];
+        }
+    }
+
+    public function delete(int $id): array
+    {
+        try {
+            DB::beginTransaction();
+            $deleted = $this->repository->delete($id);
+            if (!$deleted) {
+                DB::rollBack();
+                Log::warning(__METHOD__ . ' - Role tidak ditemukan.', ['role_id' => $id]);
+                return [
+                    'success' => false,
+                    'message' => 'Data role tidak ditemukan.',
+                ];
+            }
+            DB::commit();
+            return [
+                'success' => true,
+                'message' => 'Data role berhasil dihapus.',
+            ];
         } catch (Throwable $e) {
-            Log::error('RoleService::syncPermissions error', ['role_id' => $roleId, 'permission_ids' => $permissionIds, 'error' => $e->getMessage()]);
-            throw $e;
+            DB::rollBack();
+            Log::error('Terjadi kesalahan saat menghapus data role.', [
+                'source' => __METHOD__,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+            return [
+                'success' => false,
+                'message' => 'Gagal menghapus data role.',
+            ];
         }
     }
 }
