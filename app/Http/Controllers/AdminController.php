@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\AdminRequest;
+use App\Http\Requests\ProfileRequest;
 use App\Services\AdminService;
 use App\Services\RoleService;
 use Illuminate\Http\RedirectResponse;
@@ -100,5 +101,23 @@ class AdminController extends Controller
             return redirect()->route('admin.index')->with('success', 'Data berhasil dihapus');
         }
         return redirect()->route('admin.index')->with('error', 'Data gagal dihapus');
+    }
+
+    public function viewProfile(): View
+    {
+        $user = \Auth::user();
+        $user->load('admin:id,user_id,nama,no_hp,alamat');
+        return view('pages.profile.profile', compact('user'));
+    }
+
+    public function updateProfile(ProfileRequest $request, $id)
+    {
+        $result = $this->service->update($id, $request->validated());
+
+        if ($result['success']) {
+            return redirect()->back()->with('success', 'Data profile berhasil diperbarui');
+        }
+
+        return redirect()->back()->with('error', 'Data profile gagal diperbarui');
     }
 }
