@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Repositories\Interfaces\CrudInterface;
+use App\Repositories\Interfaces\KelompokTaniCustomQueryInterface;
 use App\Repositories\Interfaces\ManyRelationshipManagement;
 use Illuminate\Support\Facades\Log;
 
@@ -10,11 +11,13 @@ class KelompokTaniService
 {
     protected CrudInterface $kelompokTaniRepository;
     protected ManyRelationshipManagement $relationManager;
+    protected KelompokTaniCustomQueryInterface $customQuery;
 
-    public function __construct(CrudInterface $kelompokTaniRepository, ManyRelationshipManagement $relationManager)
+    public function __construct(CrudInterface $kelompokTaniRepository, ManyRelationshipManagement $relationManager, KelompokTaniCustomQueryInterface $customQuery)
     {
         $this->kelompokTaniRepository = $kelompokTaniRepository;
         $this->relationManager = $relationManager;
+        $this->customQuery = $customQuery;
     }
 
     /**
@@ -59,8 +62,8 @@ class KelompokTaniService
     /**
      * Mengambil data kelompok tani beserta relasi
      *
-     * @deprecated ganti dengan getAll, dan set param true.
      * @return array|\Illuminate\Database\Eloquent\Collection|void
+     * @deprecated ganti dengan getAll, dan set param true.
      */
     public function getAllWithRelations()
     {
@@ -85,7 +88,7 @@ class KelompokTaniService
             if (!empty($kelompokTani)) {
                 return [
                     'success' => true,
-                    'message' => 'Data kelompok tani berhasil diambil',
+                    'message' => 'Data kelompok tani ditemukan',
                     'data' => $kelompokTani,
                 ];
             }
@@ -113,9 +116,9 @@ class KelompokTaniService
     /**
      * Mengambil data kelompok tani beserta data pivot
      *
-     * @deprecated ganti dengan getById()
      * @param string|int $id Id kelompok tani
      * @return array
+     * @deprecated ganti dengan getById()
      */
     public function getByIdWithPivot(string|int $id): array
     {
@@ -155,7 +158,7 @@ class KelompokTaniService
      * @param array $data Data kelompok tani
      * @return array
      */
-    public function create(array $data):array
+    public function create(array $data): array
     {
         try {
             $kelompokTani = $this->kelompokTaniRepository->create($data);
@@ -271,6 +274,67 @@ class KelompokTaniService
             return [
                 'success' => false,
                 'message' => 'Gagal menghapus data kelompok tani.',
+                'data' => [],
+            ];
+        }
+    }
+
+    /**
+     * Mengambil data kelompok tani berdasarkan  id penyuluh
+     *
+     * @param array $id Id penyuluh
+     * @return array
+     */
+    public function getByPenyuluhId(array $id): array
+    {
+        try {
+            $kelompokTanis = $this->customQuery->getByPenyuluhId($id);
+            if ($kelompokTanis->isNotEmpty()) {
+                $data = $kelompokTanis->map(function ($item) {
+                    return [
+                        'id' => $item->id,
+                        'nama' => $item->nama,
+                        'desa' => [
+                            'id' => $item->desa->id ?? null,
+                            'nama' => $item->desa->nama ?? null,
+                        ],
+                        'kecamatan' => [
+                            'id' => $item->desa->kecamatan->id ?? null,
+                            'nama' => $item->desa->kecamatan->nama ?? null,
+                        ],
+                        'penyuluhs' => $item->penyuluhTerdaftars->map(function ($penyuluh) {
+                            return [
+                                'id' => $penyuluh->id,
+                                'nama' => $penyuluh->nama,
+                                'no_hp' => $penyuluh->no_hp,
+                                'alamat' => $penyuluh->alamat,
+                            ];
+                        }),
+                    ];
+                });
+
+                return [
+                    'success' => true,
+                    'message' => 'Data kelompok tani ditemukan',
+                    'data' => $data,
+                ];
+            }
+
+            return [
+                'success' => false,
+                'message' => 'Data kelompok tani tidak ditemukan',
+                'data' => [],
+            ];
+        } catch (\Throwable $th) {
+            Log::error('Terjadi kesalahan saat mengambil data kelompok tani.', [
+                'source' => __METHOD__,
+                'error' => $th->getMessage(),
+                'trace' => $th->getTraceAsString(),
+            ]);
+
+            return [
+                'success' => false,
+                'message' => 'Data kelompok tani tidak ditemukan',
                 'data' => [],
             ];
         }
