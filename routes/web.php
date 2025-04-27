@@ -51,6 +51,9 @@ Route::middleware(['active.session', 'panel.admin.permission'])->group(function 
         Route::get('{bibit}/edit', 'edit')->middleware('permission:bibit.ubah')->name('bibit.edit');
         Route::put('{bibit}', 'update')->middleware('permission:bibit.ubah')->name('bibit.update');
         Route::delete('{bibit}', 'destroy')->middleware('permission:bibit.hapus')->name('bibit.destroy');
+        Route::get('download', 'downloadTemplate')->middleware('permission:bibit.lihat')->name('bibit.download');
+        Route::get('export', 'export')->middleware('permission:bibit.lihat')->name('bibit.export');
+        Route::post('import', 'import')->middleware('permission:bibit.tambah')->name('bibit.import');
     });
 
     // Desa

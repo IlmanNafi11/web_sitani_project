@@ -2,11 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\BibitExport;
+use App\Exports\template\BibitTemplate;
 use App\Http\Requests\BibitRequest;
+use App\Http\Requests\FileExcelRequest;
+use App\Imports\BibitImport;
 use App\Services\BibitService;
 use App\Services\KomoditasService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
+use Maatwebsite\Excel\Facades\Excel;
 
 class BibitBerkualitasController extends Controller
 {
@@ -104,5 +109,38 @@ class BibitBerkualitasController extends Controller
         }
 
         return redirect()->route('bibit.index')->with('error', 'Data gagal dihapus');
+    }
+
+    public function downloadTemplate()
+    {
+        return Excel::download(new BibitTemplate(), 'bibit_berkualitas.xlsx');
+    }
+
+    public function import(FileExcelRequest $request): RedirectResponse
+    {
+        $data = $request->validated();
+
+        try {
+            $import = new BibitImport();
+            Excel::import($import, $data['file']);
+
+            $failures = $import->getFailures();
+
+            if (!empty($failures)) {
+                return redirect()->route('bibit.index')->with([
+                    'success' => 'Data berhasil diimport, namun ada beberapa data yang gagal.',
+                    'failures' => $failures
+                ]);
+            }
+
+            return redirect()->route('bibit.index')->with('success', 'Data berhasil diimport');
+        } catch (\Exception $e) {
+            return redirect()->route('bibit.index')->with('error', $e->getMessage());
+        }
+    }
+
+    public function export()
+    {
+        return Excel::download(new BibitExport(), 'bibit_berkualitas.xlsx');
     }
 }
