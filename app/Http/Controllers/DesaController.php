@@ -2,12 +2,17 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\DesaExport;
+use App\Exports\template\DesaTemplate;
 use App\Http\Requests\DesaRequest;
+use App\Http\Requests\FileExcelRequest;
+use App\Imports\DesaImport;
 use App\Services\DesaService;
 use App\Services\KecamatanService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
+use Maatwebsite\Excel\Facades\Excel;
 
 class DesaController extends Controller
 {
@@ -113,5 +118,38 @@ class DesaController extends Controller
         }
 
         return response()->json($desas['message']);
+    }
+
+    public function downloadTemplate()
+    {
+        return Excel::download(new DesaTemplate(), 'desa.xlsx');
+    }
+
+    public function import(FileExcelRequest $request): RedirectResponse
+    {
+        $data = $request->validated();
+
+        try {
+            $import = new DesaImport();
+            Excel::import($import, $data['file']);
+
+            $failures = $import->getFailures();
+
+            if (!empty($failures)) {
+                return redirect()->route('desa.index')->with([
+                    'success' => 'Data berhasil diimport, namun ada beberapa data yang gagal.',
+                    'failures' => $failures
+                ]);
+            }
+
+            return redirect()->route('desa.index')->with('success', 'Data berhasil diimport');
+        } catch (\Exception $e) {
+            return redirect()->route('desa.index')->with('error', $e->getMessage());
+        }
+    }
+
+    public function export()
+    {
+        return Excel::download(new DesaExport(), 'desa.xlsx');
     }
 }

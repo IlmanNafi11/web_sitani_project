@@ -2,10 +2,24 @@
 @section('title', 'Desa | Sitani')
 @section('content')
     <x-ui.result-alert />
+    <x-ui.table.import-failed-table/>
     <x-ui.card>
         <div class="mb-5">
             <x-ui.title :title="'Data Desa'" />
             <x-ui.sub-title :title="'Manajemen Data Desa di Nganjuk'" />
+        </div>
+        <div id="file-action-container">
+            <x-ui.dropdown-action :title="'File'" :color="'btn-secondary'">
+                <x-ui.button.export-button :title="'Download Template'" :style="'btn-soft'" :color="'btn-secondary'"
+                                           :routes="route('desa.download')" :permission="'desa.lihat'"
+                                           :extra-class-element="'w-full'"/>
+                <x-ui.button.export-button :title="'Export Excel'" :style="'btn-soft'" :color="'btn-success'"
+                                           :routes="route('desa.export')" :permission="'desa.lihat'"
+                                           :extra-class-element="'w-full'"/>
+                <x-ui.button.import-button :title="'Import Excel'" :style="'btn-soft'" :color="'btn-warning'"
+                                           :permission="'desa.lihat'" :extra-class-element="'w-full'"
+                                           :keyId="'import-modal'"/>
+            </x-ui.dropdown-action>
         </div>
         <table id="desa-table" class="table">
             <x-ui.table.header-table :items="[
@@ -31,6 +45,23 @@
 
             </tbody>
         </table>
+        <x-ui.modal :title="'Import Data Desa'" :keyId="'import-modal'">
+            <form id="import-form" action="{{ route('desa.import') }}" method="post" enctype="multipart/form-data">
+                @csrf
+                <div class="modal-body pt-0">
+                    <x-form.file-input :keyId="'import-file'" :name="'file'"
+                                       :helper-text="'Pastikan Format cslx'"/>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-soft btn-secondary" data-overlay="#import-modal">Tutup</button>
+                    <x-ui.button.save-button :title="'Import'" :color="'btn-success'" :formId="'import-form'"
+                                             :style="'btn-soft'"
+                                             :message-alert="'Pastikan data telah sesuai dengan aturan yang tertera'"
+                                             :title-alert="'Impor Data?'" :title-confirm-button="'Ya'"
+                                             :title-cancel-button="'Batal'"/>
+                </div>
+            </form>
+        </x-ui.modal>
     </x-ui.card>
     <script>
 
@@ -54,8 +85,14 @@
 
             $(document).ready(function () {
                 const dataTable = $(".datatable-top");
-                dataTable.prepend(`<div class="action-header-container flex"><x-ui.button.add-button :color="'btn-accent'" :style="'btn-soft'" :route="route('desa.create')" :title="'Tambah Data'" :permission="'desa.tambah'" /></div>`);
-                $(".datatable-top").children().not(".action-header-container").wrapAll('<div class="features-action-container flex flex-row-reverse gap-4 flex-wrap"></div>');
+                dataTable.prepend(`<div id="action-header-container" class="action-header-container flex gap-2.5"><x-ui.button.add-button :color="'btn-accent'" :style="'btn-soft'" :route="route('desa.create')" :title="'Tambah Data'" :permission="'desa.tambah'" /></div>`);
+                dataTable.children().not(".action-header-container").wrapAll('<div class="features-action-container flex flex-row-reverse gap-4 flex-wrap"></div>');
+                const fileActionContainer = document.getElementById('file-action-container');
+                const actionHeaderContainer = document.getElementById('action-header-container');
+
+                if (fileActionContainer && actionHeaderContainer) {
+                    actionHeaderContainer.appendChild(fileActionContainer);
+                }
             });
         }
     </script>

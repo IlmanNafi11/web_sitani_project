@@ -61,6 +61,9 @@ Route::middleware(['active.session', 'panel.admin.permission'])->group(function 
         Route::get('{desa}/edit', 'edit')->middleware('permission:desa.ubah')->name('desa.edit');
         Route::put('{desa}', 'update')->middleware('permission:desa.ubah')->name('desa.update');
         Route::delete('{desa}', 'destroy')->middleware('permission:desa.hapus')->name('desa.destroy');
+        Route::get('download', 'downloadTemplate')->middleware('permission:desa.lihat')->name('desa.download');
+        Route::get('export', 'export')->middleware('permission:desa.lihat')->name('desa.export');
+        Route::post('import', 'import')->middleware('permission:desa.tambah')->name('desa.import');
     });
 
     // Kecamatan
