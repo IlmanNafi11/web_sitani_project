@@ -95,7 +95,9 @@ Route::middleware(['active.session', 'panel.admin.permission'])->group(function 
         Route::get('{komoditas}/edit', 'edit')->middleware('permission:komoditas.ubah')->name('komoditas.edit');
         Route::put('{komoditas}', 'update')->middleware('permission:komoditas.ubah')->name('komoditas.update');
         Route::delete('{komoditas}', 'destroy')->middleware('permission:komoditas.hapus')->name('komoditas.destroy');
-        Route::get('{komoditas}', 'show')->middleware('permission:komoditas.lihat')->name('komoditas.show');
+        Route::get('download', 'downloadTemplate')->middleware('permission:komoditas.lihat')->name('komoditas.download');
+        Route::get('export', 'export')->middleware('permission:komoditas.lihat')->name('komoditas.export');
+        Route::post('import', 'import')->middleware('permission:komoditas.tambah')->name('komoditas.import');
     });
 
     // Penyuluh Terdaftar
