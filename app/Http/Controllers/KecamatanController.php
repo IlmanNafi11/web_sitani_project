@@ -2,10 +2,17 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\KecamatanExport;
+use App\Exports\template\KecamatanTemplate;
+use App\Http\Requests\FileExcelRequest;
 use App\Http\Requests\KecamatanRequest;
+use App\Imports\KecamatanImport;
+use App\Imports\KomoditasImport;
 use App\Services\KecamatanService;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Log;
 use Illuminate\View\View;
+use Maatwebsite\Excel\Facades\Excel;
 
 class KecamatanController extends Controller
 {
@@ -90,5 +97,38 @@ class KecamatanController extends Controller
             return redirect()->route('kecamatan.index')->with('success', 'Data berhasil dihapus');
         }
         return redirect()->route('kecamatan.index')->with('error', 'Data gagal dihapus');
+    }
+
+    public function downloadTemplate()
+    {
+        return Excel::download(new KecamatanTemplate(), 'kecamatan.xlsx');
+    }
+
+    public function import(FileExcelRequest $request): RedirectResponse
+    {
+        $data = $request->validated();
+
+        try {
+            $import = new KecamatanImport();
+            Excel::import($import, $data['file']);
+
+            $failures = $import->getFailures();
+
+            if (!empty($failures)) {
+                return redirect()->route('kecamatan.index')->with([
+                    'success' => 'Data berhasil diimport, namun ada beberapa data yang gagal.',
+                    'failures' => $failures
+                ]);
+            }
+
+            return redirect()->route('kecamatan.index')->with('success', 'Data berhasil diimport');
+        } catch (\Exception $e) {
+            return redirect()->route('kecamatan.index')->with('error', $e->getMessage());
+        }
+    }
+
+    public function export()
+    {
+        return Excel::download(new KecamatanExport(), 'kecamatan.xlsx');
     }
 }

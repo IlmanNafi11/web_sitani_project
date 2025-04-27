@@ -51,7 +51,6 @@ Route::middleware(['active.session', 'panel.admin.permission'])->group(function 
         Route::get('{bibit}/edit', 'edit')->middleware('permission:bibit.ubah')->name('bibit.edit');
         Route::put('{bibit}', 'update')->middleware('permission:bibit.ubah')->name('bibit.update');
         Route::delete('{bibit}', 'destroy')->middleware('permission:bibit.hapus')->name('bibit.destroy');
-        Route::get('{bibit}', 'show')->middleware('permission:bibit.lihat')->name('bibit.show');
     });
 
     // Desa
@@ -62,7 +61,6 @@ Route::middleware(['active.session', 'panel.admin.permission'])->group(function 
         Route::get('{desa}/edit', 'edit')->middleware('permission:desa.ubah')->name('desa.edit');
         Route::put('{desa}', 'update')->middleware('permission:desa.ubah')->name('desa.update');
         Route::delete('{desa}', 'destroy')->middleware('permission:desa.hapus')->name('desa.destroy');
-        Route::get('{desa}', 'show')->middleware('permission:desa.lihat')->name('desa.show');
     });
 
     // Kecamatan
@@ -73,7 +71,9 @@ Route::middleware(['active.session', 'panel.admin.permission'])->group(function 
         Route::get('{kecamatan}/edit', 'edit')->middleware('permission:kecamatan.ubah')->name('kecamatan.edit');
         Route::put('{kecamatan}', 'update')->middleware('permission:kecamatan.ubah')->name('kecamatan.update');
         Route::delete('{kecamatan}', 'destroy')->middleware('permission:kecamatan.hapus')->name('kecamatan.destroy');
-        Route::get('{kecamatan}', 'show')->middleware('permission:kecamatan.lihat')->name('kecamatan.show');
+        Route::get('download', 'downloadTemplate')->middleware('permission:kecamatan.lihat')->name('kecamatan.download');
+        Route::get('export', 'export')->middleware('permission:kecamatan.lihat')->name('kecamatan.export');
+        Route::post('import', 'import')->middleware('permission:kecamatan.tambah')->name('kecamatan.import');
     });
 
     // Kelompok Tani
@@ -84,7 +84,6 @@ Route::middleware(['active.session', 'panel.admin.permission'])->group(function 
         Route::get('{kelompok_tani}/edit', 'edit')->middleware('permission:kelompok-tani.ubah')->name('kelompok-tani.edit');
         Route::put('{kelompok_tani}', 'update')->middleware('permission:kelompok-tani.ubah')->name('kelompok-tani.update');
         Route::delete('{kelompok_tani}', 'destroy')->middleware('permission:kelompok-tani.hapus')->name('kelompok-tani.destroy');
-        Route::get('{kelompok_tani}', 'show')->middleware('permission:kelompok-tani.lihat')->name('kelompok-tani.show');
     });
 
     // Komoditas
