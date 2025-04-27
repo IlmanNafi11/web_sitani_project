@@ -35,9 +35,7 @@ class OtpCodeNotification extends Notification
     {
         return (new MailMessage)
             ->subject('Kode OTP Anda')
-            ->line('Berikut adalah kode OTP Anda:')
-            ->line($this->otp)
-            ->line('Kode ini berlaku selama 5 menit.');
+            ->view('mail.mail', ['code' => $this->otp]);
     }
 
     /**
