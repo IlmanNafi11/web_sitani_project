@@ -29,7 +29,6 @@ class BibitImport implements ToModel, WithValidation, SkipsOnFailure, WithHeadin
     {
         $komoditas = Komoditas::whereRaw('LOWER(nama) = ?', [strtolower($row['komoditas'])])->first();
 
-        Log::info($komoditas);
         if (!$komoditas) {
             return null;
         }

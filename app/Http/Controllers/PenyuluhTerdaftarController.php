@@ -2,12 +2,17 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\PenyuluhTerdaftarExport;
+use App\Exports\template\PenyuluhTerdaftarTemplate;
+use App\Http\Requests\FileExcelRequest;
 use App\Http\Requests\PenyuluhTerdaftarRequest;
+use App\Imports\PenyuluhTerdaftarImport;
 use App\Services\KecamatanService;
 use App\Services\PenyuluhTerdaftarService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
+use Maatwebsite\Excel\Facades\Excel;
 
 class PenyuluhTerdaftarController extends Controller
 {
@@ -121,5 +126,38 @@ class PenyuluhTerdaftarController extends Controller
         }
 
         return response()->json($result['message']);
+    }
+
+    public function downloadTemplate()
+    {
+        return Excel::download(new PenyuluhTerdaftarTemplate(), 'penyuluh_terdaftar.xlsx');
+    }
+
+    public function import(FileExcelRequest $request): RedirectResponse
+    {
+        $data = $request->validated();
+
+        try {
+            $import = new PenyuluhTerdaftarImport();
+            Excel::import($import, $data['file']);
+
+            $failures = $import->getFailures();
+
+            if (!empty($failures)) {
+                return redirect()->route('penyuluh-terdaftar.index')->with([
+                    'success' => 'Data berhasil diimport, namun ada beberapa data yang gagal.',
+                    'failures' => $failures
+                ]);
+            }
+
+            return redirect()->route('penyuluh-terdaftar.index')->with('success', 'Data berhasil diimport');
+        } catch (\Exception $e) {
+            return redirect()->route('penyuluh-terdaftar.index')->with('error', $e->getMessage());
+        }
+    }
+
+    public function export()
+    {
+        return Excel::download(new PenyuluhTerdaftarExport(), 'penyuluh_terdaftar.xlsx');
     }
 }

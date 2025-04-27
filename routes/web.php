@@ -113,7 +113,9 @@ Route::middleware(['active.session', 'panel.admin.permission'])->group(function 
         Route::get('{penyuluh_terdaftar}/edit', 'edit')->middleware('permission:penyuluh.ubah')->name('penyuluh-terdaftar.edit');
         Route::put('{penyuluh_terdaftar}', 'update')->middleware('permission:penyuluh.ubah')->name('penyuluh-terdaftar.update');
         Route::delete('{penyuluh_terdaftar}', 'destroy')->middleware('permission:penyuluh.hapus')->name('penyuluh-terdaftar.destroy');
-        Route::get('{penyuluh_terdaftar}', 'show')->middleware('permission:penyuluh.lihat')->name('penyuluh-terdaftar.show');
+        Route::get('download', 'downloadTemplate')->middleware('permission:penyuluh.lihat')->name('penyuluh-terdaftar.download');
+        Route::get('export', 'export')->middleware('permission:penyuluh.lihat')->name('penyuluh-terdaftar.export');
+        Route::post('import', 'import')->middleware('permission:penyuluh.tambah')->name('penyuluh-terdaftar.import');
     });
 
     // Laporan Bibit
