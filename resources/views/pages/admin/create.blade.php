@@ -22,7 +22,7 @@
                                :optionValue="'name'" :optionLabel="'name'"/>
             </div>
             <div class="flex gap-2.5">
-                <x-ui.button.back-button :style="'btn-soft'" :title="'Kembali'"/>
+                <x-ui.button.back-button :style="'btn-soft'" :title="'Kembali'" :routes="'admin.index'" />
                 <x-ui.button.save-button :style="'btn-soft'" formId="form-tambah-admin"/>
             </div>
         </form>

@@ -119,12 +119,7 @@
 
     {{-- action button --}}
     <div class="button-group flex space-x-4">
-        <button class="btn btn-soft btn-secondary" onclick="back()">Kembali</button>
+        <x-ui.button.back-button :style="'btn-soft'" :title="'Kembali'" :routes="'laporan-bibit.index'" />
         <x-ui.button.save-button :style="'btn-soft'" :formId="'form-verify-bibit'" :title="$laporan->status == 2 ? 'Verifikasi': 'Perbarui'"/>
     </div>
 </form>
-<script>
-    function back(){
-        history.back();
-    }
-</script>

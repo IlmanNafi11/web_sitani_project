@@ -12,13 +12,15 @@ class BackButton extends Component
     public $style;
     public $icon;
     public $title;
+    public $routes;
 
-    public function __construct($color, $style, $icon, $title)
+    public function __construct($color, $style, $icon, $title, $routes)
     {
-        $this->$color = $color;
+        $this->color = $color;
         $this->style = $style;
         $this->icon = $icon;
         $this->title = $title;
+        $this->routes = $routes;
     }
 
     /**

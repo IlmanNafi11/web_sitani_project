@@ -18,7 +18,7 @@
                     :label="'Penyuluh'" :placeholder="'Pilih penyuluh'" :helperText="'Pilih kecamatan terlebih dahulu untuk menampilkan opsi'" :isMultiple="true" :hasSearch="true" :searchPlaceholder="'Cari Penyuluh'" />
             </div>
             <div class="flex gap-2.5">
-                <x-ui.button.back-button :style="'btn-soft'" :title="'Kembali'" />
+                <x-ui.button.back-button :style="'btn-soft'" :title="'Kembali'" :routes="'kelompok-tani.index'" />
                 <x-ui.button.save-button formId="form-tambah-kelompok-tani" :style="'btn-soft'" />
             </div>
         </form>

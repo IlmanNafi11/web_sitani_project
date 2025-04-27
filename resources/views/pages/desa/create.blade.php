@@ -13,7 +13,7 @@
                     :options="$kecamatans" :selected="null" :placeholder="'Pilih Kecamatan...'" />
             </div>
             <div class="flex gap-2.5">
-                <x-ui.button.back-button :style="'btn-soft'" :title="'Kembali'" />
+                <x-ui.button.back-button :style="'btn-soft'" :title="'Kembali'" :routes="'desa.index'" />
                 <x-ui.button.save-button :style="'btn-soft'" formId="form-tambah-desa" />
             </div>
         </form>

@@ -15,7 +15,7 @@
                 <x-form.number-counter :name="'musim'" :min="1" :max="10" :defaultValue="$komoditas->musim" :extraClassElement="'col-span-1 row-span-2'" :keyId="'musim'" :helperText="'Mohon pilih jumlah musim antara 1 - 10'" :label="'Jumlah Musim'" />
             </div>
             <div class="flex gap-2.5">
-                <x-ui.button.back-button :style="'btn-soft'" :title="'Kembali'" />
+                <x-ui.button.back-button :style="'btn-soft'" :title="'Kembali'" :routes="'komoditas.index'" />
                 <x-ui.button.save-button :style="'btn-soft'" formId="form-perbarui-komoditas" />
             </div>
         </form>

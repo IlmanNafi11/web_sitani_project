@@ -13,7 +13,7 @@
                 <x-form.text-area :keyId="'deskripsi'" :label="'Deskripsi'" :name="'deskripsi'" :placeholder="'Masukan deskripsi bibit, contoh: Cap gajah merupakan bibit padi paling berkualitas'" :extraClassOption="'col-span-2'" />
             </div>
             <div class="flex gap-2.5">
-                <x-ui.button.back-button :style="'btn-soft'" :title="'Kembali'" />
+                <x-ui.button.back-button :style="'btn-soft'" :title="'Kembali'" :routes="'bibit.index'" />
                 <x-ui.button.save-button :style="'btn-soft'" formId="form-tambah-bibit" />
             </div>
         </form>

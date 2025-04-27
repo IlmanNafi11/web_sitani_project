@@ -71,7 +71,7 @@
                 </div>
             </div>
             <div class="flex gap-2.5">
-                <x-ui.button.back-button :style="'btn-soft'" :title="'Kembali'"/>
+                <x-ui.button.back-button :style="'btn-soft'" :title="'Kembali'" :routes="'admin.roles.index'" />
                 <x-ui.button.save-button :style="'btn-soft'" formId="form-update-role"/>
             </div>
         </form>
