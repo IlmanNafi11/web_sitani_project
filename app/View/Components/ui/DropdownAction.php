@@ -11,16 +11,22 @@ class DropdownAction extends Component
 {
     public array $items;
     public string $title;
-    
+    public string $color;
+    public string $style;
+
     /**
      * Dropdown action button component
      * @param array $items item dropdown(elemen/component)
      * @param string $title title dropdown button, default 'Dropdown'
+     * @param string $color warna dropdown component, default 'btn-accent'
+     * @param string $style style dropdown component, default 'btn-soft'
      */
-    public function __construct(array $items, string $title)
+    public function __construct(array $items, string $title, string $color, string $style)
     {
         $this->items = $items;
         $this->title = $title;
+        $this->color = $color;
+        $this->style = $style;
     }
 
     /**
