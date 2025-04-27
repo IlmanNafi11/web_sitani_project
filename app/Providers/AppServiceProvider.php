@@ -70,8 +70,5 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         LaporanKondisi::observe(LaporanBibitObserver::class);
-        \Event::listen(
-            OtpGenerated::class, SendOtpNotification::class
-        );
     }
 }
