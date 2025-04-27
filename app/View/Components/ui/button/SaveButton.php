@@ -16,8 +16,10 @@ class SaveButton extends Component
     public $extraClassElement;
     public $titleAlert;
     public $messageAlert;
+    public $titleConfirmButton;
+    public $titleCancelButton;
 
-    public function __construct($color, $icon, $style, $title, $formId, $extraClassElement, $titleAlert, $messageAlert)
+    public function __construct($color, $icon, $style, $title, $formId, $extraClassElement, $titleAlert, $messageAlert, $titleConfirmButton, $titleCancelButton)
     {
         $this->color = $color;
         $this->icon = $icon;
@@ -27,6 +29,8 @@ class SaveButton extends Component
         $this->extraClassElement = $extraClassElement;
         $this->titleAlert = $titleAlert;
         $this->messageAlert = $messageAlert;
+        $this->titleConfirmButton = $titleConfirmButton;
+        $this->titleCancelButton = $titleCancelButton;
     }
 
     /**
