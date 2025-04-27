@@ -31,10 +31,15 @@
 
 @once
     <script>
-        document.getElementById('btn-bersihkan').addEventListener('click', function () {
-            const errorContainer = document.getElementById('error-container');
-            if (errorContainer) {
-                errorContainer.remove();
+        document.addEventListener('DOMContentLoaded', function (){
+            const btnHapus = document.getElementById('btn-bersihkan');
+            if (btnHapus){
+                document.getElementById('btn-bersihkan').addEventListener('click', function () {
+                    const errorContainer = document.getElementById('error-container');
+                    if (errorContainer) {
+                        errorContainer.remove();
+                    }
+                });
             }
         });
     </script>
