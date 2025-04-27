@@ -2,12 +2,17 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\AdminExport;
+use App\Exports\template\AdminTemplate;
 use App\Http\Requests\AdminRequest;
+use App\Http\Requests\FileExcelRequest;
 use App\Http\Requests\ProfileRequest;
+use App\Imports\AdminImport;
 use App\Services\AdminService;
 use App\Services\RoleService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
+use Maatwebsite\Excel\Facades\Excel;
 
 class AdminController extends Controller
 {
@@ -119,5 +124,38 @@ class AdminController extends Controller
         }
 
         return redirect()->back()->with('error', 'Data profile gagal diperbarui');
+    }
+
+    public function downloadTemplate()
+    {
+        return Excel::download(new AdminTemplate(), 'data_admin.xlsx');
+    }
+
+    public function import(FileExcelRequest $request): RedirectResponse
+    {
+        $data = $request->validated();
+
+        try {
+            $import = new AdminImport();
+            Excel::import($import, $data['file']);
+
+            $failures = $import->getFailures();
+
+            if (!empty($failures)) {
+                return redirect()->route('admin.index')->with([
+                    'success' => 'Data berhasil diimport, namun ada beberapa data yang gagal.',
+                    'failures' => $failures
+                ]);
+            }
+
+            return redirect()->route('admin.index')->with('success', 'Data berhasil diimport');
+        } catch (\Exception $e) {
+            return redirect()->route('admin.index')->with('error', $e->getMessage());
+        }
+    }
+
+    public function export()
+    {
+        return Excel::download(new AdminExport(), 'data_admin.xlsx');
     }
 }

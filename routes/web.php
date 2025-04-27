@@ -137,6 +137,9 @@ Route::middleware(['active.session', 'panel.admin.permission'])->group(function 
         Route::get('{id}/edit', 'edit')->middleware('permission:admin.ubah')->name('admin.edit');
         Route::put('{id}', 'update')->middleware('permission:admin.ubah')->name('admin.update');
         Route::delete('{id}', 'destroy')->middleware('permission:admin.hapus')->name('admin.destroy');
+        Route::get('download', 'downloadTemplate')->middleware('permission:admin.lihat')->name('admin.download');
+        Route::get('export', 'export')->middleware('permission:admin.lihat')->name('admin.export');
+        Route::post('import', 'import')->middleware('permission:admin.tambah')->name('admin.import');
     });
 
     // Role & Permission Management
