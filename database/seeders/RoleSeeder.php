@@ -22,7 +22,7 @@ class RoleSeeder extends Seeder
 
         Role::create([
             'name' => 'penyuluh',
-            'guard_name' => 'api',
+            'guard_name' => 'web',
             'created_at' => now(),
             'updated_at' => now(),
         ]);
