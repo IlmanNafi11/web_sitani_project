@@ -33,7 +33,7 @@ class PenyuluhSeeder extends Seeder
             'kecamatan_id' => $kecamatan->id,
         ]);
 
-        $user->assignRole('penyuluh');
+        $user->assignRole('penyuluh', 'api');
 
         $penyuluh = Penyuluh::create([
             'user_id' => $user->id,
