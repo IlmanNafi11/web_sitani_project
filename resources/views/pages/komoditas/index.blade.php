@@ -10,9 +10,9 @@
         </div>
         <div id="file-action-container">
             <x-ui.dropdown-action :title="'File'" :color="'btn-secondary'">
-                <x-ui.button.export-button :title="'Download Template'" :style="'btn-soft'" :color="'btn-secondary'" :routes="route('komoditas.download')" :permission="'komoditas.lihat'" :extra-class-element="'w-full'" />
-                <x-ui.button.export-button :title="'Export Excel'" :style="'btn-soft'" :color="'btn-success'" :routes="route('komoditas.export')" :permission="'komoditas.lihat'" :extra-class-element="'w-full'" />
-                <x-ui.button.import-button :title="'Import Excel'" :style="'btn-soft'" :color="'btn-warning'" :permission="'komoditas.lihat'" :extra-class-element="'w-full'" :keyId="'import-modal'" />
+                <x-ui.button.export-button :title="'Unduh Template'" :style="'btn-soft'" :color="'btn-secondary'" :routes="route('komoditas.download')" :permission="'komoditas.lihat'" :extra-class-element="'w-full'" :icon="'icon-[line-md--file-download]'" />
+                <x-ui.button.export-button :title="'Export Excel'" :style="'btn-soft'" :color="'btn-success'" :routes="route('komoditas.export')" :permission="'komoditas.export'" :extra-class-element="'w-full'" :icon="'icon-[line-md--file-export]'" />
+                <x-ui.button.import-button :title="'Import Excel'" :style="'btn-soft'" :color="'btn-info'" :permission="'komoditas.import'" :extra-class-element="'w-full'" :keyId="'import-modal'" :icon="'icon-[line-md--file-import]'" />
             </x-ui.dropdown-action>
         </div>
         <table id="komoditas-table" class="table">

@@ -52,8 +52,8 @@ Route::middleware(['active.session', 'panel.admin.permission'])->group(function 
         Route::put('{bibit}', 'update')->middleware('permission:bibit.ubah')->name('bibit.update');
         Route::delete('{bibit}', 'destroy')->middleware('permission:bibit.hapus')->name('bibit.destroy');
         Route::get('download', 'downloadTemplate')->middleware('permission:bibit.lihat')->name('bibit.download');
-        Route::get('export', 'export')->middleware('permission:bibit.lihat')->name('bibit.export');
-        Route::post('import', 'import')->middleware('permission:bibit.tambah')->name('bibit.import');
+        Route::get('export', 'export')->middleware('permission:bibit.export')->name('bibit.export');
+        Route::post('import', 'import')->middleware('permission:bibit.import')->name('bibit.import');
     });
 
     // Desa
@@ -65,8 +65,8 @@ Route::middleware(['active.session', 'panel.admin.permission'])->group(function 
         Route::put('{desa}', 'update')->middleware('permission:desa.ubah')->name('desa.update');
         Route::delete('{desa}', 'destroy')->middleware('permission:desa.hapus')->name('desa.destroy');
         Route::get('download', 'downloadTemplate')->middleware('permission:desa.lihat')->name('desa.download');
-        Route::get('export', 'export')->middleware('permission:desa.lihat')->name('desa.export');
-        Route::post('import', 'import')->middleware('permission:desa.tambah')->name('desa.import');
+        Route::get('export', 'export')->middleware('permission:desa.export')->name('desa.export');
+        Route::post('import', 'import')->middleware('permission:desa.import')->name('desa.import');
     });
 
     // Kecamatan
@@ -78,8 +78,8 @@ Route::middleware(['active.session', 'panel.admin.permission'])->group(function 
         Route::put('{kecamatan}', 'update')->middleware('permission:kecamatan.ubah')->name('kecamatan.update');
         Route::delete('{kecamatan}', 'destroy')->middleware('permission:kecamatan.hapus')->name('kecamatan.destroy');
         Route::get('download', 'downloadTemplate')->middleware('permission:kecamatan.lihat')->name('kecamatan.download');
-        Route::get('export', 'export')->middleware('permission:kecamatan.lihat')->name('kecamatan.export');
-        Route::post('import', 'import')->middleware('permission:kecamatan.tambah')->name('kecamatan.import');
+        Route::get('export', 'export')->middleware('permission:kecamatan.export')->name('kecamatan.export');
+        Route::post('import', 'import')->middleware('permission:kecamatan.import')->name('kecamatan.import');
     });
 
     // Kelompok Tani
@@ -104,8 +104,8 @@ Route::middleware(['active.session', 'panel.admin.permission'])->group(function 
         Route::put('{komoditas}', 'update')->middleware('permission:komoditas.ubah')->name('komoditas.update');
         Route::delete('{komoditas}', 'destroy')->middleware('permission:komoditas.hapus')->name('komoditas.destroy');
         Route::get('download', 'downloadTemplate')->middleware('permission:komoditas.lihat')->name('komoditas.download');
-        Route::get('export', 'export')->middleware('permission:komoditas.lihat')->name('komoditas.export');
-        Route::post('import', 'import')->middleware('permission:komoditas.tambah')->name('komoditas.import');
+        Route::get('export', 'export')->middleware('permission:komoditas.export')->name('komoditas.export');
+        Route::post('import', 'import')->middleware('permission:komoditas.import')->name('komoditas.import');
     });
 
     // Penyuluh Terdaftar
@@ -117,8 +117,8 @@ Route::middleware(['active.session', 'panel.admin.permission'])->group(function 
         Route::put('{penyuluh_terdaftar}', 'update')->middleware('permission:penyuluh.ubah')->name('penyuluh-terdaftar.update');
         Route::delete('{penyuluh_terdaftar}', 'destroy')->middleware('permission:penyuluh.hapus')->name('penyuluh-terdaftar.destroy');
         Route::get('download', 'downloadTemplate')->middleware('permission:penyuluh.lihat')->name('penyuluh-terdaftar.download');
-        Route::get('export', 'export')->middleware('permission:penyuluh.lihat')->name('penyuluh-terdaftar.export');
-        Route::post('import', 'import')->middleware('permission:penyuluh.tambah')->name('penyuluh-terdaftar.import');
+        Route::get('export', 'export')->middleware('permission:penyuluh.export')->name('penyuluh-terdaftar.export');
+        Route::post('import', 'import')->middleware('permission:penyuluh.import')->name('penyuluh-terdaftar.import');
     });
 
     // Laporan Bibit
@@ -141,8 +141,8 @@ Route::middleware(['active.session', 'panel.admin.permission'])->group(function 
         Route::put('{id}', 'update')->middleware('permission:admin.ubah')->name('admin.update');
         Route::delete('{id}', 'destroy')->middleware('permission:admin.hapus')->name('admin.destroy');
         Route::get('download', 'downloadTemplate')->middleware('permission:admin.lihat')->name('admin.download');
-        Route::get('export', 'export')->middleware('permission:admin.lihat')->name('admin.export');
-        Route::post('import', 'import')->middleware('permission:admin.tambah')->name('admin.import');
+        Route::get('export', 'export')->middleware('permission:admin.export')->name('admin.export');
+        Route::post('import', 'import')->middleware('permission:admin.import')->name('admin.import');
     });
 
     // Role & Permission Management

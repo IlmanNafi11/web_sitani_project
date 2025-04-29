@@ -10,15 +10,15 @@
         </div>
         <div id="file-action-container">
             <x-ui.dropdown-action :title="'File'" :color="'btn-secondary'">
-                <x-ui.button.export-button :title="'Download Template'" :style="'btn-soft'" :color="'btn-secondary'"
+                <x-ui.button.export-button :title="'Unduh Template'" :style="'btn-soft'" :color="'btn-secondary'"
                                            :routes="route('bibit.download')" :permission="'bibit.lihat'"
-                                           :extra-class-element="'w-full'"/>
+                                           :extra-class-element="'w-full'" :icon="'icon-[line-md--file-download]'" />
                 <x-ui.button.export-button :title="'Export Excel'" :style="'btn-soft'" :color="'btn-success'"
-                                           :routes="route('bibit.export')" :permission="'bibit.lihat'"
-                                           :extra-class-element="'w-full'"/>
-                <x-ui.button.import-button :title="'Import Excel'" :style="'btn-soft'" :color="'btn-warning'"
-                                           :permission="'bibit.lihat'" :extra-class-element="'w-full'"
-                                           :keyId="'import-modal'"/>
+                                           :routes="route('bibit.export')" :permission="'bibit.export'"
+                                           :extra-class-element="'w-full'" :icon="'icon-[line-md--file-export]'" />
+                <x-ui.button.import-button :title="'Import Excel'" :style="'btn-soft'" :color="'btn-info'"
+                                           :permission="'bibit.import'" :extra-class-element="'w-full'"
+                                           :keyId="'import-modal'" :icon="'icon-[line-md--file-import]'" />
             </x-ui.dropdown-action>
         </div>
         <table id="bibit-table" class="table">

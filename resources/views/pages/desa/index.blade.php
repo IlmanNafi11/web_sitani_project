@@ -10,15 +10,15 @@
         </div>
         <div id="file-action-container">
             <x-ui.dropdown-action :title="'File'" :color="'btn-secondary'">
-                <x-ui.button.export-button :title="'Download Template'" :style="'btn-soft'" :color="'btn-secondary'"
+                <x-ui.button.export-button :title="'Unduh Template'" :style="'btn-soft'" :color="'btn-secondary'"
                                            :routes="route('desa.download')" :permission="'desa.lihat'"
-                                           :extra-class-element="'w-full'"/>
+                                           :extra-class-element="'w-full'" :icon="'icon-[line-md--file-download]'" />
                 <x-ui.button.export-button :title="'Export Excel'" :style="'btn-soft'" :color="'btn-success'"
-                                           :routes="route('desa.export')" :permission="'desa.lihat'"
-                                           :extra-class-element="'w-full'"/>
-                <x-ui.button.import-button :title="'Import Excel'" :style="'btn-soft'" :color="'btn-warning'"
-                                           :permission="'desa.lihat'" :extra-class-element="'w-full'"
-                                           :keyId="'import-modal'"/>
+                                           :routes="route('desa.export')" :permission="'desa.export'"
+                                           :extra-class-element="'w-full'" :icon="'icon-[line-md--file-export]'" />
+                <x-ui.button.import-button :title="'Import Excel'" :style="'btn-soft'" :color="'btn-info'"
+                                           :permission="'desa.import'" :extra-class-element="'w-full'"
+                                           :keyId="'import-modal'" :icon="'icon-[line-md--file-import]'" />
             </x-ui.dropdown-action>
         </div>
         <table id="desa-table" class="table">
