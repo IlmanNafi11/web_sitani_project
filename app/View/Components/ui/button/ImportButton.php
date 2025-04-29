@@ -13,15 +13,13 @@ class ImportButton extends Component
     public $icon;
     public $extraClassElement;
     public $color;
-    public $routes;
     public $permission;
     public $keyId;
-    public function __construct($title, $style, $icon, $routes, $permission, $color, $extraClassElement, $keyId)
+    public function __construct($title, $style, $icon, $permission, $color, $extraClassElement, $keyId)
     {
         $this->title = $title;
         $this->style = $style;
         $this->icon = $icon;
-        $this->routes = $routes;
         $this->permission = $permission;
         $this->color = $color;
         $this->extraClassElement = $extraClassElement;
