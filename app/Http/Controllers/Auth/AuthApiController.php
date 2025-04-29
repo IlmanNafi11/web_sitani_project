@@ -160,7 +160,7 @@ class AuthApiController extends Controller
         $data = $this->userService->findUser(['email' => $email]);
 
         if (!$data['success']) {
-            return $this->errorResponse('Gagal mengirim OTP', 401);
+            return $this->errorResponse($data['message'], $data['code']);
         }
 
         $user = $data['data'];

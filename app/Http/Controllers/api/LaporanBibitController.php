@@ -50,6 +50,6 @@ class LaporanBibitController extends Controller
             return $this->successResponse(LaporanKondisiResource::collection($result['data']), $result['message'], 200);
         }
 
-        return $this->errorResponse($result['message'], 500, ['id' => $id]);
+        return $this->errorResponse($result['message'], $result['code'], ['penyuluh_id' => $id]);
     }
 }

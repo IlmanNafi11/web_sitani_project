@@ -4,6 +4,7 @@ namespace App\Observers;
 
 use App\Models\LaporanKondisi;
 use App\Models\LaporanKondisiDetail;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 
@@ -19,12 +20,13 @@ class LaporanBibitObserver
                 $data = request()->all();
                 $file = $data['foto_bibit'];
                 $now = date('Y-m-d');
+                $waktuPanen = Carbon::parse($data['estimasi_panen'])->format('Y-m-d');
                 $filename = time() . '_' . $file->getClientOriginalName();
                 $path = $file->storeAs('foto_bibit/' . $data['kelompok_tani_id'] . '/' . $now, $filename, 'public');
                 LaporanKondisiDetail::create([
                     'laporan_kondisi_id' => $laporanKondisi->id,
                             'luas_lahan' => $data['luas_lahan'],
-                            'estimasi_panen' => $data['estimasi_panen'],
+                            'estimasi_panen' => $waktuPanen,
                             'jenis_bibit' => $data['jenis_bibit'],
                             'foto_bibit' => $path,
                             'lokasi_lahan' => $data['lokasi_lahan'],

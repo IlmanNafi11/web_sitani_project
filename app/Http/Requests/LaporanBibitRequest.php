@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
 class LaporanBibitRequest extends FormRequest
@@ -17,24 +18,24 @@ class LaporanBibitRequest extends FormRequest
     /**
      * Get the validation rules that apply to the request.
      *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
+     * @return array<string, ValidationRule|array|string>
      */
     public function rules(): array
     {
-        if (request()->isMethod('POST')) {
+        if ($this->isMethod('POST')) {
             return [
-                'kelompok_tani_id' => 'required|exists:kelompok_tanis,id',
-                'komoditas_id' => 'required|exists:komoditas,id',
-                'penyuluh_id' => 'required|exists:penyuluhs,id',
-                'luas_lahan' => 'required|numeric|min:0',
-                'estimasi_panen' => 'required|date|after:today',
-                'jenis_bibit' => 'required|string|max:255',
-                'foto_bibit' => 'required|image|mimes:jpeg,png,jpg|max:2048',
-                'lokasi_lahan' => 'required|string|max:255',
+                'kelompok_tani_id' => ['required', 'exists:kelompok_tanis,id'],
+                'komoditas_id' => ['required', 'exists:komoditas,id'],
+                'penyuluh_id' => ['required', 'exists:penyuluhs,id'],
+                'luas_lahan' => ['required', 'numeric', 'min:0'],
+                'estimasi_panen' => ['required', 'date_format:Y-m-d', 'after:today'],
+                'jenis_bibit' => ['required', 'string', 'max:255'],
+                'foto_bibit' => ['required', 'image', 'mimes:jpeg,png,jpg', 'max:2048'],
+                'lokasi_lahan' => ['required', 'string', 'max:255'],
             ];
-        } else if (request()->isMethod('PUT')) {
+        } elseif ($this->isMethod('PUT')) {
             return [
-                'status' => 'required',
+                'status' => ['required'],
             ];
         }
 
@@ -43,7 +44,7 @@ class LaporanBibitRequest extends FormRequest
 
     public function messages(): array
     {
-        if (request()->isMethod('POST')) {
+        if ($this->isMethod('POST')) {
             return [
                 'kelompok_tani_id.required' => 'Kelompok Tani wajib diisi.',
                 'kelompok_tani_id.exists' => 'Kelompok Tani tidak valid.',
@@ -55,7 +56,7 @@ class LaporanBibitRequest extends FormRequest
                 'luas_lahan.numeric' => 'Luas Lahan harus berupa angka.',
                 'luas_lahan.min' => 'Luas Lahan tidak boleh kurang dari 0.',
                 'estimasi_panen.required' => 'Estimasi Panen wajib diisi.',
-                'estimasi_panen.date' => 'Estimasi Panen harus berupa tanggal yang valid.',
+                'estimasi_panen.date_format' => 'Format Estimasi Panen harus YYYY-MM-DD.',
                 'estimasi_panen.after' => 'Estimasi Panen harus tanggal setelah hari ini.',
                 'jenis_bibit.required' => 'Jenis Bibit wajib diisi.',
                 'jenis_bibit.string' => 'Jenis Bibit harus berupa teks.',
@@ -67,9 +68,9 @@ class LaporanBibitRequest extends FormRequest
                 'lokasi_lahan.string' => 'Lokasi Lahan harus berupa teks.',
                 'lokasi_lahan.max' => 'Lokasi Lahan maksimal 255 karakter.',
             ];
-        } else if (request()->isMethod('PUT')) {
+        } elseif ($this->isMethod('PUT')) {
             return [
-                'status.required' => 'Silahkan pilih opsi kualitas bibit yang tersedia'
+                'status.required' => 'Silahkan pilih opsi kualitas bibit yang tersedia',
             ];
         }
 

@@ -28,12 +28,13 @@ class UserService
     public function findUser(array $conditions, array $relations = []): array
     {
         try {
-            $user = $this->repository->findUser($conditions,false, $relations);
+            $user = $this->repository->findUser($conditions, false, $relations);
             if ($user !== null) {
                 return [
                     'success' => true,
                     'message' => 'Data pengguna ditemukan',
-                    'data' => $user
+                    'data' => $user,
+                    'code' => 200,
                 ];
             }
 
@@ -41,6 +42,7 @@ class UserService
                 'success' => false,
                 'message' => 'Data pengguna tidak ditemukan',
                 'data' => [],
+                'code' => 404,
             ];
         } catch (\Throwable $e) {
             Log::error('Terjadi kesalahan saat mencari data pengguna', [
@@ -52,6 +54,7 @@ class UserService
                 'success' => false,
                 'message' => 'Terjadi kesalahan saat mencari data pengguna.',
                 'data' => [],
+                'code' => 500,
             ];
         }
     }
@@ -71,6 +74,7 @@ class UserService
                 return [
                     'success' => true,
                     'message' => 'Kata sandi berhasil diperbarui',
+                    'code' => 200,
                 ];
             }
 
@@ -78,6 +82,7 @@ class UserService
                 'success' => false,
                 'message' => 'Gagal memperbarui kata sandi pengguna',
                 'data' => [],
+                'code' => 500,
             ];
         } catch (\Throwable $e) {
             Log::error('Terjadi kesalahan saat memperbarui kata sandi pengguna', [
@@ -89,6 +94,7 @@ class UserService
                 'success' => false,
                 'message' => 'Terjadi kesalahan saat memperbarui kata sandi pengguna',
                 'data' => [],
+                'code' => 500,
             ];
         }
     }
@@ -103,31 +109,24 @@ class UserService
     {
         try {
             $code = $this->repository->generateAndSaveOtp($user);
-            if ($code !== null) {
-                event(new OtpGenerated($user, $code));
-                return [
-                    'success' => true,
-                    'message' => 'Kode OTP berhasil dikirim',
-                    'data' => [],
-                ];
-            }
-
+            event(new OtpGenerated($user, $code));
             return [
-                'success' => false,
-                'message' => 'Kode OTP gagal dikirim',
+                'success' => true,
+                'message' => 'Kode OTP berhasil dikirim',
                 'data' => [],
+                'code' => 200,
             ];
-
         } catch (\Throwable $e) {
-            Log::error('Terjadi kesalahan saat generate kode OTP', [
+            Log::error('Terjadi kesalahan saat generate dan kirim kode OTP', [
                 'source' => __METHOD__,
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString(),
             ]);
             return [
                 'success' => false,
-                'message' => 'Terjadi kesalahan saat generate kode OTP',
+                'message' => 'Terjadi kesalahan saat mengirim kode OTP',
                 'data' => [],
+                'code' => 500,
             ];
         }
     }
@@ -149,6 +148,7 @@ class UserService
                     'success' => true,
                     'message' => 'Kode OTP terverifikasi',
                     'data' => ['OTP' => $otp],
+                    'code' => 200,
                 ];
             }
 
@@ -156,6 +156,7 @@ class UserService
                 'success' => false,
                 'message' => 'Kode OTP salah atau kadaluarsa',
                 'data' => [],
+                'code' => 401,
             ];
         } catch (\Throwable $e) {
             Log::error('Terjadi kesalahan saat memvalidasi kode OTP', [
@@ -167,6 +168,7 @@ class UserService
                 'success' => false,
                 'message' => 'Terjadi kesalahan saat memvalidasi kode OTP',
                 'data' => [],
+                'code' => 500,
             ];
         }
     }

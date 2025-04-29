@@ -195,12 +195,14 @@ class LaporanBibitService
                     'success' => true,
                     'message' => 'Berhasil menghapus data laporan bibit',
                     'data' => ['id' => $id],
+                    'code' => 200,
                 ];
             }
             return [
                 'success' => false,
                 'message' => 'Gagal menghapus data laporan bibit',
                 'data' => [],
+                'code' => 500,
             ];
         } catch (\Throwable $th) {
             Log::error('Gagal menghapus data laporan bibit.', [
@@ -213,6 +215,7 @@ class LaporanBibitService
                 'success' => false,
                 'message' => 'Gagal menghapus data laporan bibit',
                 'data' => [],
+                'code' => 500,
             ];
         }
     }
@@ -228,12 +231,14 @@ class LaporanBibitService
                     'success' => true,
                     'message' => 'Laporan bibit ditemukan',
                     'data' => $result,
+                    'code' => 200,
                 ];
             }
             return [
                 'success' => false,
                 'message' => 'Laporan bibit tidak ditemukan',
                 'data' => [],
+                'code' => 404,
             ];
         } catch (\Throwable $th) {
             Log::error('Terjadi kesalahan saat mengambil data laporan bibit.', [
@@ -246,6 +251,7 @@ class LaporanBibitService
                 'success' => false,
                 'message' => 'Gagal mengambil data laporan bibit',
                 'data' => [],
+                'code' => 500,
             ];
         }
     }

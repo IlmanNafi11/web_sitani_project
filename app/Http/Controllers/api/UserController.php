@@ -41,10 +41,10 @@ class UserController extends Controller
         ]);
 
         if ($result['success']) {
-            return $this->successResponse(new UserResource($result['data']), 'Data profile berhasil diambil');
+            return $this->successResponse(new UserResource($result['data']), $result['message']);
         }
 
-        return $this->errorResponse('Data pengguna tidak ditemukan', 404, ['id' => $id]);
+        return $this->errorResponse($result['message'], $result['code'], ['user_id' => $id]);
     }
 
 }

@@ -27,7 +27,7 @@ Route::controller(AuthApiController::class)->group(function () {
  * Route untuk memperbarui data penyuluh terdaftar.
  * Gunakan jika waktu proses registrasi data penyuluh tidak valid
  */
-Route::post('users/penyuluh-terdaftar/{id}', [PenyuluhController::class, 'update'])->withoutMiddleware(JwtMiddleware::class);
+Route::put('users/penyuluh-terdaftar/{id}', [PenyuluhController::class, 'update'])->withoutMiddleware(JwtMiddleware::class);
 
 /**
  * Route untuk mengambil data profil
