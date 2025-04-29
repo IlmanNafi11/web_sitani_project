@@ -90,6 +90,9 @@ Route::middleware(['active.session', 'panel.admin.permission'])->group(function 
         Route::get('{kelompok_tani}/edit', 'edit')->middleware('permission:kelompok-tani.ubah')->name('kelompok-tani.edit');
         Route::put('{kelompok_tani}', 'update')->middleware('permission:kelompok-tani.ubah')->name('kelompok-tani.update');
         Route::delete('{kelompok_tani}', 'destroy')->middleware('permission:kelompok-tani.hapus')->name('kelompok-tani.destroy');
+        Route::get('download', 'downloadTemplate')->middleware('permission:kelompok-tani.lihat')->name('kelompok-tani.download');
+        Route::get('export', 'export')->middleware('permission:kelompok-tani.export')->name('kelompok-tani.export');
+        Route::post('import', 'import')->middleware('permission:kelompok-tani.import')->name('kelompok-tani.import');
     });
 
     // Komoditas
