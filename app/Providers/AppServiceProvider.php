@@ -70,5 +70,8 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         LaporanKondisi::observe(LaporanBibitObserver::class);
+        if (\App::environment('production')){
+            \URL::forceScheme('https');
+        }
     }
 }
