@@ -3,6 +3,7 @@
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\Auth\AuthWebController;
 use App\Http\Controllers\BibitBerkualitasController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DesaController;
 use App\Http\Controllers\KecamatanController;
 use App\Http\Controllers\KelompokTaniController;
@@ -40,7 +41,7 @@ Route::middleware('otp.session')->controller(AuthWebController::class)->group(fu
  */
 Route::middleware(['active.session', 'panel.admin.permission'])->group(function () {
     // Dashboard
-    Route::get('admin/dashboard', fn() => view('pages.dashboard'))
+    Route::get('admin/dashboard', [DashboardController::class, 'index'])
         ->name('dashboard.admin');
 
     // Bibit Berkualitas
