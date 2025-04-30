@@ -3,7 +3,9 @@
 namespace App\Providers;
 
 use App\Models\LaporanKondisi;
+use App\Models\LaporanBantuanAlat;
 use App\Observers\LaporanBibitObserver;
+use App\Observers\LaporanBantuanAlatObserver;
 use App\Repositories\AdminRepository;
 use App\Repositories\BibitRepository;
 use App\Repositories\DesaRepository;
@@ -17,6 +19,7 @@ use App\Repositories\KecamatanRepository;
 use App\Repositories\KelompokTaniRepository;
 use App\Repositories\KomoditasRepository;
 use App\Repositories\LaporanBibitRepository;
+use App\Repositories\LaporanBantuanAlatRepository;
 use App\Repositories\PenyuluhTerdaftarRepository;
 use App\Repositories\RoleRepository;
 use App\Repositories\UserRepository;
@@ -27,6 +30,7 @@ use App\Services\KecamatanService;
 use App\Services\KelompokTaniService;
 use App\Services\KomoditasService;
 use App\Services\LaporanBibitService;
+use App\Services\LaporanBantuanAlatService;
 use App\Services\PenyuluhTerdaftarService;
 use App\Services\RoleService;
 use App\Services\UserService;
@@ -49,6 +53,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->when(DesaService::class)->needs(DesaCustomQueryInterface::class)->give(DesaRepository::class);
         $this->app->when(PenyuluhTerdaftarService::class)->needs(PenyuluhTerdaftarCustomQueryInterface::class)->give(PenyuluhTerdaftarRepository::class);
         $this->app->when(LaporanBibitService::class)->needs(CrudInterface::class)->give(LaporanBibitRepository::class);
+        $this->app->when(LaporanBantuanAlatService::class)->needs(CrudInterface::class)->give(LaporanBantuanAlatRepository::class);
         $this->app->when(AdminService::class)->needs(CrudInterface::class)->give(AdminRepository::class);
         $this->app->when(UserService::class)->needs(AuthInterface::class)->give(UserRepository::class);
         $this->app->when(RoleService::class)->needs(CrudInterface::class)->give(RoleRepository::class);
@@ -61,5 +66,6 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         LaporanKondisi::observe(LaporanBibitObserver::class);
+        LaporanBantuanAlat::observe(LaporanBantuanAlatObserver::class);
     }
 }
