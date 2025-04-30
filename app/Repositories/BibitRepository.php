@@ -3,13 +3,14 @@
 namespace App\Repositories;
 
 use App\Models\BibitBerkualitas;
+use App\Repositories\Interfaces\BibitRepositoryInterface;
 use App\Repositories\Interfaces\CrudInterface;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Log;
 
-class BibitRepository implements CrudInterface
+class BibitRepository implements CrudInterface, BibitRepositoryInterface
 {
     public function getAll(bool $withRelations = false): Collection|array
     {
@@ -23,7 +24,7 @@ class BibitRepository implements CrudInterface
             Log::error('Gagal mengambil seluruh data bibit berkualitas', [
                 'source' => __METHOD__,
                 'error' => $e->getMessage(),
-                'sql' => $e->getSQL(),
+                'sql' => $e->getSql(),
             ]);
             return Collection::make();
         } catch (\Throwable $e) {
@@ -44,7 +45,7 @@ class BibitRepository implements CrudInterface
             Log::error('Gagal mengambil data bibit berkualitas berdasarkan id: ' . $id, [
                 'source' => __METHOD__,
                 'error' => $e->getMessage(),
-                'sql' => $e->getSQL(),
+                'sql' => $e->getSql(),
                 'data' => ['id' => $id],
             ]);
             return null;
@@ -67,7 +68,7 @@ class BibitRepository implements CrudInterface
             Log::error('Gagal menyimpan bibit berkualitas', [
                 'source' => __METHOD__,
                 'error' => $e->getMessage(),
-                'sql' => $e->getSQL(),
+                'sql' => $e->getSql(),
                 'data' => $data,
             ]);
             return null;
@@ -90,7 +91,7 @@ class BibitRepository implements CrudInterface
             Log::error('Gagal memperbarui data bibit berkualitas', [
                 'source' => __METHOD__,
                 'error' => $e->getMessage(),
-                'sql' => $e->getSQL(),
+                'sql' => $e->getSql(),
                 'data' => [
                     'id' => $id,
                     'data' => $data,
@@ -119,7 +120,7 @@ class BibitRepository implements CrudInterface
             Log::error('Gagal menghapus bibit berkualitas', [
                 'source' => __METHOD__,
                 'error' => $e->getMessage(),
-                'sql' => $e->getSQL(),
+                'sql' => $e->getSql(),
             ]);
             return false;
         } catch (\Throwable $e) {
@@ -130,6 +131,27 @@ class BibitRepository implements CrudInterface
                 'data' => ['id' => $id],
             ]);
             return false;
+        }
+    }
+
+    public function calculateTotal(): int
+    {
+        try {
+            return BibitBerkualitas::count();
+        } catch (QueryException $e) {
+            Log::error('Terjadi kesalahan pada query saat mencoba menghitung total record', [
+                'source' => __METHOD__,
+                'error' => $e->getMessage(),
+                'sql' => $e->getSql(),
+            ]);
+            return 0;
+        } catch (\Throwable $e) {
+            Log::error('Terjadi kesalahan saat menghitung total record', [
+                'source' => __METHOD__,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+            return 0;
         }
     }
 }

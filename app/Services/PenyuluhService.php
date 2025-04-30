@@ -3,18 +3,21 @@
 namespace App\Services;
 
 use App\Repositories\Interfaces\CrudInterface;
+use App\Repositories\Interfaces\PenyuluhRepositoryInterface;
 use Illuminate\Support\Facades\Log;
 use Throwable;
 
 class PenyuluhService
 {
-    protected CrudInterface $repository;
+    protected CrudInterface $crudRepository;
+    protected PenyuluhRepositoryInterface $repository;
 
     /**
-     * @param CrudInterface $repository
+     * @param CrudInterface $crudRepository
      */
-    public function __construct(CrudInterface $repository)
+    public function __construct(CrudInterface $crudRepository, PenyuluhRepositoryInterface $repository)
     {
+        $this->crudRepository = $crudRepository;
         $this->repository = $repository;
     }
 
@@ -26,7 +29,7 @@ class PenyuluhService
     public function getAll(): array
     {
         try {
-            $penyuluhs = $this->repository->getAll();
+            $penyuluhs = $this->crudRepository->getAll();
 
             if ($penyuluhs->isNotEmpty()) {
                 return [
@@ -66,7 +69,7 @@ class PenyuluhService
     public function find(string|int $id): array
     {
         try {
-            $penyuluh = $this->repository->getById($id);
+            $penyuluh = $this->crudRepository->getById($id);
 
             if (!empty($penyuluh)) {
                 return [
@@ -108,7 +111,7 @@ class PenyuluhService
     public function create(array $data): array
     {
         try {
-            $penyuluh = $this->repository->create($data);
+            $penyuluh = $this->crudRepository->create($data);
 
             if (!empty($penyuluh)) {
                 $penyuluh->makeHidden(['created_at', 'updated_at', 'user_id', 'penyuluh_terdaftar_id']);
@@ -151,7 +154,7 @@ class PenyuluhService
     public function update(string|int $id, array $data): array
     {
         try {
-            $updated = $this->repository->update($id, $data);
+            $updated = $this->crudRepository->update($id, $data);
 
             if ($updated) {
                 return [
@@ -194,7 +197,7 @@ class PenyuluhService
     public function delete(int $id): array
     {
         try {
-            $deleted = $this->repository->delete($id);
+            $deleted = $this->crudRepository->delete($id);
 
             if ($deleted) {
                 return [
@@ -226,6 +229,20 @@ class PenyuluhService
                 'message' => 'Terjadi kesalahan saat menghapus data penyuluh.',
                 'data' => [],
             ];
+        }
+    }
+
+    public function calculateTotal(): int
+    {
+        try {
+            return $this->repository->calculateTotal();
+        } catch (Throwable $e) {
+            Log::error('Terjadi kesalahan saat menghitung total data penyuluh.', [
+                'source' => __METHOD__,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+            return 0;
         }
     }
 }

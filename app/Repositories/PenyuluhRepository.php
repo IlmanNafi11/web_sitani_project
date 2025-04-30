@@ -5,6 +5,7 @@ namespace App\Repositories;
 use App\Models\Penyuluh;
 use App\Models\User;
 use App\Repositories\Interfaces\CrudInterface;
+use App\Repositories\Interfaces\PenyuluhRepositoryInterface;
 use Exception;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
@@ -13,7 +14,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Throwable;
 
-class PenyuluhRepository implements CrudInterface
+class PenyuluhRepository implements CrudInterface, PenyuluhRepositoryInterface
 {
 
     /**
@@ -196,6 +197,27 @@ class PenyuluhRepository implements CrudInterface
             ]);
 
             return false;
+        }
+    }
+
+    public function calculateTotal(): int
+    {
+        try {
+            return Penyuluh::count();
+        } catch (QueryException $e) {
+            Log::error('Terjadi kesalahan pada query saat mencoba menghitung total record', [
+                'source' => __METHOD__,
+                'error' => $e->getMessage(),
+                'sql' => $e->getSql(),
+            ]);
+            return 0;
+        } catch (\Exception $e) {
+            Log::error('Terjadi kesalahan saat menghitung total record', [
+                'source' => __METHOD__,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+            return 0;
         }
     }
 }

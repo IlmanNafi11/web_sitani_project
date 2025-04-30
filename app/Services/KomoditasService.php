@@ -3,16 +3,19 @@
 namespace App\Services;
 
 use App\Repositories\Interfaces\CrudInterface;
+use App\Repositories\Interfaces\KomoditasRepositoryInterface;
 use Illuminate\Support\Facades\Log;
 
 class KomoditasService
 {
 
-    protected CrudInterface $komoditasRepository;
+    protected CrudInterface $crudRepository;
+    protected KomoditasRepositoryInterface $repository;
 
-    public function __construct(CrudInterface $komoditasRepository)
+    public function __construct(CrudInterface $crudRepository, KomoditasRepositoryInterface $repository)
     {
-        $this->komoditasRepository = $komoditasRepository;
+        $this->crudRepository = $crudRepository;
+        $this->repository = $repository;
     }
 
     /**
@@ -23,7 +26,7 @@ class KomoditasService
     public function getAll(): array
     {
         try {
-            $komoditas = $this->komoditasRepository->getAll();
+            $komoditas = $this->crudRepository->getAll();
 
             if ($komoditas->isNotEmpty()) {
                 return [
@@ -62,7 +65,7 @@ class KomoditasService
     public function getById(string|int $id): array
     {
         try {
-            $komoditas = $this->komoditasRepository->getById($id);
+            $komoditas = $this->crudRepository->getById($id);
 
             if (!empty($komoditas)) {
                 return [
@@ -101,7 +104,7 @@ class KomoditasService
     public function create(array $data): array
     {
         try {
-            $komoditas = $this->komoditasRepository->create($data);
+            $komoditas = $this->crudRepository->create($data);
 
             if (!empty($komoditas)) {
                 return [
@@ -141,7 +144,7 @@ class KomoditasService
     public function update(string|int $id, array $data): array
     {
         try {
-            $result = $this->komoditasRepository->update($id, $data);
+            $result = $this->crudRepository->update($id, $data);
 
             if ($result) {
                 return [
@@ -180,7 +183,7 @@ class KomoditasService
     public function delete(string|int $id): array
     {
         try {
-            $result = $this->komoditasRepository->delete($id);
+            $result = $this->crudRepository->delete($id);
 
             if ($result) {
                 return [
@@ -207,6 +210,20 @@ class KomoditasService
                 'message' => 'Gagal menghapus data komoditas.',
                 'data' => []
             ];
+        }
+    }
+
+    public function calculateTotal(): int
+    {
+        try {
+            return $this->repository->calculateTotal();
+        } catch (\Throwable $e) {
+            Log::error('Terjadi kesalahan saat menghitung total record data', [
+                'source' => __METHOD__,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+            return 0;
         }
     }
 }

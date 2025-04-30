@@ -4,19 +4,19 @@ namespace App\Services;
 
 use App\Models\LaporanKondisi;
 use App\Repositories\Interfaces\CrudInterface;
-use App\Repositories\Interfaces\LaporanCustomQueryInterface;
+use App\Repositories\Interfaces\LaporanRepositoryInterface;
 use Illuminate\Support\Facades\Log;
 
 class LaporanBibitService
 {
 
-    protected CrudInterface $repository;
-    protected LaporanCustomQueryInterface $query;
+    protected CrudInterface $crudRepository;
+    protected LaporanRepositoryInterface $repository;
 
-    public function __construct(CrudInterface $repository, LaporanCustomQueryInterface $query)
+    public function __construct(CrudInterface $crudRepository, LaporanRepositoryInterface $repository)
     {
+        $this->crudRepository = $crudRepository;
         $this->repository = $repository;
-        $this->query = $query;
     }
 
     /**
@@ -27,7 +27,7 @@ class LaporanBibitService
     public function getAll(bool $withRelations = false): array
     {
         try {
-            $laporans = $this->repository->getAll($withRelations);
+            $laporans = $this->crudRepository->getAll($withRelations);
 
             if ($laporans->isNotEmpty()) {
                 return [
@@ -67,7 +67,7 @@ class LaporanBibitService
     public function getById(string|int $id): array
     {
         try {
-            $laporan = $this->repository->getById($id);
+            $laporan = $this->crudRepository->getById($id);
             if (!empty($laporan)) {
                 return [
                     'success' => true,
@@ -105,7 +105,7 @@ class LaporanBibitService
     public function create(array $data): array
     {
         try {
-            $laporan = $this->repository->create([
+            $laporan = $this->crudRepository->create([
                 'kelompok_tani_id' => $data['kelompok_tani_id'],
                 'komoditas_id' => $data['komoditas_id'],
                 'penyuluh_id' => $data['penyuluh_id'],
@@ -150,7 +150,7 @@ class LaporanBibitService
     public function update(string|int $id, array $data): array
     {
         try {
-            $result = $this->repository->update($id, $data);
+            $result = $this->crudRepository->update($id, $data);
 
             if ($result) {
                 return [
@@ -189,7 +189,7 @@ class LaporanBibitService
     public function delete(string|int $id): array
     {
         try {
-            $result = $this->repository->delete($id);
+            $result = $this->crudRepository->delete($id);
             if ($result) {
                 return [
                     'success' => true,
@@ -220,12 +220,18 @@ class LaporanBibitService
         }
     }
 
+    /**
+     * Mengambil data laporan berdasarkan penyuluh_id
+     *
+     * @param string|int $id ID Penyuluh
+     * @return array Hasil
+     */
     public function getByPenyuluhId(string|int $id): array
     {
         try {
             $conditions = ['penyuluh_id' => $id];
             $relations = ['penyuluh', 'penyuluh.penyuluhTerdaftar', 'komoditas', 'laporanKondisiDetail',];
-            $result = $this->query->getByPenyuluhId($conditions, $relations);
+            $result = $this->repository->getByPenyuluhId($conditions, $relations);
             if ($result->isNotEmpty()) {
                 return [
                     'success' => true,
@@ -254,5 +260,37 @@ class LaporanBibitService
                 'code' => 500,
             ];
         }
+    }
+
+    public function calculateTotal(): int
+    {
+        try {
+            return $this->repository->calculateTotal();
+        } catch (\Throwable $e) {
+            Log::error('Terjadi kesalahan saat menghitung total record data', [
+                'source' => __METHOD__,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+            return 0;
+        }
+    }
+
+    public function getLaporanStatusCounts(): array
+    {
+        try {
+            return $this->repository->getLaporanStatusCounts();
+        } catch (\Throwable $e) {
+            Log::error('Terjadi kesalahan saat menghitung data statistik status laporan', [
+                'source' => __METHOD__,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+        }
+        return [
+            'approved' => 0,
+            'rejected' => 0,
+            'pending' => 0,
+        ];
     }
 }

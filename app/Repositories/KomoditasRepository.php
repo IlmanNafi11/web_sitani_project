@@ -4,12 +4,13 @@ namespace App\Repositories;
 
 use App\Models\Komoditas;
 use App\Repositories\Interfaces\CrudInterface;
+use App\Repositories\Interfaces\KomoditasRepositoryInterface;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Log;
 
-class KomoditasRepository implements CrudInterface
+class KomoditasRepository implements CrudInterface, KomoditasRepositoryInterface
 {
     public function getAll($withRelations = false): Collection|array
     {
@@ -24,7 +25,7 @@ class KomoditasRepository implements CrudInterface
             Log::error('Gagal mengambil seluruh data komoditas', [
                 'source' => __METHOD__,
                 'error' => $e->getMessage(),
-                'sql' => $e->getSQL(),
+                'sql' => $e->getSql(),
             ]);
 
             return Collection::make();
@@ -47,7 +48,7 @@ class KomoditasRepository implements CrudInterface
             Log::error('Gagal mengambil data komoditas berdasarkan ID', [
                 'source' => __METHOD__,
                 'error' => $e->getMessage(),
-                'sql' => $e->getSQL(),
+                'sql' => $e->getSql(),
             ]);
             return null;
         } catch (\Throwable $e) {
@@ -69,7 +70,7 @@ class KomoditasRepository implements CrudInterface
             Log::error('Gagal menyimpan data komoditas', [
                 'source' => __METHOD__,
                 'error' => $e->getMessage(),
-                'sql' => $e->getSQL(),
+                'sql' => $e->getSql(),
             ]);
 
             return null;
@@ -92,7 +93,7 @@ class KomoditasRepository implements CrudInterface
             Log::error('Gagal memperbarui data komoditas', [
                 'source' => __METHOD__,
                 'error' => $e->getMessage(),
-                'sql' => $e->getSQL(),
+                'sql' => $e->getSql(),
             ]);
 
             return false;
@@ -116,7 +117,7 @@ class KomoditasRepository implements CrudInterface
             Log::error('Gagal menghapus data komoditas', [
                 'source' => __METHOD__,
                 'error' => $e->getMessage(),
-                'sql' => $e->getSQL(),
+                'sql' => $e->getSql(),
             ]);
 
             return false;
@@ -128,6 +129,27 @@ class KomoditasRepository implements CrudInterface
             ]);
 
             return false;
+        }
+    }
+
+    public function calculateTotal(): int
+    {
+        try {
+            return Komoditas::count();
+        } catch (QueryException $e) {
+            Log::error('Terjadi kesalahan pada query saat mencoba menghitung total record', [
+                'source' => __METHOD__,
+                'error' => $e->getMessage(),
+                'sql' => $e->getSql(),
+            ]);
+            return 0;
+        } catch (\Throwable $e) {
+            Log::error('Terjadi kesalahan saat menghitung total record', [
+                'source' => __METHOD__,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+            return 0;
         }
     }
 }

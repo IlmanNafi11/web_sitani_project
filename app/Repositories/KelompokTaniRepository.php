@@ -4,7 +4,7 @@ namespace App\Repositories;
 
 use App\Models\KelompokTani;
 use App\Repositories\Interfaces\CrudInterface;
-use App\Repositories\Interfaces\KelompokTaniCustomQueryInterface;
+use App\Repositories\Interfaces\KelompokTaniRepositoryInterface;
 use App\Repositories\Interfaces\ManyRelationshipManagement;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
@@ -12,7 +12,7 @@ use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Log;
 use Throwable;
 
-class KelompokTaniRepository implements CrudInterface, ManyRelationshipManagement, KelompokTaniCustomQueryInterface
+class KelompokTaniRepository implements CrudInterface, ManyRelationshipManagement, KelompokTaniRepositoryInterface
 {
     public function getAll(bool $withRelations = false): Collection|array
     {
@@ -293,6 +293,27 @@ class KelompokTaniRepository implements CrudInterface, ManyRelationshipManagemen
                 ],
             ]);
             return Collection::make();
+        }
+    }
+
+    public function calculateTotal(): int
+    {
+        try {
+            return KelompokTani::count();
+        } catch (QueryException $e) {
+            Log::error('Terjadi kesalahan pada query saat mencoba menghitung total record', [
+                'source' => __METHOD__,
+                'error' => $e->getMessage(),
+                'sql' => $e->getSql(),
+            ]);
+            return 0;
+        } catch (\Exception $e) {
+            Log::error('Terjadi kesalahan saat menghitung total record', [
+                'source' => __METHOD__,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+            return 0;
         }
     }
 }

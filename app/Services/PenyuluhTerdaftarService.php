@@ -3,18 +3,18 @@
 namespace App\Services;
 
 use App\Repositories\Interfaces\CrudInterface;
-use App\Repositories\Interfaces\PenyuluhTerdaftarCustomQueryInterface;
+use App\Repositories\Interfaces\PenyuluhTerdaftarRepositoryInterface;
 use Illuminate\Support\Facades\Log;
 
 class PenyuluhTerdaftarService
 {
-    protected CrudInterface $penyuluhRepository;
-    protected PenyuluhTerdaftarCustomQueryInterface $penyuluhTerdaftarCustomQuery;
+    protected CrudInterface $crudRepository;
+    protected PenyuluhTerdaftarRepositoryInterface $repository;
 
-    public function __construct(CrudInterface $penyuluhRepository, PenyuluhTerdaftarCustomQueryInterface $penyuluhTerdaftarCustomQuery)
+    public function __construct(CrudInterface $crudRepository, PenyuluhTerdaftarRepositoryInterface $repository)
     {
-        $this->penyuluhRepository = $penyuluhRepository;
-        $this->penyuluhTerdaftarCustomQuery = $penyuluhTerdaftarCustomQuery;
+        $this->crudRepository = $crudRepository;
+        $this->repository = $repository;
     }
 
     /**
@@ -26,7 +26,7 @@ class PenyuluhTerdaftarService
     public function getAll(bool $withRelations = false): array
     {
         try {
-            $penyuluhs = $this->penyuluhRepository->getAll($withRelations);
+            $penyuluhs = $this->crudRepository->getAll($withRelations);
 
             if ($penyuluhs->isNotEmpty()) {
                 return [
@@ -64,7 +64,7 @@ class PenyuluhTerdaftarService
     public function getAllWithKecamatan(): array
     {
         try {
-            $penyuluhs = $this->penyuluhRepository->getAll(true);
+            $penyuluhs = $this->crudRepository->getAll(true);
 
             if ($penyuluhs->isNotEmpty()) {
                 return [
@@ -103,7 +103,7 @@ class PenyuluhTerdaftarService
     public function getById(string|int $id): array
     {
         try {
-            $penyuluh = $this->penyuluhRepository->getById($id);
+            $penyuluh = $this->crudRepository->getById($id);
 
             if (!empty($penyuluh)) {
                 return [
@@ -145,7 +145,7 @@ class PenyuluhTerdaftarService
     public function create(array $data): array
     {
         try {
-            $peyuluh = $this->penyuluhRepository->create($data);
+            $peyuluh = $this->crudRepository->create($data);
 
             if (!empty($peyuluh)) {
                 return [
@@ -186,7 +186,7 @@ class PenyuluhTerdaftarService
     public function update(string|int $id, array $data): array
     {
         try {
-            $result = $this->penyuluhRepository->update($id, $data);
+            $result = $this->crudRepository->update($id, $data);
 
             if ($result) {
                 return [
@@ -229,7 +229,7 @@ class PenyuluhTerdaftarService
     public function delete(string|int $id): array
     {
         try {
-            $result = $this->penyuluhRepository->delete($id);
+            $result = $this->crudRepository->delete($id);
 
             if ($result) {
                 return [
@@ -271,7 +271,7 @@ class PenyuluhTerdaftarService
     public function getByKecamatanId(string|int $id): array
     {
         try {
-            $penyuluhs = $this->penyuluhTerdaftarCustomQuery->getByKecamatanId($id);
+            $penyuluhs = $this->repository->getByKecamatanId($id);
 
             if ($penyuluhs->isNotEmpty()) {
                 return [
@@ -313,7 +313,7 @@ class PenyuluhTerdaftarService
     public function getByPhone(string $phone): array
     {
         try {
-            $penyuluh = $this->penyuluhTerdaftarCustomQuery->getByPhone($phone);
+            $penyuluh = $this->repository->getByPhone($phone);
 
             if (!empty($penyuluh)) {
                 $penyuluh->makeHidden('kecamatan_id');
@@ -343,6 +343,20 @@ class PenyuluhTerdaftarService
                 'message' => 'Gagal mengambil data penyuluh terdaftar',
                 'data' => [],
             ];
+        }
+    }
+
+    public function calculateTotal(): int
+    {
+        try {
+            return $this->repository->calculateTotal();
+        } catch (\Throwable $e) {
+            Log::error('Terjadi kesalahan saat menghitung total record data', [
+                'source' => __METHOD__,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+            return 0;
         }
     }
 }

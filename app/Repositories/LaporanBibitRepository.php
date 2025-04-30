@@ -4,14 +4,16 @@ namespace App\Repositories;
 
 use App\Models\LaporanKondisi;
 use App\Repositories\Interfaces\CrudInterface;
-use App\Repositories\Interfaces\LaporanCustomQueryInterface;
+use App\Repositories\Interfaces\LaporanRepositoryInterface;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\QueryException;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Throwable;
 
-class LaporanBibitRepository implements CrudInterface, LaporanCustomQueryInterface
+class LaporanBibitRepository implements CrudInterface, LaporanRepositoryInterface
 {
     public function getAll(bool $withRelations = false): Collection|array
     {
@@ -209,6 +211,89 @@ class LaporanBibitRepository implements CrudInterface, LaporanCustomQueryInterfa
                 'trace' => $e->getTraceAsString(),
             ]);
             return Collection::make();
+        }
+    }
+
+    public function calculateTotal(): int
+    {
+        try {
+            return LaporanKondisi::count();
+        } catch (QueryException $e) {
+            Log::error('Terjadi kesalahan pada query saat mencoba menghitung total record', [
+                'source' => __METHOD__,
+                'error' => $e->getMessage(),
+                'sql' => $e->getSql(),
+            ]);
+            return 0;
+        } catch (\Exception $e) {
+            Log::error('Terjadi kesalahan saat menghitung total record', [
+                'source' => __METHOD__,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+            return 0;
+        }
+    }
+
+    public function getLaporanStatusCounts(): array
+    {
+        $statusCounts = [
+            'approved' => 0,
+            'rejected' => 0,
+            'pending' => 0,
+        ];
+
+        try {
+            $currentYear = Carbon::now()->year;
+            $startDate = Carbon::create($currentYear, 1, 1)->startOfDay();
+            $endDate = Carbon::create($currentYear, 12, 31)->endOfDay();
+
+            $rawCounts = LaporanKondisi::select('status', DB::raw('count(*) as total'))
+                ->whereIn('status', [1, 2, 3])
+                ->whereBetween('created_at', [$startDate, $endDate])
+                ->groupBy('status')
+                ->pluck('total', 'status')
+                ->toArray();
+
+            $statusMap = [
+                1 => 'approved',
+                2 => 'rejected',
+                3 => 'pending',
+            ];
+
+            foreach ($rawCounts as $statusValue => $count) {
+                if (isset($statusMap[$statusValue])) {
+                    $statusCounts[$statusMap[$statusValue]] = $count;
+                }
+            }
+
+            return $statusCounts;
+
+        } catch (QueryException $e) {
+            Log::error('Terjadi kesalahan pada query saat mencoba menghitung status laporan tahun ini', [
+                'source' => __METHOD__,
+                'error' => $e->getMessage(),
+                'sql' => $e->getSql(),
+            ]);
+
+            return [
+                'approved' => 0,
+                'rejected' => 0,
+                'pending' => 0,
+            ];
+
+        } catch (Throwable $e) {
+            Log::error('Terjadi kesalahan umum saat mencoba menghitung status laporan tahun ini', [
+                'source' => __METHOD__,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            return [
+                'approved' => 0,
+                'rejected' => 0,
+                'pending' => 0,
+            ];
         }
     }
 }

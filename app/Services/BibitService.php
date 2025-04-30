@@ -1,15 +1,18 @@
 <?php
 namespace App\Services;
 
+use App\Repositories\Interfaces\BibitRepositoryInterface;
 use App\Repositories\Interfaces\CrudInterface;
 use Illuminate\Support\Facades\Log;
 
 class BibitService {
-    protected CrudInterface $bibitRepository;
+    protected CrudInterface $crudRepository;
+    protected BibitRepositoryInterface $repository;
 
-    public function __construct(CrudInterface $bibitRepository)
+    public function __construct(CrudInterface $crudRepository, BibitRepositoryInterface $repository)
     {
-        $this->bibitRepository = $bibitRepository;
+        $this->crudRepository = $crudRepository;
+        $this->repository = $repository;
     }
 
     /**
@@ -21,7 +24,7 @@ class BibitService {
     public function getAll(bool $withRelations = false): array
     {
         try {
-            $bibits = $this->bibitRepository->getAll($withRelations);
+            $bibits = $this->crudRepository->getAll($withRelations);
             if ($bibits->isNotEmpty()) {
                 return [
                     'success' => true,
@@ -59,7 +62,7 @@ class BibitService {
     public function getById(string|int $id): array
     {
         try {
-            $bibit = $this->bibitRepository->getById($id);
+            $bibit = $this->crudRepository->getById($id);
 
             if (!empty($bibit)) {
                 return [
@@ -98,7 +101,7 @@ class BibitService {
     public function getAllWithKomoditas(): array
     {
         try {
-            $bibit = $this->bibitRepository->getAll(true);
+            $bibit = $this->crudRepository->getAll(true);
 
             if ($bibit->isNotEmpty()) {
                 return [
@@ -137,7 +140,7 @@ class BibitService {
     public function create(array $data): array
     {
         try {
-            $bibit = $this->bibitRepository->create($data);
+            $bibit = $this->crudRepository->create($data);
 
             if (!empty($bibit)) {
                 return [
@@ -177,7 +180,7 @@ class BibitService {
     public function update(string|int $id, array $data): array
     {
         try {
-            $result = $this->bibitRepository->update($id, $data);
+            $result = $this->crudRepository->update($id, $data);
 
             if($result) {
                 return [
@@ -216,7 +219,7 @@ class BibitService {
     public function delete(string|int $id): array
     {
         try {
-            $result = $this->bibitRepository->delete($id);
+            $result = $this->crudRepository->delete($id);
 
             if ($result) {
                 return [
@@ -243,6 +246,20 @@ class BibitService {
                 'message' => 'Gagal menghapus data bibit.',
                 'data' => []
             ];
+        }
+    }
+
+    public function calculateTotal(): int
+    {
+        try {
+            return $this->repository->calculateTotal();
+        } catch (\Throwable $e) {
+            Log::error('Terjadi kesalahan saat menghitung total record data', [
+                'source' => __METHOD__,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+            return 0;
         }
     }
 }

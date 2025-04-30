@@ -3,21 +3,22 @@
 namespace App\Services;
 
 use App\Repositories\Interfaces\CrudInterface;
-use App\Repositories\Interfaces\KelompokTaniCustomQueryInterface;
+use App\Repositories\Interfaces\KelompokTaniRepositoryInterface;
 use App\Repositories\Interfaces\ManyRelationshipManagement;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Log;
 
 class KelompokTaniService
 {
-    protected CrudInterface $kelompokTaniRepository;
+    protected CrudInterface $crudRepository;
     protected ManyRelationshipManagement $relationManager;
-    protected KelompokTaniCustomQueryInterface $customQuery;
+    protected KelompokTaniRepositoryInterface $repository;
 
-    public function __construct(CrudInterface $kelompokTaniRepository, ManyRelationshipManagement $relationManager, KelompokTaniCustomQueryInterface $customQuery)
+    public function __construct(CrudInterface $crudRepository, ManyRelationshipManagement $relationManager, KelompokTaniRepositoryInterface $repository)
     {
-        $this->kelompokTaniRepository = $kelompokTaniRepository;
+        $this->crudRepository = $crudRepository;
         $this->relationManager = $relationManager;
-        $this->customQuery = $customQuery;
+        $this->repository = $repository;
     }
 
     /**
@@ -29,7 +30,7 @@ class KelompokTaniService
     public function getAll(bool $withRelations = false): array
     {
         try {
-            $kelompokTanis = $this->kelompokTaniRepository->getAll($withRelations);
+            $kelompokTanis = $this->crudRepository->getAll($withRelations);
 
             if ($kelompokTanis->isNotEmpty()) {
                 return [
@@ -62,13 +63,13 @@ class KelompokTaniService
     /**
      * Mengambil data kelompok tani beserta relasi
      *
-     * @return array|\Illuminate\Database\Eloquent\Collection|void
+     * @return array|Collection|void
      * @deprecated ganti dengan getAll, dan set param true.
      */
     public function getAllWithRelations()
     {
         try {
-            return $this->kelompokTaniRepository->getAll(true);
+            return $this->crudRepository->getAll(true);
         } catch (\Throwable $th) {
             Log::error('Gagal mengambil seluruh data kelompok tani beserta relasi: ' . $th->getMessage());
         }
@@ -83,7 +84,7 @@ class KelompokTaniService
     public function getById(string|int $id): array
     {
         try {
-            $kelompokTani = $this->kelompokTaniRepository->getById($id);
+            $kelompokTani = $this->crudRepository->getById($id);
 
             if (!empty($kelompokTani)) {
                 return [
@@ -123,7 +124,7 @@ class KelompokTaniService
     public function getByIdWithPivot(string|int $id): array
     {
         try {
-            $kelompokTani = $this->kelompokTaniRepository->getById($id);
+            $kelompokTani = $this->crudRepository->getById($id);
             if (!empty($kelompokTani)) {
                 return [
                     'success' => true,
@@ -161,9 +162,9 @@ class KelompokTaniService
     public function create(array $data): array
     {
         try {
-            $kelompokTani = $this->kelompokTaniRepository->create($data);
+            $kelompokTani = $this->crudRepository->create($data);
 
-            if (!empty($kelompokTani)) {
+            if ($kelompokTani !== null) {
                 $this->relationManager->attach($kelompokTani, $data['penyuluh_terdaftar_id']);
 
                 return [
@@ -203,7 +204,7 @@ class KelompokTaniService
     public function update(string|int $id, array $data): array
     {
         try {
-            $kelompokTani = $this->kelompokTaniRepository->update($id, [
+            $kelompokTani = $this->crudRepository->update($id, [
                 "nama" => $data["nama"],
                 "desa_id" => $data["desa_id"],
                 "kecamatan_id" => $data["kecamatan_id"],
@@ -247,7 +248,7 @@ class KelompokTaniService
     public function delete(string|int $id): array
     {
         try {
-            $kelompokTani = $this->kelompokTaniRepository->delete($id);
+            $kelompokTani = $this->crudRepository->delete($id);
             if (!empty($kelompokTani)) {
                 $this->relationManager->detach($kelompokTani);
 
@@ -288,7 +289,7 @@ class KelompokTaniService
     public function getByPenyuluhId(array $id): array
     {
         try {
-            $kelompokTanis = $this->customQuery->getByPenyuluhId($id);
+            $kelompokTanis = $this->repository->getByPenyuluhId($id);
             if ($kelompokTanis->isNotEmpty()) {
                 $data = $kelompokTanis->map(function ($item) {
                     return [
@@ -337,6 +338,20 @@ class KelompokTaniService
                 'message' => 'Data kelompok tani tidak ditemukan',
                 'data' => [],
             ];
+        }
+    }
+
+    public function calculateTotal(): int
+    {
+        try {
+            return $this->repository->calculateTotal();
+        } catch (\Throwable $e) {
+            Log::error('Terjadi kesalahan saat menghitung total record data', [
+                'source' => __METHOD__,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+            return 0;
         }
     }
 }

@@ -4,13 +4,13 @@ namespace App\Repositories;
 
 use App\Models\Desa;
 use App\Repositories\Interfaces\CrudInterface;
-use App\Repositories\Interfaces\DesaCustomQueryInterface;
+use App\Repositories\Interfaces\DesaRepositoryInterface;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Log;
 
-class DesaRepository implements CrudInterface, DesaCustomQueryInterface
+class DesaRepository implements CrudInterface, DesaRepositoryInterface
 {
 
     public function getAll(bool $withRelations = false): Collection|array

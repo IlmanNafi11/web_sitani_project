@@ -4,14 +4,14 @@ namespace App\Services;
 
 use App\Repositories\Interfaces\CrudInterface;
 use Illuminate\Support\Facades\Log;
-use App\Repositories\Interfaces\DesaCustomQueryInterface;
+use App\Repositories\Interfaces\DesaRepositoryInterface;
 
 class DesaService
 {
     protected CrudInterface $desaRepository;
-    protected DesaCustomQueryInterface $desaCustomQuery;
+    protected DesaRepositoryInterface $desaCustomQuery;
 
-    public function __construct(CrudInterface $desaRepository, DesaCustomQueryInterface $desaCustomQuery)
+    public function __construct(CrudInterface $desaRepository, DesaRepositoryInterface $desaCustomQuery)
     {
         $this->desaRepository = $desaRepository;
         $this->desaCustomQuery = $desaCustomQuery;

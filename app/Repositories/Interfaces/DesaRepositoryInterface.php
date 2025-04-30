@@ -4,7 +4,7 @@ namespace App\Repositories\Interfaces;
 
 use Illuminate\Database\Eloquent\Collection;
 
-interface DesaCustomQueryInterface
+interface DesaRepositoryInterface
 {
     /**
      * Mengambil data desa berdasarkan Id kecamatan
