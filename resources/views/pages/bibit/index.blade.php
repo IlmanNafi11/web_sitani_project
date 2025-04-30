@@ -1,24 +1,24 @@
 @extends('layouts.layout')
 @section('title', 'Bibit | Sitani')
 @section('content')
-    <x-ui.result-alert />
+    <x-ui.result-alert/>
     <x-ui.table.import-failed-table/>
     <x-ui.card>
         <div class="mb-5">
-            <x-ui.title :title="'Data Bibit'" />
-            <x-ui.sub-title :title="'Manajemen Data bibit berkualitas'" />
+            <x-ui.title :title="'Data Bibit'"/>
+            <x-ui.sub-title :title="'Manajemen Data bibit berkualitas'"/>
         </div>
         <div id="file-action-container">
             <x-ui.dropdown-action :title="'File'" :color="'btn-secondary'">
                 <x-ui.button.export-button :title="'Unduh Template'" :style="'btn-soft'" :color="'btn-secondary'"
                                            :routes="route('bibit.download')" :permission="'bibit.lihat'"
-                                           :extra-class-element="'w-full'" :icon="'icon-[line-md--file-download]'" />
+                                           :extra-class-element="'w-full'" :icon="'icon-[line-md--file-download]'"/>
                 <x-ui.button.export-button :title="'Export Excel'" :style="'btn-soft'" :color="'btn-success'"
                                            :routes="route('bibit.export')" :permission="'bibit.export'"
-                                           :extra-class-element="'w-full'" :icon="'icon-[line-md--file-export]'" />
+                                           :extra-class-element="'w-full'" :icon="'icon-[line-md--file-export]'"/>
                 <x-ui.button.import-button :title="'Import Excel'" :style="'btn-soft'" :color="'btn-info'"
                                            :permission="'bibit.import'" :extra-class-element="'w-full'"
-                                           :keyId="'import-modal'" :icon="'icon-[line-md--file-import]'" />
+                                           :keyId="'import-modal'" :icon="'icon-[line-md--file-import]'"/>
             </x-ui.dropdown-action>
         </div>
         <table id="bibit-table" class="table">
@@ -27,22 +27,25 @@
         ['title' => 'Komoditas'],
         ['title' => 'Deskripsi'],
         ['title' => 'Aksi'],
-    ]" />
+    ]"/>
             <tbody>
-                @forelse ($datas as $bibit)
-                    <tr class="text-black">
-                        <td>{{ $bibit->nama }}</td>
-                        <td>{{ $bibit->komoditas->nama }}</td>
-                        <td>{{ $bibit->deskripsi ?? 'Tidak ada deskripsi' }}</td>
-                        <td class="flex gap-3">
-                            <x-ui.button.edit-button :color="'btn-warning'" :style="'btn-soft'" :route="route('bibit.edit', $bibit->id)" :title="'Perbarui'" :permission="'bibit.ubah'" />
-                            <x-ui.button.delete-button :color="'btn-error'" :style="'btn-soft'" :title="'Hapus'"
-                                :keyId="$bibit->id" :route="route('bibit.destroy', $bibit->id)" :permission="'bibit.hapus'" />
-                        </td>
-                    </tr>
-                @empty
+            @forelse ($datas as $bibit)
+                <tr class="text-black">
+                    <td>{{ $bibit->nama }}</td>
+                    <td>{{ $bibit->komoditas->nama }}</td>
+                    <td>{{ $bibit->deskripsi ?? 'Tidak ada deskripsi' }}</td>
+                    <td class="flex gap-3">
+                        <x-ui.button.edit-button :color="'btn-warning'" :style="'btn-soft'"
+                                                 :route="route('bibit.edit', $bibit->id)" :title="'Perbarui'"
+                                                 :permission="'bibit.ubah'"/>
+                        <x-ui.button.delete-button :color="'btn-error'" :style="'btn-soft'" :title="'Hapus'"
+                                                   :keyId="$bibit->id" :route="route('bibit.destroy', $bibit->id)"
+                                                   :permission="'bibit.hapus'"/>
+                    </td>
+                </tr>
+            @empty
 
-                @endforelse
+            @endforelse
 
             </tbody>
         </table>
