@@ -37,7 +37,10 @@ Route::get('users/{id}', [UserController::class, 'getProfile']);
 /**
  * Route untuk mengambil data bibit berkualitas
  */
-Route::get('bibit', [BibitController::class, 'getAll']);
+Route::controller(BibitController::class)->group(function () {
+    Route::get('bibit', 'getAll');
+    Route::get('bibit/count', 'calculateTotal');
+});
 
 /**
  * Route untuk mengambil seluruh data komoditas dan berdasarkan id komoditas
@@ -52,6 +55,7 @@ Route::controller(KomoditasController::class)->group(function () {
  */
 Route::controller(KelompokTaniController::class)->group(function () {
     Route::get('kelompok-tani', 'getAllByPenyuluhId');
+    Route::get('kelompok-tani/count','calculateTotal');
     Route::get('kelompok-tani/{id}', 'getById');
 });
 
@@ -60,5 +64,6 @@ Route::controller(KelompokTaniController::class)->group(function () {
  */
 Route::controller(LaporanBibitController::class)->group(function () {
     Route::post('laporan-kondisi', 'saveReport');
+    Route::get('laporan-kondisi/count/{id}', 'getLaporanStatusCounts');
     Route::get('history-laporan/{id}', 'getByPenyuluhId');
 });

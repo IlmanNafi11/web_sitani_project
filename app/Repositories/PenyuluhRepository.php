@@ -200,6 +200,9 @@ class PenyuluhRepository implements CrudInterface, PenyuluhRepositoryInterface
         }
     }
 
+    /**
+     * @throws Exception
+     */
     public function calculateTotal(): int
     {
         try {
@@ -210,14 +213,14 @@ class PenyuluhRepository implements CrudInterface, PenyuluhRepositoryInterface
                 'error' => $e->getMessage(),
                 'sql' => $e->getSql(),
             ]);
-            return 0;
+            throw new \Exception('Terjadi Kesalahan pada query', 500);
         } catch (\Exception $e) {
             Log::error('Terjadi kesalahan saat menghitung total record', [
                 'source' => __METHOD__,
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString(),
             ]);
-            return 0;
+            throw new \Exception('Terjadi Kesalahan di server saat menghitung total record', 500);
         }
     }
 }

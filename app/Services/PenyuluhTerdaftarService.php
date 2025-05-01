@@ -356,7 +356,7 @@ class PenyuluhTerdaftarService
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString(),
             ]);
-            return 0;
+            throw new \Exception('Terjadi kesalahan diserver saat menghitung total record data', 500);
         }
     }
 }

@@ -59,4 +59,19 @@ class KelompokTaniController extends Controller
         }
         return $this->errorResponse($result['message'], 404);
     }
+
+    /**
+     * Mengambil total Kelompok tani yang terdaftar di dinas
+     *
+     * @return JsonResponse
+     */
+    public function calculateTotal(): JsonResponse
+    {
+        try {
+            $total = $this->service->calculateTotal();
+            return $this->successResponse($total, 'Total Kelompok Tani Berhasil diambil');
+        } catch (\Exception $e) {
+            return $this->errorResponse($e->getMessage());
+        }
+    }
 }

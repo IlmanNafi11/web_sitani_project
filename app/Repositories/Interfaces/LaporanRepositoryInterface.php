@@ -25,8 +25,9 @@ interface LaporanRepositoryInterface
     /**
      * Menghitung total penggunaan bibit berkualitas
      *
+     * @param int|null $penyuluhId Id penyuluh, kirim id penyuluh jika mengambil total laporan berdasarkan penyuluh(pelapor), default = null(keseluruhan)
      * @return array Hasil rekap Penggunaan Bibit(berkualitas, tidak berkualitas, dan laporan yang masih pending)
      */
-    public function getLaporanStatusCounts(): array;
+    public function getLaporanStatusCounts(?int $penyuluhId = null): array;
 
 }

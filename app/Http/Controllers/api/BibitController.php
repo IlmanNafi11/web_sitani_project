@@ -31,4 +31,19 @@ class BibitController extends Controller
         }
         return $this->errorResponse($result['message'], 404);
     }
+
+    /**
+     * Mengambil total bibit berkualitas
+     *
+     * @return JsonResponse
+     */
+    public function calculateTotal(): JsonResponse
+    {
+        try {
+            $total = $this->service->calculateTotal();
+            return $this->successResponse(['total' => $total], 'Total bibit berkualitas berhasil diambil');
+        } catch (\Throwable $e) {
+            return $this->errorResponse($e->getMessage());
+        }
+    }
 }

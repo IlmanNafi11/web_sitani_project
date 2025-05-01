@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Log;
+use PHPUnit\Event\Code\Throwable;
 
 class BibitRepository implements CrudInterface, BibitRepositoryInterface
 {
@@ -134,24 +135,27 @@ class BibitRepository implements CrudInterface, BibitRepositoryInterface
         }
     }
 
+    /**
+     * @throws \Exception
+     */
     public function calculateTotal(): int
     {
         try {
             return BibitBerkualitas::count();
         } catch (QueryException $e) {
-            Log::error('Terjadi kesalahan pada query saat mencoba menghitung total record', [
+            Log::error('Terjadi kesalahan diserver pada query saat mencoba menghitung total record', [
                 'source' => __METHOD__,
                 'error' => $e->getMessage(),
                 'sql' => $e->getSql(),
             ]);
-            return 0;
+            throw new QueryException($e->getConnectionName(), $e->getSql(), $e->getBindings(), $e->getPrevious());
         } catch (\Throwable $e) {
-            Log::error('Terjadi kesalahan saat menghitung total record', [
+            Log::error('Terjadi kesalahan diserver saat menghitung total record', [
                 'source' => __METHOD__,
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString(),
             ]);
-            return 0;
+            throw new \Exception('Terjadi Kesalahan di server saat menghitung total record', 500);
         }
     }
 }

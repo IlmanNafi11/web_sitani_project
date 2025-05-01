@@ -3,7 +3,9 @@ namespace App\Services;
 
 use App\Repositories\Interfaces\BibitRepositoryInterface;
 use App\Repositories\Interfaces\CrudInterface;
+use http\Exception;
 use Illuminate\Support\Facades\Log;
+use Throwable;
 
 class BibitService {
     protected CrudInterface $crudRepository;
@@ -38,7 +40,7 @@ class BibitService {
                 'message' => 'Data bibit tidak ditemukan',
                 'data' => []
             ];
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             Log::error('Terjadi kesalahan saat mengambil data bibit.', [
                 'source' => __METHOD__,
                 'error' => $e->getMessage(),
@@ -77,7 +79,7 @@ class BibitService {
                 'message' => 'Data bibit tidak ditemukan',
                 'data' => [],
             ];
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             Log::error('Terjadi kesalahan saat mengambil data bibit berdasarkan id.', [
                 'source' => __METHOD__,
                 'error' => $e->getMessage(),
@@ -116,7 +118,7 @@ class BibitService {
                 'message' => 'Data bibit tidak ditemukan',
                 'data' => [],
             ];
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             Log::error('Terjadi kesalahan saat mengambil data bibit beserta komoditas.', [
                 'source' => __METHOD__,
                 'error' => $e->getMessage(),
@@ -155,7 +157,7 @@ class BibitService {
                 'message' => 'Data bibit gagal disimpan',
                 'data' => [],
             ];
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             Log::error('Terjadi kesalahan saat menyimpan data bibit.', [
                 'source' => __METHOD__,
                 'error' => $e->getMessage(),
@@ -195,7 +197,7 @@ class BibitService {
                 'message' => 'Data bibit gagal diperbarui',
                 'data' => [],
             ];
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             Log::error('Terjadi kesalahan saat memperbarui data bibit.', [
                 'source' => __METHOD__,
                 'error' => $e->getMessage(),
@@ -234,7 +236,7 @@ class BibitService {
                 'message' => 'Data bibit gagal dihapus',
                 'data' => [],
             ];
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             Log::error('Terjadi kesalahan saat menghapus data bibit.', [
                 'source' => __METHOD__,
                 'error' => $e->getMessage(),
@@ -249,17 +251,24 @@ class BibitService {
         }
     }
 
+    /**
+     * Mengambil total bibit berkualitas yang terdaftar di Sitani
+     *
+     * @return int Total
+     * @throws Throwable
+     */
     public function calculateTotal(): int
     {
         try {
             return $this->repository->calculateTotal();
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             Log::error('Terjadi kesalahan saat menghitung total record data', [
                 'source' => __METHOD__,
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString(),
+                'previous' => $e->getPrevious(),
             ]);
-            return 0;
+            throw new \Exception('Terjadi Kesalahan diserver saat menghitung total bibit', $e->getCode(), $e->getPrevious());
         }
     }
 }

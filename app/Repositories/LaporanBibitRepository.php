@@ -6,6 +6,7 @@ use App\Models\LaporanKondisi;
 use App\Repositories\Interfaces\CrudInterface;
 use App\Repositories\Interfaces\LaporanRepositoryInterface;
 use Carbon\Carbon;
+use Exception;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\QueryException;
@@ -214,6 +215,9 @@ class LaporanBibitRepository implements CrudInterface, LaporanRepositoryInterfac
         }
     }
 
+    /**
+     * @throws Exception
+     */
     public function calculateTotal(): int
     {
         try {
@@ -224,18 +228,21 @@ class LaporanBibitRepository implements CrudInterface, LaporanRepositoryInterfac
                 'error' => $e->getMessage(),
                 'sql' => $e->getSql(),
             ]);
-            return 0;
+            throw new Exception('Terjadi kesalahan pada query.', 500);
         } catch (\Exception $e) {
             Log::error('Terjadi kesalahan saat menghitung total record', [
                 'source' => __METHOD__,
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString(),
             ]);
-            return 0;
+            throw new Exception('Terjadi kesalahan pada server saat menghitung total record.', 500);
         }
     }
 
-    public function getLaporanStatusCounts(): array
+    /**
+     * @throws Exception
+     */
+    public function getLaporanStatusCounts(?int $penyuluhId = null): array
     {
         $statusCounts = [
             'approved' => 0,
@@ -244,14 +251,18 @@ class LaporanBibitRepository implements CrudInterface, LaporanRepositoryInterfac
         ];
 
         try {
-            $currentYear = Carbon::now()->year;
-            $startDate = Carbon::create($currentYear, 1, 1)->startOfDay();
-            $endDate = Carbon::create($currentYear, 12, 31)->endOfDay();
+            $startDate = Carbon::now()->startOfYear();
+            $endDate = Carbon::now()->endOfYear();
 
-            $rawCounts = LaporanKondisi::select('status', DB::raw('count(*) as total'))
+            $query = LaporanKondisi::select('status', DB::raw('count(*) as total'))
                 ->whereIn('status', [1, 2, 3])
-                ->whereBetween('created_at', [$startDate, $endDate])
-                ->groupBy('status')
+                ->whereBetween('created_at', [$startDate, $endDate]);
+
+            if (!is_null($penyuluhId)) {
+                $query->where('penyuluh_id', $penyuluhId);
+            }
+
+            $rawCounts = $query->groupBy('status')
                 ->pluck('total', 'status')
                 ->toArray();
 
@@ -261,39 +272,31 @@ class LaporanBibitRepository implements CrudInterface, LaporanRepositoryInterfac
                 3 => 'pending',
             ];
 
-            foreach ($rawCounts as $statusValue => $count) {
-                if (isset($statusMap[$statusValue])) {
-                    $statusCounts[$statusMap[$statusValue]] = $count;
-                }
+            foreach ($statusMap as $statusValue => $statusName) {
+                $statusCounts[$statusName] = $rawCounts[$statusValue] ?? 0;
             }
-
             return $statusCounts;
-
         } catch (QueryException $e) {
-            Log::error('Terjadi kesalahan pada query saat mencoba menghitung status laporan tahun ini', [
+            Log::error('Repository Error: Terjadi kesalahan pada query', [
                 'source' => __METHOD__,
                 'error' => $e->getMessage(),
                 'sql' => $e->getSql(),
-            ]);
-
-            return [
-                'approved' => 0,
-                'rejected' => 0,
-                'pending' => 0,
-            ];
-
-        } catch (Throwable $e) {
-            Log::error('Terjadi kesalahan umum saat mencoba menghitung status laporan tahun ini', [
-                'source' => __METHOD__,
-                'error' => $e->getMessage(),
+                'bindings' => $e->getBindings(),
+                'penyuluh_id' => $penyuluhId,
                 'trace' => $e->getTraceAsString(),
             ]);
 
-            return [
-                'approved' => 0,
-                'rejected' => 0,
-                'pending' => 0,
-            ];
+            throw new Exception('Terjadi kesalahan pada query saat menghitung record', 500, $e);
+
+        } catch (Throwable $e) {
+            Log::error('Repository Error: Terjadi kesalahan saat menghitung record', [
+                'source' => __METHOD__,
+                'error' => $e->getMessage(),
+                'penyuluh_id' => $penyuluhId,
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            throw new Exception('Terjadi kesalahan saat menghitung record', 500, $e);
         }
     }
 }

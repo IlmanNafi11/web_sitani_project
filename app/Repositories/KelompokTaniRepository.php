@@ -306,14 +306,14 @@ class KelompokTaniRepository implements CrudInterface, ManyRelationshipManagemen
                 'error' => $e->getMessage(),
                 'sql' => $e->getSql(),
             ]);
-            return 0;
+            throw new QueryException($e->getConnectionName(), $e->getSql(), $e->getBindings(), $e->getPrevious());
         } catch (\Exception $e) {
             Log::error('Terjadi kesalahan saat menghitung total record', [
                 'source' => __METHOD__,
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString(),
             ]);
-            return 0;
+            throw new \Exception('Terjadi Kesalahan di server saat menghitung total record', 500);
         }
     }
 }

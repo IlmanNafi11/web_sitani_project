@@ -26,7 +26,7 @@ class LaporanBibitController extends Controller
      * @param LaporanBibitRequest $request Form request
      * @return JsonResponse
      */
-    public function saveReport(LaporanBibitRequest $request):JsonResponse
+    public function saveReport(LaporanBibitRequest $request): JsonResponse
     {
         $result = $this->service->create($request->validated());
 
@@ -51,5 +51,29 @@ class LaporanBibitController extends Controller
         }
 
         return $this->errorResponse($result['message'], $result['code'], ['penyuluh_id' => $id]);
+    }
+
+    /**
+     * Mengambil total laporan bibit berdasarkan penyuluh id
+     *
+     * @return JsonResponse
+     */
+    public function getLaporanStatusCounts($id): JsonResponse
+    {
+        try {
+            $stats = $this->service->getLaporanStatusCounts($id);
+
+            if (array_sum($stats) === 0) {
+                return $this->errorResponse('Laporan Tidak ditemukan', 404, ['penyuluh_id' => $id]);
+            }
+
+            return $this->successResponse($stats, 'Total laporan bibit berhasil diambil');
+        } catch (\Throwable $e) {
+            return $this->errorResponse('Terjadi kesalahan diserver', 500,[
+                'approved' => 0,
+                'rejected' => 0,
+                'pending' => 0,
+            ]);
+        }
     }
 }

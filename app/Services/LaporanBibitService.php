@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\LaporanKondisi;
 use App\Repositories\Interfaces\CrudInterface;
 use App\Repositories\Interfaces\LaporanRepositoryInterface;
+use Exception;
 use Illuminate\Support\Facades\Log;
 
 class LaporanBibitService
@@ -262,6 +263,12 @@ class LaporanBibitService
         }
     }
 
+    /**
+     * Mengambil total keseluruhan laporan bibit
+     *
+     * @return int total
+     * @throws Exception
+     */
     public function calculateTotal(): int
     {
         try {
@@ -272,25 +279,28 @@ class LaporanBibitService
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString(),
             ]);
-            return 0;
+            throw new \Exception($e->getMessage(), 500);
         }
     }
 
-    public function getLaporanStatusCounts(): array
+    /**
+     * Mengambil total seluruh laporan berdasarkan statusnya
+     *
+     * @return int[] data total tiap status
+     * @throws Exception
+     */
+    public function getLaporanStatusCounts(?int $penyuluhId = null): array
     {
         try {
-            return $this->repository->getLaporanStatusCounts();
+            return $this->repository->getLaporanStatusCounts($penyuluhId);
         } catch (\Throwable $e) {
-            Log::error('Terjadi kesalahan saat menghitung data statistik status laporan', [
+            Log::error('Terjadi kesalahan saat menghitung total record data', [
                 'source' => __METHOD__,
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString(),
+                'previous' => $e->getPrevious(),
             ]);
+            throw new \Exception($e->getMessage(), 500);
         }
-        return [
-            'approved' => 0,
-            'rejected' => 0,
-            'pending' => 0,
-        ];
     }
 }

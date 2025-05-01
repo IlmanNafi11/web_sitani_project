@@ -232,6 +232,11 @@ class PenyuluhService
         }
     }
 
+    /**
+     * Mengambil total penyuluh yang terdafar di mobile sitani
+     *
+     * @throws \Exception
+     */
     public function calculateTotal(): int
     {
         try {
@@ -242,7 +247,7 @@ class PenyuluhService
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString(),
             ]);
-            return 0;
+            throw new \Exception($e->getMessage(), 500);
         }
     }
 }

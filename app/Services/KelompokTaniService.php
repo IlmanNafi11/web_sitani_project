@@ -341,6 +341,12 @@ class KelompokTaniService
         }
     }
 
+    /**
+     * Mengambil totol kelompok tani yang terdaftar di Sitani
+     *
+     * @return int Total
+     * @throws \Exception
+     */
     public function calculateTotal(): int
     {
         try {
@@ -350,8 +356,9 @@ class KelompokTaniService
                 'source' => __METHOD__,
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString(),
+                'previous' => $e->getPrevious(),
             ]);
-            return 0;
+            throw new \Exception('Terjadi Kesalahan diserver saat menghitung total kelompok tani', $e->getCode(), $e->getPrevious());
         }
     }
 }
