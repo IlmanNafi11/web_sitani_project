@@ -16,17 +16,17 @@ class PenyuluhSeeder extends Seeder
      */
     public function run(): void
     {
-        $kecamatan = Kecamatan::create([
+        $kecamatan = Kecamatan::firstOrCreate([
             'nama' => 'Kecamatan test',
         ]);
 
-        $user = User::create([
+        $user = User::firstOrCreate([
             'email' => 'officialsitani@gmail.com',
             'password' => bcrypt('Admin1234#'),
             'is_password_set' => true,
         ]);
 
-        $penyuluhTerdaftar = PenyuluhTerdaftar::create([
+        $penyuluhTerdaftar = PenyuluhTerdaftar::firstOrCreate([
             'nama' => 'Penyuluh 1',
             'no_hp' => '085666777555',
             'alamat' => 'Jalan imphen',
@@ -35,7 +35,7 @@ class PenyuluhSeeder extends Seeder
 
         $user->assignRole('penyuluh');
 
-        $penyuluh = Penyuluh::create([
+        $penyuluh = Penyuluh::firstOrCreate([
             'user_id' => $user->id,
             'penyuluh_terdaftar_id' => $penyuluhTerdaftar->id,
         ]);
