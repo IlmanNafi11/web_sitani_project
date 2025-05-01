@@ -14,7 +14,7 @@ class UserSeeder extends Seeder
      */
     public function run(): void
     {
-        $user = User::firstOrCreate([
+        $user = User::updateOrCreate([
             'email' => 'fajarfadhilah510@gmail.com',
             'password' => bcrypt("sitani"),
             'is_password_set' => false,
@@ -22,7 +22,7 @@ class UserSeeder extends Seeder
 
         $user->assignRole('super admin');
 
-        Admin::firstOrCreate([
+        Admin::updateOrCreate([
             'user_id' => $user->id,
             'nama' => 'Ilman Nafi',
             'no_hp' => "085555123456",
