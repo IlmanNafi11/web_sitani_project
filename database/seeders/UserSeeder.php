@@ -17,7 +17,6 @@ class UserSeeder extends Seeder
         $user = User::firstOrCreate([
             'email' => 'fajarfadhilah510@gmail.com',
             'password' => bcrypt("sitani"),
-            'email_verified_at' => now(),
             'is_password_set' => false,
         ]);
 

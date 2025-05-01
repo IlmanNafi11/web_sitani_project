@@ -16,15 +16,11 @@ class RoleSeeder extends Seeder
         Role::updateOrCreate([
             'name' => 'super admin',
             'guard_name' => 'web',
-            'created_at' => now(),
-            'updated_at' => now(),
         ]);
 
         Role::updateOrCreate([
             'name' => 'penyuluh',
             'guard_name' => 'web',
-            'created_at' => now(),
-            'updated_at' => now(),
         ]);
     }
 }
