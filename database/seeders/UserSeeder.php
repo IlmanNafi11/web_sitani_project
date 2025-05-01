@@ -14,19 +14,28 @@ class UserSeeder extends Seeder
      */
     public function run(): void
     {
-        $user = User::updateOrCreate([
-            'email' => 'fajarfadhilah510@gmail.com',
-            'password' => bcrypt("sitani"),
-            'is_password_set' => false,
-        ]);
+        $user = User::firstOrCreate(
+            [
+                'email' => 'fajarfadhilah510@gmail.com',
+            ],
+            [
+                'password' => bcrypt("sitani"),
+                'email_verified_at' => now(),
+                'is_password_set' => false,
+            ]
+        );
 
         $user->assignRole('super admin');
 
-        Admin::updateOrCreate([
-            'user_id' => $user->id,
-            'nama' => 'Ilman Nafi',
-            'no_hp' => "085555123456",
-            'alamat' => "Jl. Merapi No. 123",
-        ]);
+        Admin::firstOrCreate(
+            [
+                'user_id' => $user->id,
+            ],
+            [
+                'nama' => 'Ilman Nafi',
+                'no_hp' => "085555123456",
+                'alamat' => "Jl. Merapi No. 123",
+            ]
+        );
     }
 }
