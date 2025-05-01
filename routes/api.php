@@ -14,12 +14,12 @@ use App\Http\Middleware\JwtMiddleware;
  * Route untuk fungsional login, register, otp, dan reset password
  */
 Route::controller(AuthApiController::class)->group(function () {
-    Route::post('login', 'login')->withoutMiddleware(JwtMiddleware::class)->name('login');
-    Route::post('register', 'register')->withoutMiddleware(JwtMiddleware::class)->name('register');
-    Route::post('validate-phone', 'validatePhone')->withoutMiddleware(JwtMiddleware::class)->name('validate-phone');
-    Route::post('forgot-password', 'sendOtp')->withoutMiddleware(JwtMiddleware::class)->name('forgot-password');
-    Route::post('verify-otp', 'validateOtp')->withoutMiddleware(JwtMiddleware::class)->name('verify-otp');
-    Route::post('reset-password', 'passwordReset')->withoutMiddleware(JwtMiddleware::class)->name('reset-password');
+    Route::post('login', 'login')->withoutMiddleware(JwtMiddleware::class)->name('login.mobile');
+    Route::post('register', 'register')->withoutMiddleware(JwtMiddleware::class)->name('register.mobile');
+    Route::post('validate-phone', 'validatePhone')->withoutMiddleware(JwtMiddleware::class)->name('validate-phone.mobile');
+    Route::post('forgot-password', 'sendOtp')->withoutMiddleware(JwtMiddleware::class)->name('forgot-password.mobile');
+    Route::post('verify-otp', 'validateOtp')->withoutMiddleware(JwtMiddleware::class)->name('verify-otp.mobile');
+    Route::post('reset-password', 'passwordReset')->withoutMiddleware(JwtMiddleware::class)->name('reset-password.mobile');
 
 });
 
