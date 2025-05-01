@@ -20,11 +20,13 @@ class PenyuluhSeeder extends Seeder
             'nama' => 'Kecamatan test',
         ]);
 
-        $user = User::firstOrCreate([
-            'email' => 'officialsitani@gmail.com',
-            'password' => bcrypt('Admin1234#'),
-            'is_password_set' => true,
-        ]);
+        $user = User::firstOrCreate(
+            [
+                'email' => 'officialsitani@gmail.com',],
+            [
+                'password' => bcrypt('Admin1234#'),
+                'is_password_set' => true,
+            ]);
 
         $penyuluhTerdaftar = PenyuluhTerdaftar::firstOrCreate([
             'nama' => 'Penyuluh 1',
