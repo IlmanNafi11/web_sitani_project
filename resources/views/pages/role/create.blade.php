@@ -20,7 +20,6 @@
                             return explode('.', $perm->name)[0];
                         });
                         $menuLabels = [
-                            'dashboard' => 'Dashboard',
                             'bibit' => 'Kelola Bibit',
                             'komoditas' => 'Kelola Komoditas',
                             'penyuluh' => 'Kelola Penyuluh',
