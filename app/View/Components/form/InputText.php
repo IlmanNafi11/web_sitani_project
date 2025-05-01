@@ -17,8 +17,16 @@ class InputText extends Component
     public $extraClassElement;
     public $defaultValue;
 
-    public function __construct($keyId, $name, $label, $placeholder, $helperText, $extraClassOption, $extraClassElement, $defaultValue)
-    {
+    public function __construct(
+        $keyId = '',
+        $name = '',
+        $label = '',
+        $placeholder = '',
+        $helperText = '',
+        $extraClassOption = '',
+        $extraClassElement = '',
+        $defaultValue = null
+    ){
         $this->keyId = $keyId;
         $this->name = $name;
         $this->label = $label;

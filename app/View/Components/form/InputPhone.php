@@ -18,8 +18,17 @@ class InputPhone extends Component
     public $defaultValue;
     public $icon;
 
-    public function __construct($keyId, $name, $label, $placeholder, $helperText, $extraClassOption, $extraClassElement, $defaultValue, $icon)
-    {
+    public function __construct(
+        $keyId = '',
+        $name = '',
+        $label = '',
+        $placeholder = '',
+        $helperText = '',
+        $extraClassOption = '',
+        $extraClassElement = '',
+        $defaultValue = null,
+        $icon = null
+    ){
         $this->keyId = $keyId;
         $this->name = $name;
         $this->label = $label;

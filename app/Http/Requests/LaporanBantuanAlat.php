@@ -24,7 +24,7 @@ class LaporanBantuanAlat extends FormRequest
         return [
             'kelompok_tani_id' => 'required|exists:kelompok_tani_id',
             'penyuluh_id' => 'required|exist:penyuluh_id',
-            'alat_diminta' => 'required|string',
+            'alat_diminta' => 'required', 'regex:/^[a-zA-Z0-9\s]+$/',
             'path_proposal' => 'required|string',
             'status' => 'required|string',
         ];

@@ -19,8 +19,18 @@ class Select extends Component
     public $extraClassOption;
     public $extraClassElement;
 
-    public function __construct($name, $label, $options, $optionValue, $optionLabel, $selected, $helperText, $placeholder, $extraClassOption, $extraClassElement)
-    {
+    public function __construct(
+        $name = '',
+        $label = '',
+        $options = [],
+        $optionValue = 'id',
+        $optionLabel = 'name',
+        $selected = null,
+        $helperText = '',
+        $placeholder = '',
+        $extraClassOption = '',
+        $extraClassElement = ''
+    ){
         $this->name = $name;
         $this->label = $label;
         $this->options = $options;

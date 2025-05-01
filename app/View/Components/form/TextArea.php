@@ -17,8 +17,16 @@ class TextArea extends Component
     public $extraClassOption;
     public $extraClassElement;
 
-    public function __construct($keyId, $defaultValue, $name, $label, $placeholder, $helperText, $extraClassOption, $extraClassElement)
-    {
+    public function __construct(
+        $keyId = '',
+        $defaultValue = '',
+        $name = '',
+        $label = '',
+        $placeholder = '',
+        $helperText = '',
+        $extraClassOption = '',
+        $extraClassElement = ''
+    ){
         $this->keyId = $keyId;
         $this->defaultValue = $defaultValue;
         $this->name = $name;

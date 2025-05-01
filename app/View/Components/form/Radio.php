@@ -18,8 +18,17 @@ class Radio extends Component
     public $extraClassElement;
     public $color;
 
-    public function __construct($name, $value, $keyId, $defaultValue, $checked, $label, $extraClassOption, $extraClassElement, $color)
-    {
+    public function __construct(
+        $name = '',
+        $value = '',
+        $keyId = '',
+        $defaultValue = null,
+        $checked = false,
+        $label = '',
+        $extraClassOption = '',
+        $extraClassElement = '',
+        $color = 'primary'
+    ){
         $this->name = $name;
         $this->value = $value;
         $this->keyId = $keyId;

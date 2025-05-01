@@ -125,6 +125,12 @@ Route::middleware(['active.session', 'panel.admin.permission'])->group(function 
     //Laporan Alat
     Route::controller(LaporanBantuanAlatController::class)->prefix('admin/laporan-alat')->group(function(){
         Route::get('/', 'index')->name('laporan-alat.index');
+        Route::get('create', 'create')->name('laporan-alat.create');
+        Route::post('/', 'store')->name('laporan-alat.store');
+        Route::get('{laporan_alat}/edit', 'edit')->name('laporan-alat.edit');
+        Route::put('{laporan_alat}', 'update')->name('laporan-alat.update');
+        Route::delete('{laporan_alat}', 'destroy')->name('laporan-alat.destroy');
+        Route::get('{laporan_alat}', 'show')->name('laporan-alat.show');
     });
 
     // Admin User Management

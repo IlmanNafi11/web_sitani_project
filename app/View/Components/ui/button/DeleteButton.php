@@ -18,8 +18,17 @@ class DeleteButton extends Component
     public $extraClassElement;
     public $permission;
 
-    public function __construct($color, $icon, $style, $title, $route, $keyId, $extraClassOption, $extraClassElement, $permission)
-    {
+    public function __construct(
+        $color = 'danger',          // Default value for color
+        $icon = 'trash',            // Default value for icon
+        $style = 'default',         // Default value for style
+        $title = 'Delete',          // Default value for title
+        $route = '',                // Default value for route (optional, can be empty)
+        $keyId = null,              // Default value for keyId (optional)
+        $extraClassOption = '',     // Default empty class for options
+        $extraClassElement = '',    // Default empty class for element
+        $permission = null          // Default permission (optional)
+    ){
         $this->color = $color;
         $this->icon = $icon;
         $this->style = $style;

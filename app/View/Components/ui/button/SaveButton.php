@@ -17,7 +17,16 @@ class SaveButton extends Component
     public $titleAlert;
     public $messageAlert;
 
-    public function __construct($color, $icon, $style, $title, $formId, $extraClassElement, $titleAlert, $messageAlert)
+    public function __construct(
+        $color = 'primary',
+        $icon = 'fa-save',
+        $style = 'solid',
+        $title = 'Simpan',
+        $formId = null,
+        $extraClassElement = '',
+        $titleAlert = 'Konfirmasi Simpan',
+        $messageAlert = 'Yakin ingin menyimpan data ini?'
+    )
     {
         $this->color = $color;
         $this->icon = $icon;

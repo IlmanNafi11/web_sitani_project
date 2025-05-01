@@ -16,8 +16,15 @@ class AddButton extends Component
     public $extraClassOption;
     public $permission;
 
-    public function __construct($color, $icon, $style, $title, $route, $extraClassOption, $permission)
-    {
+    public function __construct(
+        $color = 'primary', // Default value
+        $icon = '',         // Default value
+        $style = 'default', // Default value
+        $title = 'Add',     // Default value
+        $route = '',        // Default value
+        $extraClassOption = '', // Default value
+        $permission = null  // Default value
+    ){
         $this->color = $color;
         $this->icon = $icon;
         $this->style = $style;

@@ -13,8 +13,12 @@ class BackButton extends Component
     public $icon;
     public $title;
 
-    public function __construct($color, $style, $icon, $title)
-    {
+    public function __construct(
+        $color = 'primary', // Default value
+        $style = 'default', // Default value
+        $icon = '',         // Default value
+        $title = 'Back'     // Default value
+    ){
         $this->$color = $color;
         $this->style = $style;
         $this->icon = $icon;

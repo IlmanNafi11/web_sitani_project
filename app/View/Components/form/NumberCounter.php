@@ -17,8 +17,16 @@ class NumberCounter extends Component
     public $defaultValue;
     public $extraClassElement;
 
-    public function __construct($label, $name, $keyId, $min, $max, $helperText, $defaultValue, $extraClassElement)
-    {
+    public function __construct(
+        $label = '',
+        $name = '',
+        $keyId = '',
+        $min = 0,
+        $max = 100,
+        $helperText = '',
+        $defaultValue = 0,
+        $extraClassElement = ''
+    ){
         $this->label = $label;
         $this->name = $name;
         $this->keyId = $keyId;

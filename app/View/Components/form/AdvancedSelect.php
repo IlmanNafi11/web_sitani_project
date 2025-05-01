@@ -25,8 +25,23 @@ class AdvancedSelect extends Component
     public $noResultText;
 
 
-    public function __construct($keyId, $label, $name, $placeholder, $options, $optionValue, $optionLabel, $selected, $helperText, $extraClassElement, $extraClassOptions, $isMultiple, $hasSearch, $searchPlaceholder, $noResultText)
-    {
+    public function __construct(
+        $keyId = '',
+        $label = '',
+        $name = '',
+        $placeholder = '',
+        $options = [],
+        $optionValue = '',
+        $optionLabel = '',
+        $selected = null,
+        $helperText = '',
+        $extraClassElement = '',
+        $extraClassOptions = '',
+        $isMultiple = false,
+        $hasSearch = false,
+        $searchPlaceholder = 'Search...',
+        $noResultText = 'No results found'
+    ){
         $this->keyId = $keyId;
         $this->label = $label;
         $this->name = $name;
