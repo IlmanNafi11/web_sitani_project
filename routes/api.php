@@ -65,6 +65,7 @@ Route::controller(KelompokTaniController::class)->group(function () {
     Route::get('kelompok-tani', 'getAllByPenyuluhId');
     Route::get('kelompok-tani/count','calculateTotal');
     Route::get('kelompok-tani/{id}', 'getById');
+    Route::get('kelompok-tani/kecamatan/{id}/count','countByKecamatanId');
 });
 
 /**

@@ -5,8 +5,10 @@ namespace App\Services;
 use App\Repositories\Interfaces\CrudInterface;
 use App\Repositories\Interfaces\KelompokTaniRepositoryInterface;
 use App\Repositories\Interfaces\ManyRelationshipManagement;
+use Exception;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Log;
+use Throwable;
 
 class KelompokTaniService
 {
@@ -359,6 +361,22 @@ class KelompokTaniService
                 'previous' => $e->getPrevious(),
             ]);
             throw new \Exception('Terjadi Kesalahan diserver saat menghitung total kelompok tani', $e->getCode(), $e->getPrevious());
+        }
+    }
+
+    /**
+     * Mengambil total kelompok tani berdasarkan kecamatan id
+     *
+     * @return int Total
+     * @throws Exception
+     * @throws Throwable
+     */
+    public function countByKecamatanId(string|int $id): int
+    {
+        try {
+            return $this->repository->countByKecamatanId($id);
+        }catch (\Throwable $e) {
+            throw new Exception('Terjadi kesalahan di server', 500);
         }
     }
 }

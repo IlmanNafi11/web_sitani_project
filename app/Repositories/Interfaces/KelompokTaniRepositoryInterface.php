@@ -20,4 +20,12 @@ interface KelompokTaniRepositoryInterface
      * @return int Total Data kelompok tani
      */
     public function calculateTotal(): int;
+
+    /**
+     * Mengambil total kelompok tani berdasarkan kecamatan id
+     *
+     * @param string|int $id kecamatan id
+     * @return int
+     */
+    public function countByKecamatanId(string|int $id): int;
 }

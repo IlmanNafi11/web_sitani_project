@@ -6,6 +6,8 @@ use App\Models\KelompokTani;
 use App\Repositories\Interfaces\CrudInterface;
 use App\Repositories\Interfaces\KelompokTaniRepositoryInterface;
 use App\Repositories\Interfaces\ManyRelationshipManagement;
+use App\Trait\LoggingError;
+use Exception;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\QueryException;
@@ -14,6 +16,8 @@ use Throwable;
 
 class KelompokTaniRepository implements CrudInterface, ManyRelationshipManagement, KelompokTaniRepositoryInterface
 {
+    use LoggingError;
+
     public function getAll(bool $withRelations = false): Collection|array
     {
         try {
@@ -313,7 +317,23 @@ class KelompokTaniRepository implements CrudInterface, ManyRelationshipManagemen
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString(),
             ]);
-            throw new \Exception('Terjadi Kesalahan di server saat menghitung total record', 500);
+            throw new Exception('Terjadi Kesalahan di server saat menghitung total record', 500);
+        }
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function countByKecamatanId(int|string $id): int
+    {
+        try {
+            return KelompokTani::where('kecamatan_id', $id)->count();
+        } catch (QueryException $e) {
+            $this->LogSqlException($e);
+            throw new Exception('Terjadi kesalahan pada query', 500);
+        } catch (\Throwable $e) {
+            $this->LogGeneralException($e);
+            throw new Exception('Terjadi kesalahan pada repository', 500);
         }
     }
 }

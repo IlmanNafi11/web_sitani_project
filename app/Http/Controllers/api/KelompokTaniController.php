@@ -74,4 +74,14 @@ class KelompokTaniController extends Controller
             return $this->errorResponse($e->getMessage());
         }
     }
+
+    public function countByKecamatanId(string|int $id): JsonResponse
+    {
+        try {
+            $total = $this->service->countByKecamatanId($id);
+            return $this->successResponse(['total' => $total], 'Total Kelompok Tani berhasil diambil');
+        } catch (\Exception $e) {
+            return $this->errorResponse($e->getMessage(), $e->getCode());
+        }
+    }
 }
