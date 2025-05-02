@@ -124,7 +124,7 @@ Route::middleware(['active.session', 'panel.admin.permission'])->group(function 
 
     //Laporan Alat
     Route::controller(LaporanBantuanAlatController::class)->prefix('admin/laporan-alat')->group(function(){
-        Route::get('/', 'index')->name('laporan-alat.index');
+        Route::get('/', 'index')->name('laporan-alat.index'); //Tambahkan Middleware
         Route::get('create', 'create')->name('laporan-alat.create');
         Route::post('/', 'store')->name('laporan-alat.store');
         Route::get('{laporan_alat}/edit', 'edit')->name('laporan-alat.edit');

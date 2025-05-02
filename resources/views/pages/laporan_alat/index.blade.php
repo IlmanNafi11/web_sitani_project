@@ -65,9 +65,8 @@
         </table>
     </x-ui.card>
     <script>
-
-        if (document.getElementById("laporan-alat-table") && typeof simpleDatatables.DataTable !== 'undefined') {
-            const dataTable = new simpleDatatables.DataTable("#laporan-alat-table", {
+        if (document.getElementById("laporan-bantuan-alat-table") && typeof simpleDatatables.DataTable !== 'undefined') {
+            const dataTable = new simpleDatatables.DataTable("#laporan-bantuan-alat-table", {
                 paging: true,
                 perPage: 5,
                 perPageSelect: [5, 10, 15, 20, 25],
@@ -84,11 +83,6 @@
                 },
             });
 
-            $(document).ready(function () {
-                const dataTable = $(".datatable-top");
-                dataTable.prepend(`<div class="action-header-container flex"><x-ui.button.add-button :color="'btn-accent'" :style="'btn-soft'" :route="route('kelompok-tani.create')" :title="'Tambah Data'" :permission="null" /></div>`);
-                $(".datatable-top").children().not(".action-header-container").wrapAll('<div class="features-action-container flex flex-row-reverse gap-4 flex-wrap"></div>');
-            });
         }
     </script>
 @endsection
