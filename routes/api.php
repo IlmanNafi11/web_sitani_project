@@ -27,7 +27,7 @@ Route::controller(AuthApiController::class)->group(function () {
 Route::controller(NotificationController::class)->group(function () {
     Route::post('fcm-token/store', 'storeFcmToken')->name('store-fcm-token');
     Route::get('notifications', 'getUserNotification');
-    Route::post('notifications/{id}/read', 'markAsReadNotification');
+    Route::patch('notifications/{id}/read', 'markAsReadNotification');
     Route::delete('notifications/{id}', 'destroy');
 });
 
