@@ -50,4 +50,19 @@ class KomoditasController extends Controller
 
         return $this->errorResponse($komoditas['message'], 404);
     }
+
+    /**
+     * Mengambil total musim tiap komoditas
+     *
+     * @return JsonResponse
+     */
+    public function getTotalMusim(): JsonResponse
+    {
+        try {
+            $komoditas = $this->service->getMusim();
+            return $this->successResponse($komoditas, 'Data musim tiap komoditas berhasil diambil');
+        } catch (\Throwable $e) {
+            return $this->errorResponse('Terjadi kesalahan di server');
+        }
+    }
 }

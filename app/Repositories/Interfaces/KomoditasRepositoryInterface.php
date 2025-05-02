@@ -2,6 +2,8 @@
 
 namespace App\Repositories\Interfaces;
 
+use Illuminate\Support\Collection;
+
 interface KomoditasRepositoryInterface
 {
     /**
@@ -10,4 +12,11 @@ interface KomoditasRepositoryInterface
      * @return int Total Data Komoditas
      */
     public function calculateTotal(): int;
+
+    /**
+     * Mengambil data musim tiap komoditas
+     *
+     * @return Collection data
+     */
+    public function GetMusim(): Collection;
 }

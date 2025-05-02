@@ -5,6 +5,7 @@ namespace App\Repositories;
 use App\Models\Komoditas;
 use App\Repositories\Interfaces\CrudInterface;
 use App\Repositories\Interfaces\KomoditasRepositoryInterface;
+use App\Trait\LoggingError;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\QueryException;
@@ -12,6 +13,8 @@ use Illuminate\Support\Facades\Log;
 
 class KomoditasRepository implements CrudInterface, KomoditasRepositoryInterface
 {
+    use LoggingError;
+
     public function getAll($withRelations = false): Collection|array
     {
         try {
@@ -153,6 +156,22 @@ class KomoditasRepository implements CrudInterface, KomoditasRepositoryInterface
                 'trace' => $e->getTraceAsString(),
             ]);
             throw new \Exception('Terjadi kesalahan pada server saat menghitung total komoditas', 500);
+        }
+    }
+
+    /**
+     * @throws \Exception
+     */
+    public function GetMusim(): Collection
+    {
+        try {
+            return Komoditas::select(['nama', 'musim'])->get();
+        } catch (QueryException $e) {
+            $this->LogSqlException($e);
+            throw new \Exception('Terjadi kesalahan pada query', 500);
+        } catch (\Throwable $e) {
+            $this->LogGeneralException($e);
+            throw new \Exception('Terjadi kesalahan direpository', 500);
         }
     }
 }

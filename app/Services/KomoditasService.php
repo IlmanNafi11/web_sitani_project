@@ -4,7 +4,9 @@ namespace App\Services;
 
 use App\Repositories\Interfaces\CrudInterface;
 use App\Repositories\Interfaces\KomoditasRepositoryInterface;
+use Exception;
 use Illuminate\Support\Facades\Log;
+use Throwable;
 
 class KomoditasService
 {
@@ -41,7 +43,7 @@ class KomoditasService
                 'message' => 'Data komoditas tidak ditemukan',
                 'data' => []
             ];
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             Log::error('Terjadi kesalahan saat mengambil data komoditas.', [
                 'source' => __METHOD__,
                 'error' => $e->getMessage(),
@@ -80,7 +82,7 @@ class KomoditasService
                 'message' => 'Data komoditas tidak ditemukan',
                 'data' => []
             ];
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             Log::error('Terjadi kesalahan saat mengambil data komoditas berdasarkan ID.', [
                 'source' => __METHOD__,
                 'error' => $e->getMessage(),
@@ -119,7 +121,7 @@ class KomoditasService
                 'message' => 'Data komoditas gagal disimpan',
                 'data' => []
             ];
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             Log::error('Terjadi kesalahan saat menyimpan data komoditas.', [
                 'source' => __METHOD__,
                 'error' => $e->getMessage(),
@@ -159,7 +161,7 @@ class KomoditasService
                 'message' => 'Data komoditas gagal diperbarui',
                 'data' => []
             ];
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             Log::error('Terjadi kesalahan saat memperbarui data komoditas.', [
                 'source' => __METHOD__,
                 'error' => $e->getMessage(),
@@ -198,7 +200,7 @@ class KomoditasService
                 'message' => 'Data komoditas gagal dihapus',
                 'data' => []
             ];
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             Log::error('Terjadi kesalahan saat menghapus data komoditas.', [
                 'source' => __METHOD__,
                 'error' => $e->getMessage(),
@@ -216,19 +218,31 @@ class KomoditasService
     /**
      * Mengambil total komoditas yang terdaftar disitani
      *
-     * @throws \Exception
+     * @throws Exception
      */
     public function calculateTotal(): int
     {
         try {
             return $this->repository->calculateTotal();
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             Log::error('Terjadi kesalahan saat menghitung total record data', [
                 'source' => __METHOD__,
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString(),
             ]);
-            throw new \Exception('Gagal menghitung total record data.', 500);
+            throw new Exception('Gagal menghitung total record data.', 500);
+        }
+    }
+
+    /**
+     * @throws Throwable
+     */
+    public function getMusim()
+    {
+        try {
+            return $this->repository->GetMusim();
+        } catch (Throwable $e) {
+            throw $e;
         }
     }
 }
