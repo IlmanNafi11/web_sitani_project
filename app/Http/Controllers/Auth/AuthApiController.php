@@ -174,7 +174,7 @@ class AuthApiController extends Controller
     }
 
     /**
-     * Memperbarui kata sandi
+     * Memperbarui kata sandi(OTP)
      *
      * @param PasswordRequest $request Form request
      * @return JsonResponse
@@ -183,23 +183,46 @@ class AuthApiController extends Controller
     {
         $validated = $request->validated();
         $email = $request->input('email');
-        $data = $this->userService->findUser(['email' => $email]);
-        $user = null;
+        $newPassword = $validated['password'];
 
-        if ($data['success']) {
-            $user = $data['data'];
-        }
 
-        if (!$data['success']) {
-            return $this->errorResponse($data['message'], 401);
-        }
+        $result = $this->userService->processPasswordResetFlow(
+            $email,
+            $newPassword,
+            true
+        );
 
-        $this->userService->invalidateOtps($user);
-        $result = $this->userService->resetPassword($user, $validated['password']);
         if (!$result['success']) {
-            return $this->errorResponse($result['message'], 401);
+            return $this->errorResponse($result['message'], $result['code']);
         }
 
         return $this->successResponse(['email' => $email], $result['message']);
     }
+
+    /**
+     * Memperbarui kata sandi melalui profile
+     *
+     * @param PasswordRequest $request
+     * @return JsonResponse
+     */
+    public function updatePasswordViaProfile(PasswordRequest $request): JsonResponse
+    {
+        $validated = $request->validated();
+        $email = $request->input('email');
+        $newPassword = $validated['password'];
+
+
+        $result = $this->userService->processPasswordResetFlow(
+            $email,
+            $newPassword,
+            false
+        );
+
+        if (!$result['success']) {
+            return $this->errorResponse($result['message'], $result['code']);
+        }
+
+        return $this->successResponse(['email' => $email], $result['message']);
+    }
+
 }

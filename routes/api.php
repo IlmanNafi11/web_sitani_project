@@ -21,7 +21,7 @@ Route::controller(AuthApiController::class)->group(function () {
     Route::post('forgot-password', 'sendOtp')->withoutMiddleware(JwtMiddleware::class)->name('forgot-password.mobile');
     Route::post('verify-otp', 'validateOtp')->withoutMiddleware(JwtMiddleware::class)->name('verify-otp.mobile');
     Route::post('reset-password', 'passwordReset')->withoutMiddleware(JwtMiddleware::class)->name('reset-password.mobile');
-
+    Route::patch('users/reset-password', 'updatePasswordViaProfile')->withoutMiddleware(JwtMiddleware::class)->name('reset-password.profile.mobile');
 });
 
 Route::controller(NotificationController::class)->group(function () {

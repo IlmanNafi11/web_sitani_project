@@ -191,4 +191,29 @@ class UserService
             ]);
         }
     }
+
+    /**
+     * Reset Password Flow, menggabungkan proses reset password menggunakan otp dan tidak(profile)
+     *
+     * @param string $email email penyuluh
+     * @param string $newPassword password baru
+     * @param bool $invalidateOtp counter, default false, set true jika menggunakan otp
+     * @return array
+     */
+    public function processPasswordResetFlow(string $email, string $newPassword, bool $invalidateOtp = false): array
+    {
+        $findUserResult = $this->findUser(['email' => $email]);
+
+        if (!$findUserResult['success']) {
+            return $findUserResult;
+        }
+
+        $user = $findUserResult['data'];
+
+        if ($invalidateOtp) {
+            $this->invalidateOtps($user);
+        }
+
+        return $this->resetPassword($user, $newPassword);
+    }
 }
