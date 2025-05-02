@@ -10,21 +10,17 @@ trait LoggingError
 {
     protected function LogSqlException(QueryException $e, array $data = [], string $message = null): void
     {
-        Log::error($message ?? 'Terjadi kesalahan pada query', [
-            'error' => $e->getMessage(),
-            'sql' => $e->getSql(),
-            'bindings' => $e->getBindings(),
+        Log::error($message ?? 'Database error di ' . __METHOD__ , [
             'data' => $data,
-            'trace' => $e->getTraceAsString(),
+            'exception' => $e,
         ]);
     }
 
     protected function LogGeneralException(Throwable $e, array $data = [], string $message = null): void
     {
-        Log::error($message ?? 'Terjadi kesalahan tak terduga', [
-            'error' => $e->getMessage(),
+        Log::error($message ?? 'Terjadi kesalahan tak terduga di ' . __METHOD__ , [
             'data' => $data,
-            'trace' => $e->getTraceAsString(),
+            'exception' => $e,
         ]);
     }
 }
