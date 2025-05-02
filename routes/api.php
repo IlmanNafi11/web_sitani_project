@@ -4,6 +4,7 @@ use App\Http\Controllers\api\BibitController;
 use App\Http\Controllers\api\KelompokTaniController;
 use App\Http\Controllers\api\KomoditasController;
 use App\Http\Controllers\api\LaporanBibitController;
+use App\Http\Controllers\api\NotificationController;
 use App\Http\Controllers\api\PenyuluhController;
 use App\Http\Controllers\api\UserController;
 use App\Http\Controllers\Auth\AuthApiController;
@@ -21,6 +22,13 @@ Route::controller(AuthApiController::class)->group(function () {
     Route::post('verify-otp', 'validateOtp')->withoutMiddleware(JwtMiddleware::class)->name('verify-otp.mobile');
     Route::post('reset-password', 'passwordReset')->withoutMiddleware(JwtMiddleware::class)->name('reset-password.mobile');
 
+});
+
+Route::controller(NotificationController::class)->group(function () {
+    Route::post('fcm-token/store', 'storeFcmToken')->name('store-fcm-token');
+    Route::get('notifications', 'getUserNotification');
+    Route::post('notifications/{id}/read', 'markAsReadNotification');
+    Route::delete('notifications/{id}', 'destroy');
 });
 
 /**

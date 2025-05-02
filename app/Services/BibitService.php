@@ -1,6 +1,8 @@
 <?php
 namespace App\Services;
 
+use App\Events\NotifGenerated;
+use App\Models\User;
 use App\Repositories\Interfaces\BibitRepositoryInterface;
 use App\Repositories\Interfaces\CrudInterface;
 use http\Exception;
@@ -143,8 +145,18 @@ class BibitService {
     {
         try {
             $bibit = $this->crudRepository->create($data);
-
-            if (!empty($bibit)) {
+            Log::info($bibit);
+            if ($bibit !== null) {
+                $users = User::role('penyuluh')->get();
+                Log::info($users);
+                foreach ($users as $user) {
+                    event(new NotifGenerated(
+                        $user,
+                        'Bibit Baru Tersedia',
+                        'Admin menambahkan bibit baru: ' . ($bibit->nama ?? 'bibit'),
+                        'bibit_baru'
+                    ));
+                }
                 return [
                     'success' => true,
                     'message' => 'Data bibit berhasil disimpan',

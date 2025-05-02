@@ -15,6 +15,7 @@ use App\Repositories\Interfaces\KelompokTaniRepositoryInterface;
 use App\Repositories\Interfaces\KomoditasRepositoryInterface;
 use App\Repositories\Interfaces\LaporanRepositoryInterface;
 use App\Repositories\Interfaces\ManyRelationshipManagement;
+use App\Repositories\Interfaces\NotificationInterface;
 use App\Repositories\Interfaces\PenyuluhRepositoryInterface;
 use App\Repositories\Interfaces\PenyuluhTerdaftarRepositoryInterface;
 use App\Repositories\Interfaces\RoleRepositoryInterface;
@@ -22,6 +23,7 @@ use App\Repositories\KecamatanRepository;
 use App\Repositories\KelompokTaniRepository;
 use App\Repositories\KomoditasRepository;
 use App\Repositories\LaporanBibitRepository;
+use App\Repositories\NotificationRepository;
 use App\Repositories\PenyuluhRepository;
 use App\Repositories\PenyuluhTerdaftarRepository;
 use App\Repositories\RoleRepository;
@@ -33,6 +35,7 @@ use App\Services\KecamatanService;
 use App\Services\KelompokTaniService;
 use App\Services\KomoditasService;
 use App\Services\LaporanBibitService;
+use App\Services\NotificationService;
 use App\Services\PenyuluhService;
 use App\Services\PenyuluhTerdaftarService;
 use App\Services\RoleService;
@@ -66,6 +69,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->when(BibitService::class)->needs(BibitRepositoryInterface::class)->give(BibitRepository::class);
         $this->app->when(KomoditasService::class)->needs(KomoditasRepositoryInterface::class)->give(KomoditasRepository::class);
         $this->app->when(PenyuluhService::class)->needs(PenyuluhRepositoryInterface::class)->give(PenyuluhRepository::class);
+        $this->app->when(NotificationService::class)->needs(NotificationInterface::class)->give(NotificationRepository::class);
     }
 
     /**
