@@ -1,6 +1,6 @@
 <nav class="navbar w-full bg-base-100 border-b border-gray-200 sm:z-1 relative">
     <button type="button" class="btn btn-text max-sm:btn-square sm:hidden me-2" aria-haspopup="dialog"
-        aria-expanded="false" aria-controls="with-navbar-sidebar" data-overlay="#with-navbar-sidebar">
+        aria-expanded="false" aria-controls="with-navbar-sidebar" data-overlay="#with-navbar-sidebar" data-overlay-options='{ "backdropExtraClasses": "!absolute transition duration-300 fixed inset-0 bg-base-content/60 overlay-backdrop"}'>
         <span class="icon-[tabler--menu-2] size-5"></span>
     </button>
     <div class="flex flex-1 items-center">
