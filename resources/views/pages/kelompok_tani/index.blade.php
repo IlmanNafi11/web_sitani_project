@@ -58,15 +58,15 @@
                 @csrf
                 <div class="modal-body pt-0">
                     <x-form.file-input :keyId="'import-file'" :name="'file'"
-                                       :helper-text="'Pastikan Format cslx'"/>
+                                       :helper-text="'Pastikan Format cslx, xls'" :accept="'.xlsx, .xls'"/>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-soft btn-secondary" data-overlay="#import-modal">Tutup</button>
-                    <x-ui.button.save-button :title="'Import'" :color="'btn-success'" :formId="'import-form'"
+                    <x-ui.button.cancel-import-button :dataOverlay="'import-modal'" :inputId="'import-file'" :labelId="'helper-text-input-file'" />
+                    <x-ui.button.submit-import-button :title="'Import'" :color="'btn-success'" :formId="'import-form'"
                                              :style="'btn-soft'"
                                              :message-alert="'Pastikan data telah sesuai dengan aturan yang tertera'"
                                              :title-alert="'Impor Data?'" :title-confirm-button="'Ya'"
-                                             :title-cancel-button="'Batal'"/>
+                                             :title-cancel-button="'Batal'" :inputId="'import-file'"/>
                 </div>
             </form>
         </x-ui.modal>
