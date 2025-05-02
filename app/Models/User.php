@@ -101,4 +101,14 @@ class User extends Authenticatable implements JWTSubject
     {
         return $this->hasOne(Penyuluh::class);
     }
+
+    /**
+     * Getter user FCM token
+     *
+     * @return string|array
+     */
+    public function routeNotificationForFcm()
+    {
+        return $this->fcm_token;
+    }
 }
