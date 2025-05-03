@@ -24,7 +24,7 @@ trait LoggingError
         ]);
     }
 
-    protected function LogNotFoundException(Throwable $e, array $data = [], string $message = null): void
+    protected function LogNotFoundException(?Throwable $e, array $data = [], string $message = null): void
     {
         Log::info($message ?? 'Data tidak ditemukan', [
             'data' => $data,
