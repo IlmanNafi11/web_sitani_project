@@ -8,16 +8,34 @@ use Illuminate\View\Component;
 
 class NumberCounter extends Component
 {
-    public $label;
-    public $name;
-    public $keyId;
-    public $min;
-    public $max;
-    public $helperText;
-    public $defaultValue;
-    public $extraClassElement;
+    public string $label;
+    public string $name;
+    public string $keyId;
+    public string|int $min;
+    public string|int $max;
+    public string $helperText;
+    public string $defaultValue;
+    public string $extraClassElement;
 
-    public function __construct($label, $name, $keyId, $min, $max, $helperText, $defaultValue, $extraClassElement)
+    /**
+     * @param string $label label
+     * @param string $name name input counter
+     * @param string $keyId id input counter
+     * @param string|int $min nilai minimum
+     * @param string|int $max nilai maksimum
+     * @param string $helperText helper text
+     * @param string|int $defaultValue nilai default
+     * @param string $extraClassElement class tailwind tambahan untuk custom style kontainer input counter
+     */
+    public function __construct(string $label = 'label',
+                                string $name = 'number-counter',
+                                string $keyId = 'number-counter',
+                                string|int $min = 1,
+                                string|int $max = 10,
+                                string $helperText = 'helper text',
+                                string|int $defaultValue = '',
+                                string $extraClassElement = ''
+    )
     {
         $this->label = $label;
         $this->name = $name;

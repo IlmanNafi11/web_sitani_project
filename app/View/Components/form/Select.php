@@ -8,18 +8,40 @@ use Illuminate\View\Component;
 
 class Select extends Component
 {
-    public $name;
-    public $label;
-    public $options;
-    public $optionValue;
-    public $optionLabel;
-    public $selected;
-    public $helperText;
-    public $placeholder;
-    public $extraClassOption;
-    public $extraClassElement;
+    public string $name;
+    public string $label;
+    public array $options;
+    public string $optionValue;
+    public string $optionLabel;
+    public array|string|null $selected;
+    public string $helperText;
+    public string $placeholder;
+    public string $extraClassOption;
+    public string $extraClassElement;
 
-    public function __construct($name, $label, $options, $optionValue, $optionLabel, $selected, $helperText, $placeholder, $extraClassOption, $extraClassElement)
+    /**
+     * @param string $name name input select
+     * @param string $label label input select
+     * @param array|null $options options
+     * @param string $optionValue option value
+     * @param string $optionLabel option label
+     * @param array|string|null $selected nilai yang terselect
+     * @param string $helperText helper text
+     * @param string $placeholder placeholder
+     * @param string $extraClassOption class tailwind tambahan untuk style container input select
+     * @param string $extraClassElement clas tailwind tambahan untuk style input select
+     */
+    public function __construct(string $name = 'input-select',
+                                string $label = 'label',
+                                ?array $options = [],
+                                string $optionValue = '',
+                                string $optionLabel = '',
+                                array|string|null $selected = null,
+                                string $helperText = 'helper text',
+                                string $placeholder = 'placeholder',
+                                string $extraClassOption = '',
+                                string $extraClassElement = ''
+    )
     {
         $this->name = $name;
         $this->label = $label;
@@ -29,8 +51,8 @@ class Select extends Component
         $this->selected = $selected;
         $this->helperText = $helperText;
         $this->placeholder = $placeholder;
-        $this->$extraClassOption = $extraClassOption;
-        $this->$extraClassElement = $extraClassElement;
+        $this->extraClassOption = $extraClassOption;
+        $this->extraClassElement = $extraClassElement;
     }
 
     /**

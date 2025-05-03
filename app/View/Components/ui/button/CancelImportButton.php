@@ -15,6 +15,16 @@ class CancelImportButton extends Component
     public string $style;
     public string $labelId;
     public string $inputId;
+
+    /**
+     * @param string $color warna button
+     * @param string $icon icon button(opsional)
+     * @param string $title title button
+     * @param string $dataOverlay properti data-overlay
+     * @param string $style style button
+     * @param string $labelId id label form(untuk clear styling)
+     * @param string $inputId id input form(untuk clear styling)
+     */
     public function __construct(
         string $color = 'btn-primary',
         string $icon = '',

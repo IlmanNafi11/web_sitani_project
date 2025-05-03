@@ -8,14 +8,31 @@ use Illuminate\View\Component;
 
 class ImportButton extends Component
 {
-    public $title;
-    public $style;
-    public $icon;
-    public $extraClassElement;
-    public $color;
-    public $permission;
-    public $keyId;
-    public function __construct($title, $style, $icon, $permission, $color, $extraClassElement, $keyId)
+    public string $title;
+    public string $style;
+    public string $icon;
+    public string $extraClassElement;
+    public string $color;
+    public string $permission;
+    public string $keyId;
+
+    /**
+     * @param string $title title button
+     * @param string $style style button
+     * @param string $icon icon button(opsional)
+     * @param string $permission permission
+     * @param string $color warna button
+     * @param string $extraClassElement class tailwind tambahan untuk style custom button
+     * @param string $keyId id button
+     */
+    public function __construct(string $title = 'Import',
+                                string $style = 'btn-soft',
+                                string $icon = 'icon-[line-md--file-import]',
+                                string $permission = '',
+                                string $color = 'btn-success',
+                                string $extraClassElement = '',
+                                string $keyId = 'btn-import',
+    )
     {
         $this->title = $title;
         $this->style = $style;

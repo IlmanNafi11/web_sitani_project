@@ -8,16 +8,33 @@ use Illuminate\View\Component;
 
 class TextArea extends Component
 {
-    public $keyId;
-    public $defaultValue;
-    public $name;
-    public $label;
-    public $placeholder;
-    public $helperText;
-    public $extraClassOption;
-    public $extraClassElement;
+    public string $keyId;
+    public string $defaultValue;
+    public string $name;
+    public string $label;
+    public string $placeholder;
+    public string $helperText;
+    public string $extraClassOption;
+    public string $extraClassElement;
 
-    public function __construct($keyId, $defaultValue, $name, $label, $placeholder, $helperText, $extraClassOption, $extraClassElement)
+    /**
+     * @param string $keyId id input text area
+     * @param string $defaultValue nilai default
+     * @param string $name name input text area
+     * @param string $label label
+     * @param string $placeholder placeholder
+     * @param string $helperText helper text
+     * @param string $extraClassOption class tailwind tambahan untuk style container input text area
+     * @param string $extraClassElement class tailwind tambahan untuk style input text area
+     */
+    public function __construct(string $keyId = 'input-text-area',
+                                string $defaultValue = '',
+                                string $name = 'input-text-area',
+                                string $label = 'label',
+                                string $placeholder = 'placeholder',
+                                string $helperText = 'helper text',
+                                string $extraClassOption = '',
+                                string $extraClassElement = '')
     {
         $this->keyId = $keyId;
         $this->defaultValue = $defaultValue;

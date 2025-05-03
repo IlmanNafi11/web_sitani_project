@@ -8,17 +8,36 @@ use Illuminate\View\Component;
 
 class PasswordInput extends Component
 {
-    public $keyId;
-    public $name;
-    public $label;
-    public $placeholder;
-    public $helperText;
-    public $extraClassOption;
-    public $extraClassElement;
-    public $defaultValue;
-    public $icon;
+    public string $keyId;
+    public string $name;
+    public string $label;
+    public string $placeholder;
+    public string $helperText;
+    public string $extraClassOption;
+    public string $extraClassElement;
+    public string $defaultValue;
+    public string $icon;
 
-    public function __construct($keyId, $name, $label, $placeholder, $helperText, $extraClassOption, $extraClassElement, $defaultValue, $icon)
+    /**
+     * @param string $keyId id input password
+     * @param string $name name input password
+     * @param string $label label
+     * @param string $placeholder placeholder
+     * @param string $helperText helper text
+     * @param string $extraClassOption class tailwind tambahan untuk custom style container input password
+     * @param string $extraClassElement clas tailwind tambahan untuk custom style input password
+     * @param string $defaultValue nilai default
+     * @param string $icon icon
+     */
+    public function __construct(string $keyId = 'input-password',
+                                string $name = 'input-password',
+                                string $label = 'label',
+                                string $placeholder = 'placeholder',
+                                string $helperText = 'helper text',
+                                string $extraClassOption = '',
+                                string $extraClassElement = '',
+                                string $defaultValue = '',
+                                string $icon = 'icon-[solar--lock-password-broken]')
     {
         $this->keyId = $keyId;
         $this->name = $name;

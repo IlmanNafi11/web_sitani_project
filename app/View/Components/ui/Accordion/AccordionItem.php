@@ -17,7 +17,11 @@ class AccordionItem extends Component
      * @param string $description Deskripsi
      * @param string $keyId Id Items, Wajib untuk control (open/close) item
      */
-    public function __construct(string $title, string $description, string $keyId)
+    public function __construct(
+        string $title = 'title',
+        string $description = 'deskripsi',
+        string $keyId = ''
+    )
     {
         $this->title = $title;
         $this->description = $description;
