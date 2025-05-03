@@ -5,17 +5,19 @@ namespace App\Repositories;
 use App\Models\LaporanKondisi;
 use App\Repositories\Interfaces\CrudInterface;
 use App\Repositories\Interfaces\LaporanRepositoryInterface;
+use App\Trait\LoggingError;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 use Throwable;
 
 class LaporanBibitRepository implements CrudInterface, LaporanRepositoryInterface
 {
+    use LoggingError;
+
     public function getAll(bool $withRelations = false): Collection|array
     {
         try {
@@ -39,18 +41,9 @@ class LaporanBibitRepository implements CrudInterface, LaporanRepositoryInterfac
             }
             return $query->get();
         } catch (QueryException $e) {
-            Log::error('Failed to get all laporan kondisi bibit: ' . $e->getMessage(), [
-                'source' => __METHOD__,
-                'error' => $e->getMessage(),
-                'sql' => $e->getSql(),
-            ]);
+            $this->LogSqlException($e);
             return Collection::make();
         } catch (Throwable $e) {
-            Log::error('Failed to get all laporan kondisi bibit: ' . $e->getMessage(), [
-                'source' => __METHOD__,
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString(),
-            ]);
             return Collection::make();
         }
     }
@@ -87,20 +80,9 @@ class LaporanBibitRepository implements CrudInterface, LaporanRepositoryInterfac
 
             return $query->findOrFail($id);
         } catch (QueryException $e) {
-            Log::error('Gagal mengambil laporan bibit berdasarkan id', [
-                'source' => __METHOD__,
-                'error' => $e->getMessage(),
-                'sql' => $e->getSql(),
-                'data' => ['id' => $id],
-            ]);
+            $this->LogSqlException($e, ['id' => $id]);
             return null;
         } catch (Throwable $e) {
-            Log::error('Gagal mengambil laporan bibit berdasarkan id', [
-                'source' => __METHOD__,
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString(),
-                'data' => ['id' => $id],
-            ]);
             return null;
         }
     }
@@ -110,20 +92,9 @@ class LaporanBibitRepository implements CrudInterface, LaporanRepositoryInterfac
         try {
             return LaporanKondisi::create($data);
         } catch (QueryException $e) {
-            Log::error('Gagal menyimpan laporan bibit baru', [
-                'source' => __METHOD__,
-                'error' => $e->getMessage(),
-                'sql' => $e->getSql(),
-                'data' => $data,
-            ]);
+            $this->LogSqlException($e, $data);
             return null;
         } catch (Throwable $e) {
-            Log::error('Gagal menyimpan laporan bibit baru', [
-                'source' => __METHOD__,
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString(),
-                'data' => $data,
-            ]);
             return null;
         }
     }
@@ -135,26 +106,9 @@ class LaporanBibitRepository implements CrudInterface, LaporanRepositoryInterfac
             $model->update($data);
             return true;
         } catch (QueryException $e) {
-            Log::error('Gagal memperbarui laporan bibit', [
-                'source' => __METHOD__,
-                'error' => $e->getMessage(),
-                'sql' => $e->getSql(),
-                'data' => [
-                    'id' => $id,
-                    'data' => $data,
-                ],
-            ]);
+            $this->LogSqlException($e, ['data_baru' => $data]);
             return false;
         } catch (Throwable $e) {
-            Log::error('Gagal memperbarui laporan bibit', [
-                'source' => __METHOD__,
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString(),
-                'data' => [
-                    'id' => $id,
-                    'data' => $data,
-                ],
-            ]);
             return false;
         }
     }
@@ -166,20 +120,9 @@ class LaporanBibitRepository implements CrudInterface, LaporanRepositoryInterfac
             $model->delete();
             return true;
         } catch (QueryException $e) {
-            Log::error('Gagal menghapus laporan bibit', [
-                'source' => __METHOD__,
-                'error' => $e->getMessage(),
-                'sql' => $e->getSql(),
-                'data' => ['id' => $id],
-            ]);
+            $this->LogSqlException($e, ['id' => $id]);
             return false;
         } catch (Throwable $e) {
-            Log::error('Gagal menghapus laporan bibit', [
-                'source' => __METHOD__,
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString(),
-                'data' => ['id' => $id],
-            ]);
             return false;
         }
     }
@@ -199,18 +142,9 @@ class LaporanBibitRepository implements CrudInterface, LaporanRepositoryInterfac
 
             return $query->get();
         } catch (QueryException $e) {
-            Log::error('Gagal mengambil seluruh laporan bibit berdasarkan penyuluh id', [
-                'source' => __METHOD__,
-                'error' => $e->getMessage(),
-                'sql' => $e->getSql(),
-            ]);
+            $this->LogSqlException($e);
             return Collection::make();
         } catch (Throwable $e) {
-            Log::error('Gagal mengambil seluruh laporan bibit berdasarkan penyuluh id', [
-                'source' => __METHOD__,
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString(),
-            ]);
             return Collection::make();
         }
     }
@@ -223,18 +157,9 @@ class LaporanBibitRepository implements CrudInterface, LaporanRepositoryInterfac
         try {
             return LaporanKondisi::count();
         } catch (QueryException $e) {
-            Log::error('Terjadi kesalahan pada query saat mencoba menghitung total record', [
-                'source' => __METHOD__,
-                'error' => $e->getMessage(),
-                'sql' => $e->getSql(),
-            ]);
+            $this->LogSqlException($e);
             throw new Exception('Terjadi kesalahan pada query.', 500);
         } catch (\Exception $e) {
-            Log::error('Terjadi kesalahan saat menghitung total record', [
-                'source' => __METHOD__,
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString(),
-            ]);
             throw new Exception('Terjadi kesalahan pada server saat menghitung total record.', 500);
         }
     }
@@ -277,25 +202,10 @@ class LaporanBibitRepository implements CrudInterface, LaporanRepositoryInterfac
             }
             return $statusCounts;
         } catch (QueryException $e) {
-            Log::error('Repository Error: Terjadi kesalahan pada query', [
-                'source' => __METHOD__,
-                'error' => $e->getMessage(),
-                'sql' => $e->getSql(),
-                'bindings' => $e->getBindings(),
-                'penyuluh_id' => $penyuluhId,
-                'trace' => $e->getTraceAsString(),
-            ]);
-
+            $this->LogSqlException($e, ['penyuluh_id' => $penyuluhId]);
             throw new Exception('Terjadi kesalahan pada query saat menghitung record', 500, $e);
 
         } catch (Throwable $e) {
-            Log::error('Repository Error: Terjadi kesalahan saat menghitung record', [
-                'source' => __METHOD__,
-                'error' => $e->getMessage(),
-                'penyuluh_id' => $penyuluhId,
-                'trace' => $e->getTraceAsString(),
-            ]);
-
             throw new Exception('Terjadi kesalahan saat menghitung record', 500, $e);
         }
     }

@@ -38,7 +38,6 @@ class NotificationRepository implements NotificationInterface
             $this->LogSqlException($e, ['user_id' => $user->id]);
             throw new Exception('Terjadi kesalahan pada query repository', 500);
         } catch (\Throwable $e) {
-            $this->LogGeneralException($e, ['user_id' => $user->id]);
             throw new Exception('Terjadi kesalahan pada saat menandai notifikasi telah dibaca', 500);
         }
     }
@@ -62,7 +61,6 @@ class NotificationRepository implements NotificationInterface
             $this->LogSqlException($e, ['user_id' => $user->id, 'notification_id' => $id]);
             throw new Exception('Terjadi kesalahan pada query repository', 500);
         } catch (\Throwable $e) {
-            $this->LogGeneralException($e, ['user_id' => $user->id, 'notification_id' => $id]);
             throw new Exception('Terjadi kesalahan pada saat menandai notifikasi telah dibaca', 500);
         }
     }
@@ -83,6 +81,7 @@ class NotificationRepository implements NotificationInterface
             $notification->delete();
             return true;
         } catch (QueryException $e) {
+            $this->LogSqlException($e, ['notification_id' => $id]);
             throw new Exception('Terjadi kesalahan pada query repository', 500);
         } catch (\Throwable $e) {
             throw new Exception('Terjadi kesalahan pada saat menghapus notifikasi', 500);

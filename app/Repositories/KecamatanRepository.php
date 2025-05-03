@@ -4,13 +4,15 @@ namespace App\Repositories;
 
 use App\Models\Kecamatan;
 use App\Repositories\Interfaces\CrudInterface;
+use App\Trait\LoggingError;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\QueryException;
-use Illuminate\Support\Facades\Log;
 
 class KecamatanRepository implements CrudInterface
 {
+    use LoggingError;
+
     public function getAll(bool $withRelations = false): Collection|array
     {
         try {
@@ -20,18 +22,9 @@ class KecamatanRepository implements CrudInterface
             }
             return $query->get();
         } catch (QueryException $e) {
-            Log::error('Gagal mengambil seluruh data kecamatan', [
-                'source' => __METHOD__,
-                'error' => $e->getMessage(),
-                'sql' => $e->getSQL(),
-            ]);
+            $this->LogSqlException($e);
             return Collection::make();
         } catch (\Throwable $e) {
-            Log::error('Gagal mengambil seluruh data kecamatan', [
-                'source' => __METHOD__,
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString(),
-            ]);
             return Collection::make();
         }
     }
@@ -41,20 +34,9 @@ class KecamatanRepository implements CrudInterface
         try {
             return Kecamatan::where('id', $id)->first();
         } catch (QueryException $e) {
-            Log::error('Gagal mengambil data kecamatan berdasarkan id: ' . $id, [
-                'source' => __METHOD__,
-                'error' => $e->getMessage(),
-                'sql' => $e->getSQL(),
-                'data' => ['id' => $id],
-            ]);
+            $this->LogSqlException($e, ['id' => $id]);
             return null;
         } catch (\Throwable $e) {
-            Log::error('Gagal mengambil data kecamatan berdasarkan id: ' . $id, [
-                'source' => __METHOD__,
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString(),
-                'data' => ['id' => $id],
-            ]);
             return null;
         }
     }
@@ -64,20 +46,9 @@ class KecamatanRepository implements CrudInterface
         try {
             return Kecamatan::create($data);
         } catch (QueryException $e) {
-            Log::error('Gagal membuat data kecamatan', [
-                'source' => __METHOD__,
-                'error' => $e->getMessage(),
-                'sql' => $e->getSQL(),
-                'data' => $data,
-            ]);
+            $this->LogSqlException($e, $data);
             return null;
         } catch (\Throwable $e) {
-            Log::error('Gagal membuat data kecamatan', [
-                'source' => __METHOD__,
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString(),
-                'data' => $data,
-            ]);
             return null;
         }
     }
@@ -87,26 +58,9 @@ class KecamatanRepository implements CrudInterface
         try {
             return Kecamatan::where('id', $id)->update($data);
         } catch (QueryException $e) {
-            Log::error('Gagal memperbarui data kecamatan', [
-                'source' => __METHOD__,
-                'error' => $e->getMessage(),
-                'sql' => $e->getSQL(),
-                'data' => [
-                    'id' => $id,
-                    'data' => $data,
-                ],
-            ]);
+            $this->LogSqlException($e, ['id' => $id, 'data_baru' => $data]);
             return false;
         } catch (\Throwable $e) {
-            Log::error('Gagal memperbarui data kecamatan', [
-                'source' => __METHOD__,
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString(),
-                'data' => [
-                    'id' => $id,
-                    'data' => $data,
-                ],
-            ]);
             return false;
         }
     }
@@ -116,20 +70,9 @@ class KecamatanRepository implements CrudInterface
         try {
             return Kecamatan::destroy($id);
         } catch (QueryException $e) {
-            Log::error('Gagal menghapus data kecamatan', [
-                'source' => __METHOD__,
-                'error' => $e->getMessage(),
-                'sql' => $e->getSQL(),
-                'data' => ['id' => $id],
-            ]);
+            $this->LogSqlException($e, ['id' => $id]);
             return false;
         } catch (\Throwable $e) {
-            Log::error('Gagal menghapus data kecamatan', [
-                'source' => __METHOD__,
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString(),
-                'data' => ['id' => $id],
-            ]);
             return false;
         }
     }

@@ -6,16 +6,17 @@ use App\Models\Penyuluh;
 use App\Models\User;
 use App\Repositories\Interfaces\CrudInterface;
 use App\Repositories\Interfaces\PenyuluhRepositoryInterface;
+use App\Trait\LoggingError;
 use Exception;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 use Throwable;
 
 class PenyuluhRepository implements CrudInterface, PenyuluhRepositoryInterface
 {
+    use LoggingError;
 
     /**
      * Mendapatkan semua data penyuluh beserta relasi relasi.
@@ -38,21 +39,9 @@ class PenyuluhRepository implements CrudInterface, PenyuluhRepositoryInterface
             return $query->get();
 
         } catch (QueryException $e) {
-            Log::error("Gagal mengambil seluruh data penyuluh", [
-                'source' => __METHOD__,
-                'error' => $e->getMessage(),
-                'sql' => $e->getSql(),
-            ]);
-
+            $this->LogSqlException($e);
             return Collection::make();
-
         } catch (Exception $e) {
-            Log::error("Gagal mengambil seluruh data penyuluh", [
-                'source' => __METHOD__,
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString(),
-            ]);
-
             return Collection::make();
         }
     }
@@ -71,20 +60,9 @@ class PenyuluhRepository implements CrudInterface, PenyuluhRepositoryInterface
                 'penyuluhTerdaftar:id,nama,no_hp,alamat',
             ])->first();
         } catch (QueryException $e) {
-            Log::error('Gagal mengambil data penyuluh dengan id ' . $id, [
-                'source' => __METHOD__,
-                'error' => $e->getMessage(),
-                'sql' => $e->getSql(),
-            ]);
-
+            $this->LogSqlException($e, ['id' => $id]);
             return null;
         } catch (Exception $e) {
-            Log::error('Gagal mengambil data penyuluh dengan id ' . $id, [
-                'source' => __METHOD__,
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString(),
-            ]);
-
             return null;
         }
     }
@@ -115,22 +93,9 @@ class PenyuluhRepository implements CrudInterface, PenyuluhRepositoryInterface
                 return $penyuluh->load('user:id,email,created_at', 'penyuluhTerdaftar:id,nama,no_hp,alamat,kecamatan_id');
             });
         } catch (QueryException $e) {
-          Log::error("Gagal menyimpan data penyuluh beserta user baru", [
-              'source' => __METHOD__,
-              'error' => $e->getMessage(),
-              'sql' => $e->getSql(),
-              'data' => $data,
-          ]);
-
-          return null;
+            $this->LogSqlException($e, $data);
+            return null;
         } catch (Throwable $e) {
-            Log::error('Gagal menyimpan data penyuluh beserta user baru.', [
-                'source' => __METHOD__,
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString(),
-                'data' => $data,
-            ]);
-
             return null;
         }
     }
@@ -147,23 +112,9 @@ class PenyuluhRepository implements CrudInterface, PenyuluhRepositoryInterface
         try {
             return Penyuluh::findOrFail($id)->update($data);
         } catch (QueryException $e) {
-            Log::error('Gagal memperbarui data penyuluh dengan id ' . $id, [
-                'source' => __METHOD__,
-                'error' => $e->getMessage(),
-                'sql' => $e->getSql(),
-                'data' => $data,
-            ]);
-
+            $this->LogSqlException($e, ['id' => $id, 'data_baru' => $data]);
             return false;
-        }
-        catch (Throwable $e) {
-            Log::error('Gagal memperbarui data penyuluh dengan id ' . $id, [
-                'source' => __METHOD__,
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString(),
-                'data' => $data,
-            ]);
-
+        } catch (Throwable $e) {
             return false;
         }
     }
@@ -174,28 +125,15 @@ class PenyuluhRepository implements CrudInterface, PenyuluhRepositoryInterface
      * @param string|int $id
      * @return bool
      */
-    public function delete(string|int$id): bool
+    public function delete(string|int $id): bool
     {
         try {
             $deleted = Penyuluh::destroy($id);
             return $deleted > 0;
         } catch (QueryException $e) {
-          Log::error('Gagal hapus data penyuluh dengan id ' . $id, [
-              'source' => __METHOD__,
-              'error' => $e->getMessage(),
-              'sql' => $e->getSql(),
-              'data' => ['id' => $id],
-          ]);
-
-          return false;
+            $this->LogSqlException($e, ['id' => $id]);
+            return false;
         } catch (Throwable $e) {
-            Log::error('Gagal hapus data penyuluh dengan id ' . $id, [
-                'source' => __METHOD__,
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString(),
-                'data' => ['id' => $id],
-            ]);
-
             return false;
         }
     }
@@ -208,18 +146,9 @@ class PenyuluhRepository implements CrudInterface, PenyuluhRepositoryInterface
         try {
             return Penyuluh::count();
         } catch (QueryException $e) {
-            Log::error('Terjadi kesalahan pada query saat mencoba menghitung total record', [
-                'source' => __METHOD__,
-                'error' => $e->getMessage(),
-                'sql' => $e->getSql(),
-            ]);
+            $this->LogSqlException($e);
             throw new \Exception('Terjadi Kesalahan pada query', 500);
         } catch (\Exception $e) {
-            Log::error('Terjadi kesalahan saat menghitung total record', [
-                'source' => __METHOD__,
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString(),
-            ]);
             throw new \Exception('Terjadi Kesalahan di server saat menghitung total record', 500);
         }
     }

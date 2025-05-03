@@ -4,16 +4,18 @@ namespace App\Repositories;
 
 use App\Repositories\Interfaces\CrudInterface;
 use App\Repositories\Interfaces\RoleRepositoryInterface;
+use App\Trait\LoggingError;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
-use Illuminate\Support\Facades\Log;
 use Throwable;
 use Illuminate\Database\QueryException;
 
 class RoleRepository implements CrudInterface, RoleRepositoryInterface
 {
+    use LoggingError;
+
     public function getAll(bool $withRelations = false): Collection|array
     {
         try {
@@ -23,18 +25,9 @@ class RoleRepository implements CrudInterface, RoleRepositoryInterface
             }
             return $query->get();
         } catch (QueryException $e) {
-            Log::error('Gagal mengambil semua data role', [
-                'source' => __METHOD__,
-                'error'  => $e->getMessage(),
-                'sql'    => $e->getSql(),
-            ]);
+            $this->LogSqlException($e);
             return Collection::make();
         } catch (Throwable $e) {
-            Log::error('Gagal mengambil semua data role', [
-                'source' => __METHOD__,
-                'error'  => $e->getMessage(),
-                'trace'  => $e->getTraceAsString(),
-            ]);
             return Collection::make();
         }
     }
@@ -44,20 +37,9 @@ class RoleRepository implements CrudInterface, RoleRepositoryInterface
         try {
             return Role::with('permissions')->findOrFail($id);
         } catch (QueryException $e) {
-            Log::error('Gagal mengambil data role berdasarkan id', [
-                'source' => __METHOD__,
-                'error'  => $e->getMessage(),
-                'sql'    => $e->getSql(),
-                'data'   => ['id' => $id],
-            ]);
+            $this->LogSqlException($e, ['id' => $id]);
             return null;
         } catch (Throwable $e) {
-            Log::error('Gagal mengambil data role berdasarkan id', [
-                'source' => __METHOD__,
-                'error'  => $e->getMessage(),
-                'trace'  => $e->getTraceAsString(),
-                'data'   => ['id' => $id],
-            ]);
             return null;
         }
     }
@@ -70,20 +52,9 @@ class RoleRepository implements CrudInterface, RoleRepositoryInterface
                 'guard_name' => $data['guard_name'] ?? 'web',
             ]);
         } catch (QueryException $e) {
-            Log::error('Gagal menyimpan role baru', [
-                'source' => __METHOD__,
-                'error'  => $e->getMessage(),
-                'sql'    => $e->getSql(),
-                'data'   => $data,
-            ]);
+            $this->LogSqlException($e, $data);
             return null;
         } catch (Throwable $e) {
-            Log::error('Gagal menyimpan role baru', [
-                'source' => __METHOD__,
-                'error'  => $e->getMessage(),
-                'trace'  => $e->getTraceAsString(),
-                'data'   => $data,
-            ]);
             return null;
         }
     }
@@ -97,26 +68,9 @@ class RoleRepository implements CrudInterface, RoleRepositoryInterface
                 'guard_name' => $data['guard_name'] ?? $role->guard_name,
             ]);
         } catch (QueryException $e) {
-            Log::error('Gagal memperbarui data role', [
-                'source' => __METHOD__,
-                'error'  => $e->getMessage(),
-                'sql'    => $e->getSql(),
-                'data'   => [
-                    'id'   => $id,
-                    'data' => $data,
-                ],
-            ]);
+            $this->LogSqlException($e, ['data_baru' => $data]);
             return false;
         } catch (Throwable $e) {
-            Log::error('Gagal memperbarui data role', [
-                'source' => __METHOD__,
-                'error'  => $e->getMessage(),
-                'trace'  => $e->getTraceAsString(),
-                'data'   => [
-                    'id'   => $id,
-                    'data' => $data,
-                ],
-            ]);
             return false;
         }
     }
@@ -127,30 +81,22 @@ class RoleRepository implements CrudInterface, RoleRepositoryInterface
             $role = Role::findOrFail($id);
             return (bool) $role->delete();
         } catch (QueryException $e) {
-            Log::error('Gagal menghapus data role', [
-                'source' => __METHOD__,
-                'error'  => $e->getMessage(),
-                'sql'    => $e->getSql(),
-                'data'   => ['id' => $id],
-            ]);
+            $this->LogSqlException($e, ['id' => $id]);
             return false;
         } catch (Throwable $e) {
-            Log::error('Gagal menghapus data role', [
-                'source' => __METHOD__,
-                'error'  => $e->getMessage(),
-                'trace'  => $e->getTraceAsString(),
-                'data'   => ['id' => $id],
-            ]);
             return false;
         }
     }
 
+    /**
+     * @throws Throwable
+     */
     public function syncPermissions(int $roleId, array $permissionIds): void
     {
         try {
             $role = $this->getById($roleId);
             if (!$role) {
-                Log::warning(__METHOD__ . ' - Role tidak ditemukan', ['role_id' => $roleId]);
+                $this->LogNotFoundException(null, ['role_id' => $roleId]);
                 return;
             }
 
@@ -158,7 +104,7 @@ class RoleRepository implements CrudInterface, RoleRepositoryInterface
 
             if (count($permissionNames) !== count($permissionIds)) {
                 $notFound = array_diff($permissionIds, Permission::whereIn('id', $permissionIds)->pluck('id')->toArray());
-                Log::warning(__METHOD__ . ' - Beberapa izin tidak ditemukan', [
+                $this->LogNotFoundException(null, [
                     'role_id' => $roleId,
                     'not_found_permission_ids' => $notFound,
                 ]);
@@ -166,26 +112,9 @@ class RoleRepository implements CrudInterface, RoleRepositoryInterface
 
             $role->syncPermissions($permissionNames);
         } catch (QueryException $e) {
-            Log::error('Gagal sync permissions pada role', [
-                'source'         => __METHOD__,
-                'error'          => $e->getMessage(),
-                'sql'            => $e->getSql(),
-                'data'           => [
-                    'role_id'      => $roleId,
-                    'permission_ids' => $permissionIds,
-                ],
-            ]);
+            $this->LogSqlException($e, ['role_id' => $roleId]);
             throw $e;
         } catch (Throwable $e) {
-            Log::error('Gagal sync permissions pada role', [
-                'source'         => __METHOD__,
-                'error'          => $e->getMessage(),
-                'trace'          => $e->getTraceAsString(),
-                'data'           => [
-                    'role_id'      => $roleId,
-                    'permission_ids' => $permissionIds,
-                ],
-            ]);
             throw $e;
         }
     }

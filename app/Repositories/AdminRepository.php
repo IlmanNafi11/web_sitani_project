@@ -5,6 +5,7 @@ namespace App\Repositories;
 use App\Models\Admin;
 use App\Models\User;
 use App\Repositories\Interfaces\CrudInterface;
+use App\Trait\LoggingError;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\QueryException;
@@ -13,6 +14,8 @@ use Illuminate\Support\Facades\Log;
 
 class AdminRepository implements CrudInterface
 {
+
+    use LoggingError;
 
     public function getAll(bool $withRelations = false): Collection|array
     {
@@ -30,20 +33,9 @@ class AdminRepository implements CrudInterface
             }
             return $query->get();
         } catch (QueryException $e) {
-            Log::error('Gagal mengambil seluruh data admin', [
-                'source' => __METHOD__,
-                'error' => $e->getMessage(),
-                'sql' => $e->getSQL(),
-            ]);
-
+            $this->LogSqlException($e);
             return Collection::make();
         } catch (\Throwable $e) {
-            Log::error('Gagal mengambil seluruh data admin', [
-                'source' => __METHOD__,
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString(),
-            ]);
-
             return Collection::make();
         }
     }
@@ -60,22 +52,9 @@ class AdminRepository implements CrudInterface
                 },
             ])->find($id);
         } catch (QueryException $e) {
-            Log::error('Gagal mengambil data admin berdasarkan id', [
-                'source' => __METHOD__,
-                'error' => $e->getMessage(),
-                'sql' => $e->getSQL(),
-                'data' => ['id' => $id],
-            ]);
-
+            $this->LogSqlException($e, ['id' => 'id']);
             return null;
         } catch (\Throwable $e) {
-            Log::error('Gagal mengambil data admin berdasarkan id', [
-                'source' => __METHOD__,
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString(),
-                'data' => ['id' => $id],
-            ]);
-
             return null;
         }
     }
@@ -102,22 +81,9 @@ class AdminRepository implements CrudInterface
                 return $admin;
             });
         } catch (QueryException $e) {
-            Log::error('Gagal menyimpan data admin beserta data user', [
-                'source' => __METHOD__,
-                'error' => $e->getMessage(),
-                'sql' => $e->getSQL(),
-                'data' => $data
-            ]);
-
+            $this->LogSqlException($e, $data);
             return null;
         } catch (\Throwable $e) {
-            Log::error('Gagal menyimpan data admin beserta data user', [
-                'source' => __METHOD__,
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString(),
-                'data' => $data
-            ]);
-
             return null;
         }
     }
@@ -153,21 +119,9 @@ class AdminRepository implements CrudInterface
                 return $admin;
             }, 3);
         } catch (QueryException $e) {
-            Log::error('Gagal memperbarui data admin', [
-                'source' => __METHOD__,
-                'error' => $e->getMessage(),
-                'sql' => $e->getSQL(),
-                'data' => $data
-            ]);
-
+            $this->LogSqlException($e, ['id' => $id, 'data_baru' => $data]);
             return false;
         } catch (\Throwable $e) {
-            Log::error('Gagal memperbarui data admin', [
-                'source' => __METHOD__,
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString(),
-                'data' => $data,
-            ]);
             return false;
         }
     }
@@ -179,35 +133,23 @@ class AdminRepository implements CrudInterface
                 $admin = Admin::find($id);
 
                 if (!$admin) {
-                    Log::error("Admin id {$id} tidak ditemukan.");
+                    Log::warning("Admin id {$id} tidak ditemukan.");
                     return false;
                 }
 
                 if ($admin->user) {
                     $admin->user->delete();
                 } else {
-                    Log::error("User untuk admin id {$id} tidak ditemukan.");
+                    Log::warning("User untuk admin id {$id} tidak ditemukan.");
                 }
 
                 $admin->delete();
                 return true;
             });
         } catch (QueryException $e) {
-            Log::error('Gagal menghapus data admin', [
-                'source' => __METHOD__,
-                'error' => $e->getMessage(),
-                'sql' => $e->getSQL(),
-                'data' => ['id' => $id],
-            ]);
-
+            $this->LogSqlException($e, ['id' => $id]);
             return false;
         } catch (\Throwable $e) {
-            Log::error("Gagal menghapus data admin", [
-                'source' => __METHOD__,
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString(),
-                'data' => ['id' => $id],
-            ]);
             return false;
         }
     }

@@ -5,13 +5,15 @@ namespace App\Repositories;
 use App\Models\Desa;
 use App\Repositories\Interfaces\CrudInterface;
 use App\Repositories\Interfaces\DesaRepositoryInterface;
+use App\Trait\LoggingError;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\QueryException;
-use Illuminate\Support\Facades\Log;
 
 class DesaRepository implements CrudInterface, DesaRepositoryInterface
 {
+
+    use LoggingError;
 
     public function getAll(bool $withRelations = false): Collection|array
     {
@@ -22,18 +24,9 @@ class DesaRepository implements CrudInterface, DesaRepositoryInterface
             }
             return $query->get();
         } catch (QueryException $e) {
-            Log::error('Gagal mengambil seluruh data desa', [
-                'source' => __METHOD__,
-                'error' => $e->getMessage(),
-                'sql' => $e->getSQL(),
-            ]);
+            $this->LogSqlException($e);
             return Collection::make();
         } catch (\Throwable $e) {
-            Log::error('Gagal mengambil seluruh data desa', [
-                'source' => __METHOD__,
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString(),
-            ]);
             return Collection::make();
         }
     }
@@ -43,20 +36,9 @@ class DesaRepository implements CrudInterface, DesaRepositoryInterface
         try {
             return Desa::where('id', $id)->with(['kecamatan:id,nama'])->first();
         } catch (QueryException $e) {
-            Log::error('Gagal mengambil data desa berdasarkan id: ' . $id, [
-                'source' => __METHOD__,
-                'error' => $e->getMessage(),
-                'sql' => $e->getSQL(),
-                'data' => ['id' => $id],
-            ]);
+            $this->LogSqlException($e, ['id' => $id]);
             return null;
         } catch (\Throwable $e) {
-            Log::error('Gagal mengambil data desa berdasarkan id: ' . $id, [
-                'source' => __METHOD__,
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString(),
-                'data' => ['id' => $id],
-            ]);
             return null;
         }
     }
@@ -66,20 +48,9 @@ class DesaRepository implements CrudInterface, DesaRepositoryInterface
         try {
             return Desa::create($data);
         } catch (QueryException $e) {
-            Log::error('Gagal menyimpan data desa', [
-                'source' => __METHOD__,
-                'error' => $e->getMessage(),
-                'sql' => $e->getSQL(),
-                'data' => $data,
-            ]);
+            $this->LogSqlException($e, $data);
             return null;
         } catch (\Throwable $e) {
-            Log::error('Gagal menyimpan data desa', [
-                'source' => __METHOD__,
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString(),
-                'data' => $data,
-            ]);
             return null;
         }
     }
@@ -89,26 +60,9 @@ class DesaRepository implements CrudInterface, DesaRepositoryInterface
         try {
             return Desa::where('id', $id)->update($data);
         } catch (QueryException $e) {
-            Log::error('Gagal memperbarui data desa', [
-                'source' => __METHOD__,
-                'error' => $e->getMessage(),
-                'sql' => $e->getSQL(),
-                'data' => [
-                    'id' => $id,
-                    'data' => $data,
-                ],
-            ]);
+            $this->LogSqlException($e, ['data_baru' => $data]);
             return false;
         } catch (\Throwable $e) {
-            Log::error('Gagal memperbarui data desa', [
-                'source' => __METHOD__,
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString(),
-                'data' => [
-                    'id' => $id,
-                    'data' => $data,
-                ],
-            ]);
             return false;
         }
     }
@@ -118,20 +72,9 @@ class DesaRepository implements CrudInterface, DesaRepositoryInterface
         try {
             return Desa::destroy($id);
         } catch (QueryException $e) {
-            Log::error('Gagal menghapus data desa', [
-                'source' => __METHOD__,
-                'error' => $e->getMessage(),
-                'sql' => $e->getSQL(),
-                'data' => ['id' => $id],
-            ]);
+            $this->LogSqlException($e, ['id' => $id]);
             return false;
         } catch (\Throwable $e) {
-            Log::error('Gagal menghapus data desa', [
-                'source' => __METHOD__,
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString(),
-                'data' => ['id' => $id],
-            ]);
             return false;
         }
     }
@@ -141,20 +84,9 @@ class DesaRepository implements CrudInterface, DesaRepositoryInterface
         try {
             return Desa::select(['id', 'nama'])->where('kecamatan_id', $id)->get();
         } catch (QueryException $e) {
-            Log::error('Gagal mengambil data desa berdasarkan kecamatan_id: ' . $id, [
-                'source' => __METHOD__,
-                'error' => $e->getMessage(),
-                'sql' => $e->getSQL(),
-                'data' => ['kecamatan_id' => $id],
-            ]);
+            $this->LogSqlException($e, ['id' => $id]);
             return Collection::make();
         } catch (\Throwable $e) {
-            Log::error('Gagal mengambil data desa berdasarkan kecamatan_id: ' . $id, [
-                'source' => __METHOD__,
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString(),
-                'data' => ['kecamatan_id' => $id],
-            ]);
             return Collection::make();
         }
     }

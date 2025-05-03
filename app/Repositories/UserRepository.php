@@ -5,6 +5,7 @@ namespace App\Repositories;
 use App\Models\OtpCode;
 use App\Models\User;
 use App\Repositories\Interfaces\AuthInterface;
+use App\Trait\LoggingError;
 use Carbon\Carbon;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Log;
@@ -12,6 +13,9 @@ use Throwable;
 
 class UserRepository implements AuthInterface
 {
+
+    use LoggingError;
+
     public function findUser(array $conditions, bool $multiple = false, array $withRelations = []): ?User
     {
         try {
@@ -33,18 +37,9 @@ class UserRepository implements AuthInterface
 
             return $query->first();
         } catch (QueryException $e) {
-            Log::error('Gagal mencari data user', [
-                'source'     => __METHOD__,
-                'error'      => $e->getMessage(),
-                'sql'        => $e->getSQL(),
-            ]);
+            $this->LogSqlException($e);
             return null;
         } catch (Throwable $e) {
-            Log::error('Gagal mencari data user', [
-                'source'     => __METHOD__,
-                'error'      => $e->getMessage(),
-                'trace'      => $e->getTraceAsString(),
-            ]);
             return null;
         }
     }
@@ -61,20 +56,9 @@ class UserRepository implements AuthInterface
             }
             return true;
         } catch (QueryException $e) {
-            Log::error('Gagal memperbarui password', [
-                'source'   => __METHOD__,
-                'error'    => $e->getMessage(),
-                'sql'      => $e->getSQL(),
-                'user_id'  => $user->id,
-            ]);
+            $this->LogSqlException($e, ['user_id' => $user->id]);
             return false;
         } catch (Throwable $e) {
-            Log::error('Gagal memperbarui password', [
-                'source'  => __METHOD__,
-                'error'   => $e->getMessage(),
-                'trace'   => $e->getTraceAsString(),
-                'user_id' => $user->id,
-            ]);
             return false;
         }
     }
@@ -98,20 +82,9 @@ class UserRepository implements AuthInterface
 
             return $code;
         } catch (QueryException $e) {
-            Log::error('Gagal generate dan menyimpan kode OTP', [
-                'source'   => __METHOD__,
-                'error'    => $e->getMessage(),
-                'sql'      => $e->getSQL(),
-                'user_id'  => $user->id,
-            ]);
+            $this->LogSqlException($e, ['user_id' => $user->id]);
             throw $e;
         } catch (Throwable $e) {
-            Log::error('Gagal generate dan menyimpan kode OTP', [
-                'source'  => __METHOD__,
-                'error'   => $e->getMessage(),
-                'trace'   => $e->getTraceAsString(),
-                'user_id' => $user->id,
-            ]);
             throw $e;
         }
     }
@@ -127,26 +100,9 @@ class UserRepository implements AuthInterface
 
             return $otp !== null;
         } catch (QueryException $e) {
-            Log::error('Gagal memvalidasi kode OTP', [
-                'source'   => __METHOD__,
-                'error'    => $e->getMessage(),
-                'sql'      => $e->getSQL(),
-                'data' => [
-                    'user_id'  => $user->id,
-                    'code'     => $code,
-                ],
-            ]);
+            $this->LogSqlException($e, ['user_id' => $user->id]);
             return false;
         } catch (Throwable $e) {
-            Log::error('Gagal memvalidasi kode OTP', [
-                'source'  => __METHOD__,
-                'error'   => $e->getMessage(),
-                'trace'   => $e->getTraceAsString(),
-                'data' => [
-                    'user_id'  => $user->id,
-                    'code'     => $code,
-                ],
-            ]);
             return false;
         }
     }
@@ -159,20 +115,9 @@ class UserRepository implements AuthInterface
         try {
             OtpCode::where('user_id', $user->id)->delete();
         } catch (QueryException $e) {
-            Log::error('Gagal menghapus kode OTP', [
-                'source'  => __METHOD__,
-                'error'   => $e->getMessage(),
-                'sql'     => $e->getSQL(),
-                'user_id' => $user->id,
-            ]);
+            $this->LogSqlException($e, ['user_id' => $user->id]);
             throw $e;
         } catch (Throwable $e) {
-            Log::error('Gagal menghapus kode OTP', [
-                'source'  => __METHOD__,
-                'error'   => $e->getMessage(),
-                'trace'   => $e->getTraceAsString(),
-                'user_id' => $user->id,
-            ]);
             throw $e;
         }
     }
