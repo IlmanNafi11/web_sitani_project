@@ -2,76 +2,98 @@
 
 namespace App\Http\Controllers\api;
 
+use App\Exceptions\DataAccessException;
+use App\Exceptions\ResourceNotFoundException;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\KelompokTaniResource;
-use App\Services\KelompokTaniService;
+use App\Services\Interfaces\KelompokTaniApiServiceInterface;
 use App\Trait\ApiResponse;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Throwable;
 
 class KelompokTaniController extends Controller
 {
     use ApiResponse;
 
-    protected KelompokTaniService $service;
+    protected KelompokTaniApiServiceInterface $service;
 
-    public function __construct(KelompokTaniService $service)
+    public function __construct(KelompokTaniApiServiceInterface $service)
     {
         $this->service = $service;
     }
 
-    /**
-     * Mengambil seluruh data kelompok tani berdasarkan penyuluh id.
-     *
-     * @param Request $request
-     * @return JsonResponse
-     */
     public function getAllByPenyuluhId(Request $request): JsonResponse
     {
         $penyuluhIds = $request->query('penyuluhIds');
+
         if (is_null($penyuluhIds)) {
             return $this->errorResponse('penyuluhIds tidak boleh kosong', 400);
         }
 
         $ids = is_array($penyuluhIds) ? $penyuluhIds : explode(',', $penyuluhIds);
-        $result = $this->service->getByPenyuluhId($ids);
+        $ids = array_filter($ids, static fn($id) => !empty($id));
 
-
-        if ($result['success']) {
-            return $this->successResponse($result['data'], $result['message']);
+        if (empty($ids)) {
+            return $this->successResponse([], 'Tidak ada penyuluh ID yang valid diberikan.');
         }
 
-        return $this->errorResponse($result['message'], 404);
+        try {
+            $kelompokTanis = $this->service->getAllByPenyuluhId($ids);
+            $formattedData = $kelompokTanis->map(function($item) {
+                return [
+                    'id' => $item->id,
+                    'nama' => $item->nama,
+                    'desa' => [
+                        'id' => $item->desa->id ?? null,
+                        'nama' => $item->desa->nama ?? null,
+                    ],
+                    'kecamatan' => [
+                        'id' => $item->desa->kecamatan->id ?? null,
+                        'nama' => $item->desa->kecamatan->nama ?? null,
+                    ],
+                    'penyuluhs' => $item->penyuluhTerdaftars->map(function($penyuluh) {
+                        return [
+                            'id' => $penyuluh->id,
+                            'nama' => $penyuluh->nama,
+                            'no_hp' => $penyuluh->no_hp,
+                            'alamat' => $penyuluh->alamat,
+                        ];
+                    })
+                ];
+            });
+            return $this->successResponse($formattedData, 'Data kelompok tani ditemukan');
+        } catch (DataAccessException $e) {
+            return $this->errorResponse('Failed to fetch Kelompok Tani data.', 500);
+        } catch (Throwable $e) {
+            return $this->errorResponse('Terjadi kesalahan diserver.', 500);
+        }
     }
 
-    /**
-     * Mengambil data kelompok tani berdasarkan id
-     *
-     * @param string|int $id Id kelompok Tani
-     * @return JsonResponse
-     */
     public function getById(string|int $id): JsonResponse
     {
-        $result = $this->service->getById($id);
-
-        if ($result['success']) {
-            return $this->successResponse(new KelompokTaniResource($result['data']), $result['message']);
+        try {
+            $kelompokTani = $this->service->getById($id);
+            return $this->successResponse(new KelompokTaniResource($kelompokTani), 'Data kelompok tani ditemukan');
+        } catch (ResourceNotFoundException $e) {
+            return $this->errorResponse($e->getMessage(), 404);
+        } catch (DataAccessException $e) {
+            return $this->errorResponse('Failed to fetch Kelompok Tani data.', 500);
+        } catch (Throwable $e) {
+            return $this->errorResponse('Terjadi kesalahan diserver.', 500);
         }
-        return $this->errorResponse($result['message'], 404);
     }
 
-    /**
-     * Mengambil total Kelompok tani yang terdaftar di dinas
-     *
-     * @return JsonResponse
-     */
     public function calculateTotal(): JsonResponse
     {
         try {
             $total = $this->service->calculateTotal();
-            return $this->successResponse($total, 'Total Kelompok Tani Berhasil diambil');
-        } catch (\Exception $e) {
-            return $this->errorResponse($e->getMessage());
+
+            return $this->successResponse($total, 'Total Kelompok Tani berhasil diambil');
+        } catch (DataAccessException $e) {
+            return $this->errorResponse('Failed to calculate total Kelompok Tani.', 500);
+        } catch (Throwable $e) {
+            return $this->errorResponse('Terjadi kesalahan diserver.', 500);
         }
     }
 
@@ -79,9 +101,12 @@ class KelompokTaniController extends Controller
     {
         try {
             $total = $this->service->countByKecamatanId($id);
+
             return $this->successResponse(['total' => $total], 'Total Kelompok Tani berhasil diambil');
-        } catch (\Exception $e) {
-            return $this->errorResponse($e->getMessage(), $e->getCode());
+        } catch (DataAccessException $e) {
+            return $this->errorResponse('Failed to count Kelompok Tani by Kecamatan ID.', 500);
+        } catch (Throwable $e) {
+            return $this->errorResponse('Terjadi kesalahan diserver.', 500);
         }
     }
 }

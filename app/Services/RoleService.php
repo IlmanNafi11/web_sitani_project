@@ -2,183 +2,166 @@
 
 namespace App\Services;
 
+use App\Exceptions\DataAccessException;
+use App\Exceptions\ResourceNotFoundException;
 use App\Repositories\Interfaces\CrudInterface;
 use App\Repositories\Interfaces\RoleRepositoryInterface;
+use App\Services\Interfaces\RoleServiceInterface;
+use App\Trait\LoggingError;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\QueryException;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
-use Spatie\Permission\Models\Role;
-use Illuminate\Support\Facades\Log;
+use Spatie\Permission\Models\Permission;
 use Throwable;
 
-class RoleService
+class RoleService implements RoleServiceInterface
 {
-    protected CrudInterface $repository;
-    protected RoleRepositoryInterface $syncPerm;
+    use LoggingError;
 
-    public function __construct(CrudInterface $repository, RoleRepositoryInterface $syncPerm)
+    protected CrudInterface $repository;
+    protected RoleRepositoryInterface $roleRepository;
+
+    public function __construct(CrudInterface $repository, RoleRepositoryInterface $roleRepository)
     {
         $this->repository = $repository;
-        $this->syncPerm = $syncPerm;
+        $this->roleRepository = $roleRepository;
     }
 
-    public function getAll($withRelations = false): Collection|array
+    /**
+     * @throws DataAccessException
+     */
+    public function getAll($withRelations = false): Collection
     {
         try {
-            $roles = $this->repository->getAll($withRelations);
-            if ($roles->isNotEmpty()) {
-                return [
-                    'success' => true,
-                    'message' => 'Data role berhasil diambil',
-                    'data' => $roles,
-                ];
-            }
-
-            return [
-                'success' => false,
-                'message' => 'Data role gagal diambil',
-                'data' => [],
-            ];
-        } catch (\Throwable $e) {
-            Log::error('Terjadi kesalahan saat mengambil data role.', [
-                'source' => __METHOD__,
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString(),
-            ]);
-
-            return [
-                'success' => false,
-                'message' => 'Gagal mengambil data role.',
-                'data' => []
-            ];
+            return $this->repository->getAll($withRelations);
+        } catch (QueryException $e) {
+            throw new DataAccessException('Database error while fetching roles.', 0, $e);
+        } catch (Throwable $e) {
+            throw new DataAccessException('Unexpected error while fetching roles.', 0, $e);
         }
     }
 
-    public function getById(int|string $id): array
+    /**
+     * @throws DataAccessException
+     * @throws ResourceNotFoundException
+     */
+    public function getById(int|string $id): Model
     {
         try {
             $role = $this->repository->getById($id);
-            if ($role !== null) {
-                return [
-                    'success' => true,
-                    'message' => 'Data role ditemukan',
-                    'data' => $role,
-                ];
-            }
-            return [
-                'success' => false,
-                'message' => 'Data role tidak ditemukan',
-                'data' => [],
-            ];
-        } catch (\Throwable $e) {
-            Log::error('Terjadi kesalahan saat mengambil data role.', [
-                'source' => __METHOD__,
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString(),
-            ]);
 
-            return [
-                'success' => false,
-                'message' => 'Gagal mengambil data role.',
-                'data' => []
-            ];
+            if ($role === null) {
+                throw new ResourceNotFoundException("Role with ID {$id} not found.");
+            }
+
+            if ($role instanceof Collection) {
+                $role = $role->first();
+                if ($role === null) {
+                    throw new ResourceNotFoundException("Role with ID {$id} not found or incorrect type returned.");
+                }
+            }
+
+
+            return $role;
+        } catch (ResourceNotFoundException $e) {
+            throw $e;
+        } catch (QueryException $e) {
+            throw new DataAccessException("Database error while fetching role with ID {$id}.", 0, $e);
+        } catch (Throwable $e) {
+            throw new DataAccessException("Unexpected error while fetching role with ID {$id}.", 0, $e);
         }
     }
 
-    public function createWithPermissions(array $data, array $permissionIds = []): array
+    /**
+     * @throws ResourceNotFoundException
+     * @throws DataAccessException
+     */
+    public function createWithPermissions(array $roleData, array $permissionIds = []): Model
     {
         try {
-            return DB::transaction(function () use ($data, $permissionIds) {
-                $role = $this->repository->create($data);
-                if ($role !== null) {
-                    $this->syncPerm->syncPermissions($role->id, $permissionIds);
-                    return [
-                        'success' => true,
-                        'message' => 'Data role berhasil ditambahkan',
-                        'data' => $role,
-                    ];
-                }
-                return [
-                    'success' => false,
-                    'message' => 'Data role gagal ditambahkan',
-                    'data' => [],
-                ];
-            });
-        } catch (\Throwable $e) {
-            Log::error('Terjadi kesalahan saat menyimpan data role.', [
-                'source' => __METHOD__,
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString(),
-                'data' => $data,
-                'permission_ids' => $permissionIds,
-            ]);
+            return DB::transaction(function () use ($roleData, $permissionIds) {
+                $role = $this->repository->create($roleData);
 
-            return [
-                'success' => false,
-                'message' => 'Gagal menyimpan data role.',
-                'data' => []
-            ];
+                if ($role === null) {
+                    throw new DataAccessException('Failed to create role data in repository.');
+                }
+
+                $permissionNames = Permission::whereIn('id', $permissionIds)->pluck('name')->toArray();
+
+                $this->roleRepository->syncPermissions($role->id, $permissionNames);
+
+                $role->load('permissions');
+
+
+                return $role;
+            });
+        } catch (QueryException $e) {
+            throw new DataAccessException('Database error during role creation transaction.', 0, $e);
+        } catch (DataAccessException|ResourceNotFoundException $e) {
+            throw $e;
+        } catch (Throwable $e) {
+            throw new DataAccessException('Unexpected error during role creation transaction.', 0, $e);
         }
     }
 
-    public function updateRoleAndPermissions(int $id, array $roleData, array $permissionIds): array
+    /**
+     * @throws DataAccessException
+     * @throws ResourceNotFoundException
+     */
+    public function updateRoleAndPermissions(int $id, array $roleData, array $permissionIds): Model
     {
         try {
             return DB::transaction(function () use ($id, $roleData, $permissionIds) {
                 $updated = $this->repository->update($id, $roleData);
 
                 if (!$updated) {
-                    throw new \Exception('Role gagal diperbarui');
+                    throw new DataAccessException("Failed to update role data in repository for ID {$id}.");
                 }
-                $this->syncPerm->syncPermissions($id, $permissionIds);
-                return [
-                    'success' => true,
-                    'message' => 'Data role berhasil diperbarui',
-                ];
+
+                $role = $this->repository->getById($id);
+
+                if ($role === null) {
+                    throw new ResourceNotFoundException("Role with ID {$id} not found after update.");
+                }
+
+                $permissionNames = Permission::whereIn('id', $permissionIds)->pluck('name')->toArray();
+
+                $this->roleRepository->syncPermissions($role->id, $permissionNames);
+
+                $role->load('permissions');
+
+                return $role;
             });
-        } catch (\Throwable $e) {
-            Log::error('Terjadi kesalahan saat memperbarui data role.', [
-                'source' => __METHOD__,
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString(),
-            ]);
-            return [
-                'success' => false,
-                'message' => 'Gagal memperbarui data role.',
-                'data' => [],
-            ];
+        } catch (QueryException $e) {
+            throw new DataAccessException('Database error during role update transaction.', 0, $e);
+        } catch (DataAccessException|ResourceNotFoundException $e) {
+            throw $e;
+        } catch (Throwable $e) {
+            throw new DataAccessException('Unexpected error during role update transaction.', 0, $e);
         }
     }
 
-    public function delete(int $id): array
+    /**
+     * @throws DataAccessException
+     * @throws ResourceNotFoundException
+     */
+    public function delete(int $id): bool
     {
         try {
-            DB::beginTransaction();
             $deleted = $this->repository->delete($id);
+
             if (!$deleted) {
-                DB::rollBack();
-                Log::warning(__METHOD__ . ' - Role tidak ditemukan.', ['role_id' => $id]);
-                return [
-                    'success' => false,
-                    'message' => 'Data role tidak ditemukan.',
-                ];
+                throw new ResourceNotFoundException("Role with ID {$id} not found for deletion.");
             }
-            DB::commit();
-            return [
-                'success' => true,
-                'message' => 'Data role berhasil dihapus.',
-            ];
+
+            return true;
+        } catch (ResourceNotFoundException $e) {
+            throw $e;
+        } catch (QueryException $e) {
+            throw new DataAccessException('Database error while deleting role.', 0, $e);
         } catch (Throwable $e) {
-            DB::rollBack();
-            Log::error('Terjadi kesalahan saat menghapus data role.', [
-                'source' => __METHOD__,
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString(),
-            ]);
-            return [
-                'success' => false,
-                'message' => 'Gagal menghapus data role.',
-            ];
+            throw new DataAccessException('Unexpected error while deleting role.', 0, $e);
         }
     }
 }

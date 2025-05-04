@@ -2,6 +2,7 @@
 
 namespace App\Repositories;
 
+use App\Exceptions\DataAccessException;
 use App\Models\Desa;
 use App\Repositories\Interfaces\CrudInterface;
 use App\Repositories\Interfaces\DesaRepositoryInterface;
@@ -9,10 +10,10 @@ use App\Trait\LoggingError;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\QueryException;
+use Throwable;
 
 class DesaRepository implements CrudInterface, DesaRepositoryInterface
 {
-
     use LoggingError;
 
     public function getAll(bool $withRelations = false): Collection|array
@@ -25,9 +26,10 @@ class DesaRepository implements CrudInterface, DesaRepositoryInterface
             return $query->get();
         } catch (QueryException $e) {
             $this->LogSqlException($e);
-            return Collection::make();
-        } catch (\Throwable $e) {
-            return Collection::make();
+            throw $e;
+        } catch (Throwable $e) {
+            $this->LogGeneralException($e);
+            throw new DataAccessException('Terjadi kesalahan tak terduga di ' . __METHOD__, 0, $e);
         }
     }
 
@@ -37,9 +39,10 @@ class DesaRepository implements CrudInterface, DesaRepositoryInterface
             return Desa::where('id', $id)->with(['kecamatan:id,nama'])->first();
         } catch (QueryException $e) {
             $this->LogSqlException($e, ['id' => $id]);
-            return null;
-        } catch (\Throwable $e) {
-            return null;
+            throw $e;
+        } catch (Throwable $e) {
+            $this->LogGeneralException($e, ['id' => $id]);
+            throw new DataAccessException('Terjadi kesalahan tak terduga di ' . __METHOD__, 0, $e);
         }
     }
 
@@ -49,9 +52,10 @@ class DesaRepository implements CrudInterface, DesaRepositoryInterface
             return Desa::create($data);
         } catch (QueryException $e) {
             $this->LogSqlException($e, $data);
-            return null;
-        } catch (\Throwable $e) {
-            return null;
+            throw $e;
+        } catch (Throwable $e) {
+            $this->LogGeneralException($e, ['data' => $data]);
+            throw new DataAccessException('Terjadi kesalahan tak terduga di ' . __METHOD__, 0, $e);
         }
     }
 
@@ -60,10 +64,11 @@ class DesaRepository implements CrudInterface, DesaRepositoryInterface
         try {
             return Desa::where('id', $id)->update($data);
         } catch (QueryException $e) {
-            $this->LogSqlException($e, ['data_baru' => $data]);
-            return false;
-        } catch (\Throwable $e) {
-            return false;
+            $this->LogSqlException($e, ['id' => $id, 'data_baru' => $data]);
+            throw $e;
+        } catch (Throwable $e) {
+            $this->LogGeneralException($e, ['id' => $id, 'data_baru' => $data]);
+            throw new DataAccessException('Terjadi kesalahan tak terduga di ' . __METHOD__, 0, $e);
         }
     }
 
@@ -73,9 +78,10 @@ class DesaRepository implements CrudInterface, DesaRepositoryInterface
             return Desa::destroy($id);
         } catch (QueryException $e) {
             $this->LogSqlException($e, ['id' => $id]);
-            return false;
-        } catch (\Throwable $e) {
-            return false;
+            throw $e;
+        } catch (Throwable $e) {
+            $this->LogGeneralException($e, ['id' => $id]);
+            throw new DataAccessException('Terjadi kesalahan tak terduga di ' . __METHOD__, 0, $e);
         }
     }
 
@@ -85,9 +91,23 @@ class DesaRepository implements CrudInterface, DesaRepositoryInterface
             return Desa::select(['id', 'nama'])->where('kecamatan_id', $id)->get();
         } catch (QueryException $e) {
             $this->LogSqlException($e, ['id' => $id]);
-            return Collection::make();
-        } catch (\Throwable $e) {
-            return Collection::make();
+            throw $e;
+        } catch (Throwable $e) {
+            $this->LogGeneralException($e, ['id' => $id]);
+            throw new DataAccessException('Terjadi kesalahan tak terduga di ' . __METHOD__, 0, $e);
+        }
+    }
+
+    public function calculateTotal(): int
+    {
+        try {
+            return Desa::count();
+        } catch (QueryException $e) {
+            $this->LogSqlException($e);
+            throw $e;
+        } catch (Throwable $e) {
+            $this->LogGeneralException($e);
+            throw new DataAccessException('Terjadi kesalahan tak terduga di ' . __METHOD__, 0, $e);
         }
     }
 }

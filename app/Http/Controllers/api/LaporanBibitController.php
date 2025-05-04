@@ -2,63 +2,59 @@
 
 namespace App\Http\Controllers\api;
 
+use App\Exceptions\DataAccessException;
+use App\Exceptions\ResourceNotFoundException;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\LaporanBibitRequest;
 use App\Http\Resources\LaporanKondisiResource;
-use App\Services\LaporanBibitService;
+use App\Services\Interfaces\LaporanBibitApiServiceInterface;
 use App\Trait\ApiResponse;
 use Illuminate\Http\JsonResponse;
+use Throwable;
 
 class LaporanBibitController extends Controller
 {
     use ApiResponse;
 
-    protected LaporanBibitService $service;
+    protected LaporanBibitApiServiceInterface $service;
 
-    public function __construct(LaporanBibitService $service)
+    public function __construct(LaporanBibitApiServiceInterface $service)
     {
         $this->service = $service;
     }
 
-    /**
-     * Menyimpan laporan bibit yang dikirim oleh penyuluh
-     *
-     * @param LaporanBibitRequest $request Form request
-     * @return JsonResponse
-     */
     public function saveReport(LaporanBibitRequest $request): JsonResponse
     {
-        $result = $this->service->create($request->validated());
-
-        if ($result['success']) {
-            return $this->successResponse($result['data'], $result['message'], 201);
+        $validated = $request->validated();
+        if ($request->hasFile('foto_bibit')) {
+            $validated['foto_bibit'] = $request->file('foto_bibit');
         }
 
-        return $this->errorResponse($result['message'], 500, $request->validated());
+        try {
+            $laporan = $this->service->create($validated);
+            return $this->successResponse($laporan, 'Laporan berhasil disimpan', 201);
+        } catch (DataAccessException $e) {
+            return $this->errorResponse('Gagal menyimpan laporan: ' . ($e->getMessage() ?? 'Terjadi kesalahan database.'), 500);
+        } catch (Throwable $e) {
+            return $this->errorResponse('Terjadi kesalahan tak terduga saat menyimpan laporan.', 500);
+        }
     }
 
-    /**
-     * Mengambil laporan berdasarkan id penyuluh
-     *
-     * @param string|int $id Id penyuluh
-     * @return JsonResponse
-     */
     public function getByPenyuluhId(string|int $id): JsonResponse
     {
-        $result = $this->service->getByPenyuluhId($id);
-        if ($result['success']) {
-            return $this->successResponse(LaporanKondisiResource::collection($result['data']), $result['message'], 200);
+        try {
+            $laporans = $this->service->getByPenyuluhId($id);
+            return $this->successResponse(LaporanKondisiResource::collection($laporans), 'Laporan bibit ditemukan');
+        } catch (ResourceNotFoundException) {
+            return $this->errorResponse('Laporan Bibit tidak ditemukan', 404);
+        } catch (DataAccessException $e) {
+            return $this->errorResponse('Failed to fetch Laporan Bibit data.', 500);
+        } catch (Throwable $e) {
+            return $this->errorResponse('Terjadi kesalahan diserver.', 500);
         }
-
-        return $this->errorResponse($result['message'], $result['code'], ['penyuluh_id' => $id]);
     }
 
-    /**
-     * Mengambil total laporan bibit berdasarkan penyuluh id
-     *
-     * @return JsonResponse
-     */
-    public function getLaporanStatusCounts($id): JsonResponse
+    public function getLaporanStatusCounts(string|int $id): JsonResponse
     {
         try {
             $stats = $this->service->getLaporanStatusCounts($id);
@@ -66,14 +62,11 @@ class LaporanBibitController extends Controller
             if (array_sum($stats) === 0) {
                 return $this->errorResponse('Laporan Tidak ditemukan', 404, ['penyuluh_id' => $id]);
             }
-
             return $this->successResponse($stats, 'Total laporan bibit berhasil diambil');
-        } catch (\Throwable $e) {
-            return $this->errorResponse('Terjadi kesalahan diserver', 500,[
-                'approved' => 0,
-                'rejected' => 0,
-                'pending' => 0,
-            ]);
+        } catch (DataAccessException $e) {
+            return $this->errorResponse('Failed to calculate report status counts.', 500);
+        } catch (Throwable $e) {
+            return $this->errorResponse('Terjadi kesalahan diserver.', 500);
         }
     }
 }

@@ -2,12 +2,14 @@
 
 namespace App\Repositories;
 
+use App\Exceptions\DataAccessException;
 use App\Models\Kecamatan;
 use App\Repositories\Interfaces\CrudInterface;
 use App\Trait\LoggingError;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\QueryException;
+use Throwable;
 
 class KecamatanRepository implements CrudInterface
 {
@@ -23,9 +25,10 @@ class KecamatanRepository implements CrudInterface
             return $query->get();
         } catch (QueryException $e) {
             $this->LogSqlException($e);
-            return Collection::make();
-        } catch (\Throwable $e) {
-            return Collection::make();
+            throw $e;
+        } catch (Throwable $e) {
+            $this->LogGeneralException($e);
+            throw new DataAccessException('Terjadi kesalahan tak terduga di ' .  __METHOD__, 0, $e);
         }
     }
 
@@ -35,9 +38,10 @@ class KecamatanRepository implements CrudInterface
             return Kecamatan::where('id', $id)->first();
         } catch (QueryException $e) {
             $this->LogSqlException($e, ['id' => $id]);
-            return null;
-        } catch (\Throwable $e) {
-            return null;
+            throw $e;
+        } catch (Throwable $e) {
+            $this->LogGeneralException($e, ['id' => $id]);
+            throw new DataAccessException('Terjadi kesalahan tak terduga di ' .  __METHOD__, 0, $e);
         }
     }
 
@@ -47,9 +51,10 @@ class KecamatanRepository implements CrudInterface
             return Kecamatan::create($data);
         } catch (QueryException $e) {
             $this->LogSqlException($e, $data);
-            return null;
-        } catch (\Throwable $e) {
-            return null;
+            throw $e;
+        } catch (Throwable $e) {
+            $this->LogGeneralException($e, ['data' => $data]);
+            throw new DataAccessException('Terjadi kesalahan tak terduga di ' .  __METHOD__, 0, $e);
         }
     }
 
@@ -59,9 +64,10 @@ class KecamatanRepository implements CrudInterface
             return Kecamatan::where('id', $id)->update($data);
         } catch (QueryException $e) {
             $this->LogSqlException($e, ['id' => $id, 'data_baru' => $data]);
-            return false;
-        } catch (\Throwable $e) {
-            return false;
+            throw $e;
+        } catch (Throwable $e) {
+            $this->LogGeneralException($e, ['id' => $id, 'data_baru' => $data]);
+            throw new DataAccessException('Terjadi kesalahan tak terduga di ' .  __METHOD__, 0, $e);
         }
     }
 
@@ -71,9 +77,10 @@ class KecamatanRepository implements CrudInterface
             return Kecamatan::destroy($id);
         } catch (QueryException $e) {
             $this->LogSqlException($e, ['id' => $id]);
-            return false;
-        } catch (\Throwable $e) {
-            return false;
+            throw $e;
+        } catch (Throwable $e) {
+            $this->LogGeneralException($e, ['id' => $id]);
+            throw new DataAccessException('Terjadi kesalahan tak terduga di ' .  __METHOD__, 0, $e);
         }
     }
 }

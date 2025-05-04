@@ -2,8 +2,6 @@
 
 namespace App\Providers;
 
-use App\Models\LaporanKondisi;
-use App\Observers\LaporanBibitObserver;
 use App\Repositories\AdminRepository;
 use App\Repositories\BibitRepository;
 use App\Repositories\DesaRepository;
@@ -29,8 +27,28 @@ use App\Repositories\PenyuluhTerdaftarRepository;
 use App\Repositories\RoleRepository;
 use App\Repositories\UserRepository;
 use App\Services\AdminService;
+use App\Services\Api\BibitApiService;
+use App\Services\Api\KelompokTaniApiService;
+use App\Services\Api\KomoditasApiService;
+use App\Services\Api\LaporanBibitApiService;
+use App\Services\Api\PenyuluhTerdaftarApiService;
 use App\Services\BibitService;
 use App\Services\DesaService;
+use App\Services\Interfaces\AdminServiceInterface;
+use App\Services\Interfaces\BibitApiServiceInterface;
+use App\Services\Interfaces\BibitServiceInterface;
+use App\Services\Interfaces\DesaServiceInterface;
+use App\Services\Interfaces\KecamatanServiceInterface;
+use App\Services\Interfaces\KelompokTaniApiServiceInterface;
+use App\Services\Interfaces\KelompokTaniServiceInterface;
+use App\Services\Interfaces\KomoditasApiServiceInterface;
+use App\Services\Interfaces\KomoditasServiceInterface;
+use App\Services\Interfaces\LaporanBibitApiServiceInterface;
+use App\Services\Interfaces\LaporanBibitServiceInterface;
+use App\Services\Interfaces\PenyuluhServiceInterface;
+use App\Services\Interfaces\PenyuluhTerdaftarApiServiceInterface;
+use App\Services\Interfaces\PenyuluhTerdaftarServiceInterface;
+use App\Services\Interfaces\RoleServiceInterface;
 use App\Services\KecamatanService;
 use App\Services\KelompokTaniService;
 use App\Services\KomoditasService;
@@ -70,6 +88,39 @@ class AppServiceProvider extends ServiceProvider
         $this->app->when(KomoditasService::class)->needs(KomoditasRepositoryInterface::class)->give(KomoditasRepository::class);
         $this->app->when(PenyuluhService::class)->needs(PenyuluhRepositoryInterface::class)->give(PenyuluhRepository::class);
         $this->app->when(NotificationService::class)->needs(NotificationInterface::class)->give(NotificationRepository::class);
+
+        //Service web
+        $this->app->bind(BibitServiceInterface::class, BibitService::class);
+        $this->app->bind(KomoditasServiceInterface::class, KomoditasService::class);
+        $this->app->bind(KecamatanServiceInterface::class, KecamatanService::class);
+        $this->app->bind(DesaServiceInterface::class, DesaService::class);
+        $this->app->bind(PenyuluhTerdaftarServiceInterface::class, PenyuluhTerdaftarService::class);
+        $this->app->bind(PenyuluhServiceInterface::class, PenyuluhService::class);
+        $this->app->bind(AdminServiceInterface::class, AdminService::class);
+        $this->app->bind(RoleServiceInterface::class, RoleService::class);
+        $this->app->bind(KelompokTaniServiceInterface::class, KelompokTaniService::class);
+        $this->app->bind(LaporanBibitServiceInterface::class, LaporanBibitService::class);
+
+        //Service API
+        // Bibit
+        $this->app->bind(BibitApiServiceInterface::class, BibitApiService::class);
+        $this->app->when(BibitApiService::class)->needs(CrudInterface::class)->give(BibitRepository::class);
+        $this->app->when(BibitApiService::class)->needs(BibitRepositoryInterface::class)->give(BibitRepository::class);
+        // Komoditas
+        $this->app->bind(KomoditasApiServiceInterface::class, KomoditasApiService::class);
+        $this->app->when(KomoditasApiService::class)->needs(CrudInterface::class)->give(KomoditasRepository::class);
+        $this->app->when(KomoditasApiService::class)->needs(KomoditasRepositoryInterface::class)->give(KomoditasRepository::class);
+        // Penyuluh Terdaftar
+        $this->app->bind(PenyuluhTerdaftarApiServiceInterface::class, PenyuluhTerdaftarApiService::class);
+        $this->app->when(PenyuluhTerdaftarApiService::class)->needs(PenyuluhTerdaftarRepositoryInterface::class)->give(PenyuluhTerdaftarRepository::class);
+        // Kelompok Tani
+        $this->app->bind(KelompokTaniApiServiceInterface::class, KelompokTaniApiService::class);
+        $this->app->when(KelompokTaniApiService::class)->needs(CrudInterface::class)->give(KelompokTaniRepository::class);
+        $this->app->when(KelompokTaniApiService::class)->needs(KelompokTaniRepositoryInterface::class)->give(KelompokTaniRepository::class);
+        // Laporan Bibit
+        $this->app->bind(LaporanBibitApiServiceInterface::class, LaporanBibitApiService::class);
+        $this->app->when(LaporanBibitApiService::class)->needs(CrudInterface::class)->give(LaporanBibitRepository::class);
+        $this->app->when(LaporanBibitApiService::class)->needs(LaporanRepositoryInterface::class)->give(LaporanBibitRepository::class);
     }
 
     /**
@@ -77,7 +128,6 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        LaporanKondisi::observe(LaporanBibitObserver::class);
         if (\App::environment('production')){
             \URL::forceScheme('https');
         }

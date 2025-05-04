@@ -14,5 +14,7 @@ interface RoleRepositoryInterface
      * @param array $permissionIds
      * @return void
      */
-    public function syncPermissions(int $roleId, array $permissionIds): void;
+    public function syncPermissions(int $roleId, array $permissionNames): void;
+    public function assignPermissions(int $roleId, array $permissionNames): void;
+    public function removePermissions(int $roleId, array $permissionNames): void;
 }

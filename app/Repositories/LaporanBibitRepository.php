@@ -2,14 +2,16 @@
 
 namespace App\Repositories;
 
+use App\Exceptions\DataAccessException;
+use App\Exceptions\ResourceNotFoundException;
 use App\Models\LaporanKondisi;
 use App\Repositories\Interfaces\CrudInterface;
 use App\Repositories\Interfaces\LaporanRepositoryInterface;
 use App\Trait\LoggingError;
 use Carbon\Carbon;
-use Exception;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\DB;
 use Throwable;
@@ -21,109 +23,129 @@ class LaporanBibitRepository implements CrudInterface, LaporanRepositoryInterfac
     public function getAll(bool $withRelations = false): Collection|array
     {
         try {
-            $query = LaporanKondisi::select(['id', 'status', 'created_at', 'kelompok_tani_id', 'komoditas_id', 'penyuluh_id']);
+            $query = LaporanKondisi::query();
             if ($withRelations) {
                 $query->with([
-                    'kelompokTani' => function ($q) {
-                        $q->select(['id', 'nama']);
-                    },
-                    'komoditas' => function ($q) {
-                        $q->select(['id', 'nama', 'musim']);
-                    },
-                    'penyuluh' => function ($q) {
-                        $q->select(['id', 'penyuluh_terdaftar_id']);
-                    },
-                    'penyuluh.penyuluhTerdaftar' => function ($q) {
-                        $q->select(['id', 'nama', 'no_hp']);
-                    },
-                    'laporanKondisiDetail'
+                    'kelompokTani' => fn($q) => $q->select(['id', 'nama']),
+                    'komoditas' => fn($q) => $q->select(['id', 'nama', 'musim']),
+                    'penyuluh' => fn($q) => $q->select(['id', 'penyuluh_terdaftar_id'])->with([
+                        'penyuluhTerdaftar' => fn($q2) => $q2->select(['id', 'nama', 'no_hp']),
+                    ]),
+                    'laporanKondisiDetail' => fn($q) => $q->select(['id', 'laporan_kondisi_id', 'luas_lahan', 'estimasi_panen', 'jenis_bibit', 'foto_bibit', 'lokasi_lahan']),
                 ]);
             }
             return $query->get();
         } catch (QueryException $e) {
             $this->LogSqlException($e);
-            return Collection::make();
+            throw $e;
         } catch (Throwable $e) {
-            return Collection::make();
+            $this->LogGeneralException($e);
+            throw new DataAccessException('Unexpected repository error in getAll.', 0, $e);
         }
     }
 
+    /**
+     * @throws DataAccessException
+     */
     public function getById(string|int $id): Model|Collection|array|null
     {
         try {
-            $query = LaporanKondisi::select(['id', 'status', 'created_at', 'kelompok_tani_id', 'komoditas_id', 'penyuluh_id']); // Select columns
+            $query = LaporanKondisi::query();
             $query->with([
-                'kelompokTani' => function ($q) {
-                    $q->select(['id', 'nama', 'desa_id', 'kecamatan_id']);
-                    $q->with([
-                        'desa' => function ($q2) {
-                            $q2->select(['id', 'nama']);
-                        },
-                        'kecamatan' => function ($q2) {
-                            $q2->select(['id', 'nama']);
-                        }
-                    ]);
-                },
-                'komoditas' => function ($q) {
-                    $q->select(['id', 'nama', 'musim']);
-                },
-                'penyuluh' => function ($q) {
-                    $q->select(['id', 'penyuluh_terdaftar_id']);
-                    $q->with([
-                        'penyuluhTerdaftar' => function ($q2) {
-                            $q2->select(['id', 'nama', 'no_hp']);
-                        }
-                    ]);
-                },
-                'laporanKondisiDetail'
+                'kelompokTani' => fn($q) => $q->select(['id', 'nama', 'desa_id', 'kecamatan_id'])->with([
+                    'desa' => fn($q2) => $q2->select(['id', 'nama']),
+                    'kecamatan' => fn($q2) => $q2->select(['id', 'nama']),
+                ]),
+                'komoditas' => fn($q) => $q->select(['id', 'nama', 'musim']),
+                'penyuluh' => fn($q) => $q->select(['id', 'penyuluh_terdaftar_id'])->with([
+                    'penyuluhTerdaftar' => fn($q2) => $q2->select(['id', 'nama', 'no_hp']),
+                ]),
+                'laporanKondisiDetail' => fn($q) => $q->select(['id', 'laporan_kondisi_id', 'luas_lahan', 'estimasi_panen', 'jenis_bibit', 'foto_bibit', 'lokasi_lahan']),
             ]);
 
-            return $query->findOrFail($id);
+            return $query->find($id);
         } catch (QueryException $e) {
             $this->LogSqlException($e, ['id' => $id]);
-            return null;
+            throw $e;
         } catch (Throwable $e) {
-            return null;
+            $this->LogGeneralException($e, ['id' => $id]);
+            throw new DataAccessException('Unexpected repository error in getById.', 0, $e);
         }
     }
 
+    /**
+     * @throws DataAccessException
+     */
     public function create(array $data): ?Model
     {
         try {
-            return LaporanKondisi::create($data);
+            $model = LaporanKondisi::create($data);
+            if (!$model) {
+                throw new DataAccessException('Failed to create LaporanKondisi model.');
+            }
+            return $model;
         } catch (QueryException $e) {
             $this->LogSqlException($e, $data);
-            return null;
+            throw $e;
+        } catch (DataAccessException $e) {
+            throw $e;
         } catch (Throwable $e) {
-            return null;
+            $this->LogGeneralException($e, ['data' => $data]);
+            throw new DataAccessException('Unexpected repository error during create.', 0, $e);
         }
     }
 
+    /**
+     * @throws DataAccessException
+     * @throws ResourceNotFoundException
+     */
     public function update(string|int $id, array $data): Model|bool|int
     {
         try {
             $model = LaporanKondisi::findOrFail($id);
-            $model->update($data);
-            return true;
+            $result = $model->update($data);
+
+            if (!$result) {
+                $this->LogGeneralException(new \Exception("LaporanKondisi update returned false."), ['id' => $id, 'data' => $data]);
+            }
+
+            return (bool)$result;
+        } catch (ModelNotFoundException $e) {
+            $this->LogNotFoundException($e, ['id' => $id]);
+            throw new ResourceNotFoundException("LaporanKondisi with ID {$id} not found for update.", 0, $e);
         } catch (QueryException $e) {
-            $this->LogSqlException($e, ['data_baru' => $data]);
-            return false;
+            $this->LogSqlException($e, ['id' => $id, 'data_baru' => $data]);
+            throw $e;
         } catch (Throwable $e) {
-            return false;
+            $this->LogGeneralException($e, ['id' => $id, 'data_baru' => $data]);
+            throw new DataAccessException('Unexpected repository error during update.', 0, $e);
         }
     }
 
+    /**
+     * @throws ResourceNotFoundException
+     * @throws DataAccessException
+     */
     public function delete(string|int $id): Model|bool|int
     {
         try {
             $model = LaporanKondisi::findOrFail($id);
-            $model->delete();
-            return true;
+            $result = $model->delete();
+
+            if (!$result) {
+                $this->LogGeneralException(new \Exception("LaporanKondisi delete returned false."), ['id' => $id]);
+            }
+
+            return (bool)$result;
+        } catch (ModelNotFoundException $e) {
+            $this->LogNotFoundException($e, ['id' => $id]);
+            throw new ResourceNotFoundException("LaporanKondisi with ID {$id} not found for deletion.", 0, $e);
         } catch (QueryException $e) {
             $this->LogSqlException($e, ['id' => $id]);
-            return false;
+            throw $e;
         } catch (Throwable $e) {
-            return false;
+            $this->LogGeneralException($e, ['id' => $id]);
+            throw new DataAccessException('Unexpected repository error during delete.', 0, $e);
         }
     }
 
@@ -143,35 +165,34 @@ class LaporanBibitRepository implements CrudInterface, LaporanRepositoryInterfac
             return $query->get();
         } catch (QueryException $e) {
             $this->LogSqlException($e);
-            return Collection::make();
+            throw $e;
         } catch (Throwable $e) {
-            return Collection::make();
+            $this->LogGeneralException($e);
+            throw new DataAccessException('Unexpected repository error in getByPenyuluhId.', 0, $e);
         }
     }
 
-    /**
-     * @throws Exception
-     */
     public function calculateTotal(): int
     {
         try {
             return LaporanKondisi::count();
         } catch (QueryException $e) {
             $this->LogSqlException($e);
-            throw new Exception('Terjadi kesalahan pada query.', 500);
-        } catch (\Exception $e) {
-            throw new Exception('Terjadi kesalahan pada server saat menghitung total record.', 500);
+            throw $e;
+        } catch (Throwable $e) {
+            $this->LogGeneralException($e);
+            throw new DataAccessException('Unexpected repository error in calculateTotal.', 0, $e);
         }
     }
 
     /**
-     * @throws Exception
+     * @throws DataAccessException
      */
     public function getLaporanStatusCounts(?int $penyuluhId = null): array
     {
         $statusCounts = [
-            'approved' => 0,
             'rejected' => 0,
+            'approved' => 0,
             'pending' => 0,
         ];
 
@@ -192,9 +213,9 @@ class LaporanBibitRepository implements CrudInterface, LaporanRepositoryInterfac
                 ->toArray();
 
             $statusMap = [
+                0 => 'rejected',
                 1 => 'approved',
-                2 => 'rejected',
-                3 => 'pending',
+                2 => 'pending',
             ];
 
             foreach ($statusMap as $statusValue => $statusName) {
@@ -203,10 +224,10 @@ class LaporanBibitRepository implements CrudInterface, LaporanRepositoryInterfac
             return $statusCounts;
         } catch (QueryException $e) {
             $this->LogSqlException($e, ['penyuluh_id' => $penyuluhId]);
-            throw new Exception('Terjadi kesalahan pada query saat menghitung record', 500, $e);
-
+            throw $e;
         } catch (Throwable $e) {
-            throw new Exception('Terjadi kesalahan saat menghitung record', 500, $e);
+            $this->LogGeneralException($e, ['penyuluh_id' => $penyuluhId]);
+            throw new DataAccessException('Unexpected repository error in getLaporanStatusCounts.', 0, $e);
         }
     }
 }

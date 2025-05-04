@@ -26,6 +26,6 @@ class DesaExport implements FromCollection, WithHeadings
 
     public function headings(): array
     {
-        return ['Nama Desa', 'Kecamatan'];
+        return ['Nama Desa', 'Nama Kecamatan'];
     }
 }

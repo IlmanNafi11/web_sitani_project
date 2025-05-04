@@ -2,391 +2,211 @@
 
 namespace App\Services;
 
+use App\Exceptions\DataAccessException;
+use App\Exceptions\ImportFailedException;
+use App\Exceptions\ResourceNotFoundException;
 use App\Repositories\Interfaces\CrudInterface;
-use App\Repositories\Interfaces\KelompokTaniRepositoryInterface;
 use App\Repositories\Interfaces\ManyRelationshipManagement;
+use App\Services\Interfaces\KelompokTaniServiceInterface;
+use App\Trait\LoggingError;
 use Exception;
-use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\QueryException;
+use Illuminate\Support\Collection;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Maatwebsite\Excel\Concerns\FromCollection;
+use Maatwebsite\Excel\Facades\Excel;
+use Maatwebsite\Excel\Validators\ValidationException;
+use App\Imports\KelompokTaniImport;
+use App\Exports\KelompokTaniExport;
 use Throwable;
 
-class KelompokTaniService
+class KelompokTaniService implements KelompokTaniServiceInterface
 {
+    use LoggingError;
+
     protected CrudInterface $crudRepository;
     protected ManyRelationshipManagement $relationManager;
-    protected KelompokTaniRepositoryInterface $repository;
 
-    public function __construct(CrudInterface $crudRepository, ManyRelationshipManagement $relationManager, KelompokTaniRepositoryInterface $repository)
+    public function __construct(CrudInterface $crudRepository, ManyRelationshipManagement $relationManager)
     {
         $this->crudRepository = $crudRepository;
         $this->relationManager = $relationManager;
-        $this->repository = $repository;
     }
 
     /**
-     * Mengambil seluruh data kelompok tani
-     *
-     * @param bool $withRelations Default false, set true untuk mengambil seluruh data beserta dengan relasi
-     * @return array
+     * @throws DataAccessException
      */
-    public function getAll(bool $withRelations = false): array
+    public function getAll(bool $withRelations = false): Collection
     {
         try {
-            $kelompokTanis = $this->crudRepository->getAll($withRelations);
-
-            if ($kelompokTanis->isNotEmpty()) {
-                return [
-                    'success' => true,
-                    'message' => 'Seluruh data kelompok tani berhasil diambil',
-                    'data' => $kelompokTanis,
-                ];
-            }
-
-            return [
-                'success' => false,
-                'message' => 'Data kelompok tani kosong',
-                'data' => [],
-            ];
-        } catch (\Throwable $th) {
-            Log::error('Gagal mengambil seluruh data kelompok tani.', [
-                'source' => __METHOD__,
-                'error' => $th->getMessage(),
-                'trace' => $th->getTraceAsString(),
-            ]);
-
-            return [
-                'success' => false,
-                'message' => 'Gagal mengambil seluruh data kelompok tani',
-                'data' => [],
-            ];
+            return $this->crudRepository->getAll($withRelations);
+        } catch (QueryException $e) {
+            throw new DataAccessException('Database error while fetching kelompok tani data.', 0, $e);
+        } catch (Throwable $e) {
+            throw new DataAccessException('Unexpected error while fetching kelompok tani data.', 0, $e);
         }
     }
 
     /**
-     * Mengambil data kelompok tani beserta relasi
-     *
-     * @return array|Collection|void
-     * @deprecated ganti dengan getAll, dan set param true.
+     * @throws ResourceNotFoundException
+     * @throws DataAccessException
      */
-    public function getAllWithRelations()
-    {
-        try {
-            return $this->crudRepository->getAll(true);
-        } catch (\Throwable $th) {
-            Log::error('Gagal mengambil seluruh data kelompok tani beserta relasi: ' . $th->getMessage());
-        }
-    }
-
-    /**
-     * Mengambil data kelompok tani berdasarkan id
-     *
-     * @param string|int $id
-     * @return array
-     */
-    public function getById(string|int $id): array
+    public function getById(int|string $id): Model
     {
         try {
             $kelompokTani = $this->crudRepository->getById($id);
 
-            if (!empty($kelompokTani)) {
-                return [
-                    'success' => true,
-                    'message' => 'Data kelompok tani ditemukan',
-                    'data' => $kelompokTani,
-                ];
+            if ($kelompokTani === null) {
+                throw new ResourceNotFoundException("Kelompok Tani with ID {$id} not found.");
             }
 
-            return [
-                'success' => false,
-                'message' => 'Data kelompok tani tidak ditemukan',
-                'data' => [],
-            ];
-        } catch (\Throwable $th) {
-            Log::error('Gagal mengambil data kelompok tani berdasarkan id.', [
-                'source' => __METHOD__,
-                'error' => $th->getMessage(),
-                'trace' => $th->getTraceAsString(),
-            ]);
+            if ($kelompokTani instanceof Collection) {
+                $kelompokTani = $kelompokTani->first();
+                if ($kelompokTani === null) {
+                    throw new ResourceNotFoundException("Kelompok Tani with ID {$id} not found or incorrect type returned.");
+                }
+            }
 
-            return [
-                'success' => false,
-                'message' => 'Gagal mengambil data kelompok tani berdasarkan id.',
-                'data' => [],
-            ];
+            return $kelompokTani;
+        } catch (ResourceNotFoundException $e) {
+            throw $e;
+        } catch (QueryException $e) {
+            throw new DataAccessException("Database error while fetching Kelompok Tani with ID {$id}.", 0, $e);
+        } catch (Throwable $e) {
+            throw new DataAccessException("Unexpected error while fetching Kelompok Tani with ID {$id}.", 0, $e);
         }
     }
 
     /**
-     * Mengambil data kelompok tani beserta data pivot
-     *
-     * @param string|int $id Id kelompok tani
-     * @return array
-     * @deprecated ganti dengan getById()
+     * @throws DataAccessException
      */
-    public function getByIdWithPivot(string|int $id): array
+    public function create(array $data): Model
     {
         try {
-            $kelompokTani = $this->crudRepository->getById($id);
-            if (!empty($kelompokTani)) {
-                return [
-                    'success' => true,
-                    'message' => 'Data kelompok tani berhasil diambil',
-                    'data' => $kelompokTani,
-                ];
-            }
+            return DB::transaction(function () use ($data) {
+                $kelompokTani = $this->crudRepository->create(Arr::except($data, ['penyuluh_terdaftar_id']));
 
-            return [
-                'success' => false,
-                'message' => 'Data kelompok tani tidak ditemukan',
-                'data' => [],
-            ];
-        } catch (\Throwable $th) {
-            Log::error('Gagal mengambil data kelompok tani beserta pivot table.', [
-                'source' => __METHOD__,
-                'error' => $th->getMessage(),
-                'trace' => $th->getTraceAsString(),
-            ]);
+                if ($kelompokTani === null) {
+                    throw new DataAccessException('Failed to create Kelompok Tani data in repository.');
+                }
 
-            return [
-                'success' => false,
-                'message' => 'Gagal mengambil data kelompok tani beserta pivot table.',
-                'data' => [],
-            ];
-        }
-    }
-
-    /**
-     * Membuat data kelompok tani
-     *
-     * @param array $data Data kelompok tani
-     * @return array
-     */
-    public function create(array $data): array
-    {
-        try {
-            $kelompokTani = $this->crudRepository->create($data);
-
-            if ($kelompokTani !== null) {
                 $penyuluhIds = $data['penyuluh_terdaftar_id'] ?? [];
-
                 if (!empty($penyuluhIds)) {
                     $penyuluhIdsToAttach = Arr::flatten($penyuluhIds);
                     $this->relationManager->attach($kelompokTani, $penyuluhIdsToAttach);
                 }
 
-                return [
-                    'success' => true,
-                    'message' => 'Data kelompok tani berhasil disimpan',
-                    'data' => $kelompokTani,
-                ];
-            }
+                $kelompokTani->load('penyuluhTerdaftars');
 
-            return [
-                'success' => false,
-                'message' => 'Data kelompok tani gagal disimpan',
-                'data' => [],
-            ];
-        } catch (\Throwable $th) {
-            Log::error('Gagal menyimpan data kelompok tani.', [
-                'source' => __METHOD__,
-                'error' => $th->getMessage(),
-                'trace' => $th->getTraceAsString(),
-            ]);
-
-            return [
-                'success' => false,
-                'message' => 'Gagal menyimpan data kelompok tani.',
-                'data' => [],
-            ];
+                return $kelompokTani;
+            });
+        } catch (QueryException $e) {
+            throw new DataAccessException('Database error during Kelompok Tani creation transaction.', 0, $e);
+        } catch (DataAccessException $e) {
+            throw $e;
+        } catch (Throwable $e) {
+            throw new DataAccessException('Unexpected error during Kelompok Tani creation transaction.', 0, $e);
         }
     }
 
     /**
-     * Memperbarui data kelompok tani
-     *
-     * @param string|int $id Id kelompok tani
-     * @param array $data Data kelompok tani yang baru
-     * @return array
+     * @throws ResourceNotFoundException
+     * @throws DataAccessException
      */
-    public function update(string|int $id, array $data): array
+    public function update(int|string $id, array $data): bool
     {
         try {
-            $kelompokTani = $this->crudRepository->update($id, [
-                "nama" => $data["nama"],
-                "desa_id" => $data["desa_id"],
-                "kecamatan_id" => $data["kecamatan_id"],
-            ]);
+            return DB::transaction(function () use ($id, $data) {
+                $kelompokTani = $this->getById($id);
+                $updated = $this->crudRepository->update($id, Arr::except($data, ['penyuluh_terdaftar_id']));
 
-            if (!empty($kelompokTani)) {
-                $this->relationManager->sync($kelompokTani, $data['penyuluh_terdaftar_id']);
+                if (!$updated) {
+                    throw new DataAccessException("Failed to update Kelompok Tani data in repository for ID {$id}.");
+                }
+
                 $penyuluhIds = $data['penyuluh_terdaftar_id'] ?? [];
-
                 $penyuluhIdsToSync = Arr::flatten($penyuluhIds);
                 $this->relationManager->sync($kelompokTani, $penyuluhIdsToSync);
-                return [
-                    'success' => true,
-                    'message' => 'Data kelompok tani berhasil diperbarui',
-                    'data' => $data,
-                ];
-            }
 
-            return [
-                'success' => false,
-                'message' => 'Data kelompok tani gagal diperbarui',
-                'data' => [],
-            ];
-        } catch (\Throwable $th) {
-            Log::error('Gagal memperbarui data kelompok tani.', [
-                'source' => __METHOD__,
-                'error' => $th->getMessage(),
-                'trace' => $th->getTraceAsString(),
-            ]);
 
-            return [
-                'success' => false,
-                'message' => 'Gagal memperbarui data kelompok tani.',
-                'data' => [],
-            ];
+                return true;
+            });
+        } catch (ResourceNotFoundException|DataAccessException $e) {
+            throw $e;
+        } catch (QueryException $e) {
+            throw new DataAccessException('Database error during Kelompok Tani update transaction.', 0, $e);
+        } catch (Throwable $e) {
+            throw new DataAccessException('Unexpected error during Kelompok Tani update transaction.', 0, $e);
         }
     }
 
     /**
-     * Menghapus data kelompok tani
-     *
-     * @param string|int $id Id kelompok tani
-     * @return array
+     * @throws DataAccessException
+     * @throws ResourceNotFoundException
      */
-    public function delete(string|int $id): array
+    public function delete(int|string $id): bool
     {
         try {
-            $kelompokTani = $this->crudRepository->delete($id);
-            if (!empty($kelompokTani)) {
+            return DB::transaction(function () use ($id) {
+                $kelompokTani = $this->getById($id);
+
                 $this->relationManager->detach($kelompokTani);
+                $deleted = $this->crudRepository->delete($id);
 
-                return [
-                    'success' => true,
-                    'message' => 'Data kelompok tani berhasil dihapus',
-                    'data' => $kelompokTani,
-                ];
+                if (!$deleted) {
+                    throw new DataAccessException("Failed to delete Kelompok Tani data in repository for ID {$id}.");
+                }
+
+                return true;
+            });
+        } catch (ResourceNotFoundException|DataAccessException $e) {
+            throw $e;
+        } catch (QueryException $e) {
+            throw new DataAccessException('Database error during Kelompok Tani deletion transaction.', 0, $e);
+        } catch (Throwable $e) {
+            throw new DataAccessException('Unexpected error during Kelompok Tani deletion transaction.', 0, $e);
+        }
+    }
+
+    /**
+     * @throws DataAccessException
+     * @throws ImportFailedException
+     */
+    public function import(mixed $file): array
+    {
+        try {
+            $import = new KelompokTaniImport();
+            Excel::import($import, $file);
+
+            $failures = $import->getFailures();
+
+            if ($failures->isNotEmpty()) {
+                throw new ImportFailedException("Import completed with failures.", 0, null, $failures);
             }
-
-            return [
-                'success' => false,
-                'message' => 'Data kelompok tani gagal dihapus',
-                'data' => [],
-            ];
-
-        } catch (\Throwable $th) {
-            Log::error('Gagal menghapus data kelompok tani.', [
-                'source' => __METHOD__,
-                'error' => $th->getMessage(),
-                'trace' => $th->getTraceAsString(),
-            ]);
-
-            return [
-                'success' => false,
-                'message' => 'Gagal menghapus data kelompok tani.',
-                'data' => [],
-            ];
+            return [];
+        } catch (ImportFailedException $e) {
+            throw $e;
+        } catch (QueryException $e) {
+            $this->LogSqlException($e);
+            throw new DataAccessException("Database error during Kelompok Tani import.", 0, $e);
+        } catch (Throwable $e) {
+            $this->LogGeneralException($e);
+            throw new ImportFailedException("Unexpected error during Kelompok Tani import.", 0, $e);
         }
     }
 
     /**
-     * Mengambil data kelompok tani berdasarkan  id penyuluh
-     *
-     * @param array $id Id penyuluh
-     * @return array
+     * @throws DataAccessException
      */
-    public function getByPenyuluhId(array $id): array
+    public function export(): FromCollection
     {
         try {
-            $kelompokTanis = $this->repository->getByPenyuluhId($id);
-            if ($kelompokTanis->isNotEmpty()) {
-                $data = $kelompokTanis->map(function ($item) {
-                    return [
-                        'id' => $item->id,
-                        'nama' => $item->nama,
-                        'desa' => [
-                            'id' => $item->desa->id ?? null,
-                            'nama' => $item->desa->nama ?? null,
-                        ],
-                        'kecamatan' => [
-                            'id' => $item->desa->kecamatan->id ?? null,
-                            'nama' => $item->desa->kecamatan->nama ?? null,
-                        ],
-                        'penyuluhs' => $item->penyuluhTerdaftars->map(function ($penyuluh) {
-                            return [
-                                'id' => $penyuluh->id,
-                                'nama' => $penyuluh->nama,
-                                'no_hp' => $penyuluh->no_hp,
-                                'alamat' => $penyuluh->alamat,
-                            ];
-                        }),
-                    ];
-                });
-
-                return [
-                    'success' => true,
-                    'message' => 'Data kelompok tani ditemukan',
-                    'data' => $data,
-                ];
-            }
-
-            return [
-                'success' => false,
-                'message' => 'Data kelompok tani tidak ditemukan',
-                'data' => [],
-            ];
-        } catch (\Throwable $th) {
-            Log::error('Terjadi kesalahan saat mengambil data kelompok tani.', [
-                'source' => __METHOD__,
-                'error' => $th->getMessage(),
-                'trace' => $th->getTraceAsString(),
-            ]);
-
-            return [
-                'success' => false,
-                'message' => 'Data kelompok tani tidak ditemukan',
-                'data' => [],
-            ];
-        }
-    }
-
-    /**
-     * Mengambil totol kelompok tani yang terdaftar di Sitani
-     *
-     * @return int Total
-     * @throws \Exception
-     */
-    public function calculateTotal(): int
-    {
-        try {
-            return $this->repository->calculateTotal();
-        } catch (\Throwable $e) {
-            Log::error('Terjadi kesalahan saat menghitung total record data', [
-                'source' => __METHOD__,
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString(),
-                'previous' => $e->getPrevious(),
-            ]);
-            throw new \Exception('Terjadi Kesalahan diserver saat menghitung total kelompok tani', $e->getCode(), $e->getPrevious());
-        }
-    }
-
-    /**
-     * Mengambil total kelompok tani berdasarkan kecamatan id
-     *
-     * @return int Total
-     * @throws Exception
-     * @throws Throwable
-     */
-    public function countByKecamatanId(string|int $id): int
-    {
-        try {
-            return $this->repository->countByKecamatanId($id);
-        }catch (\Throwable $e) {
-            throw new Exception('Terjadi kesalahan di server', 500);
+            return new KelompokTaniExport();
+        } catch (Throwable $e) {
+            throw new DataAccessException("Failed to prepare Kelompok Tani data for export.", 0, $e);
         }
     }
 }

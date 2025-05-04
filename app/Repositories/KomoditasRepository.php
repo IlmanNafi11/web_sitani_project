@@ -2,14 +2,15 @@
 
 namespace App\Repositories;
 
+use App\Exceptions\DataAccessException;
 use App\Models\Komoditas;
 use App\Repositories\Interfaces\CrudInterface;
 use App\Repositories\Interfaces\KomoditasRepositoryInterface;
 use App\Trait\LoggingError;
-use Exception;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\QueryException;
+use Throwable;
 
 class KomoditasRepository implements CrudInterface, KomoditasRepositoryInterface
 {
@@ -26,9 +27,10 @@ class KomoditasRepository implements CrudInterface, KomoditasRepositoryInterface
             return $query->get();
         } catch (QueryException $e) {
             $this->LogSqlException($e);
-            return Collection::make();
-        } catch (\Throwable $e) {
-            return Collection::make();
+            throw $e;
+        } catch (Throwable $e) {
+            $this->LogGeneralException($e);
+            throw new DataAccessException('Terjadi kesalahan tak terduga di ' . __METHOD__, 0, $e);
         }
     }
 
@@ -38,9 +40,10 @@ class KomoditasRepository implements CrudInterface, KomoditasRepositoryInterface
             return Komoditas::select(['id', 'nama', 'deskripsi', 'musim'])->where('id', $id)->first();
         } catch (QueryException $e) {
             $this->LogSqlException($e, ['id' => $id]);
-            return null;
-        } catch (\Throwable $e) {
-            return null;
+            throw $e;
+        } catch (Throwable $e) {
+            $this->LogGeneralException($e, ['id' => $id]);
+            throw new DataAccessException('Terjadi kesalahan tak terduga di ' . __METHOD__, 0, $e);
         }
     }
 
@@ -50,9 +53,10 @@ class KomoditasRepository implements CrudInterface, KomoditasRepositoryInterface
             return Komoditas::create($data);
         } catch (QueryException $e) {
             $this->LogSqlException($e, $data);
-            return null;
-        } catch (\Throwable $e) {
-            return null;
+            throw $e;
+        } catch (Throwable $e) {
+            $this->LogGeneralException($e, ['data' => $data]);
+            throw new DataAccessException('Terjadi kesalahan tak terduga di ' . __METHOD__, 0, $e);
         }
     }
 
@@ -62,11 +66,11 @@ class KomoditasRepository implements CrudInterface, KomoditasRepositoryInterface
             return Komoditas::where('id', $id)->update($data);
         } catch (QueryException $e) {
             $this->LogSqlException($e, ['id' => $id, 'data_baru' => $data]);
-            return false;
-        } catch (\Throwable $e) {
-            return false;
+            throw $e;
+        } catch (Throwable $e) {
+            $this->LogGeneralException($e, ['id' => $id, 'data_baru' => $data]);
+            throw new DataAccessException('Terjadi kesalahan tak terduga di ' . __METHOD__, 0, $e);
         }
-
     }
 
     public function delete($id): Model|bool|int
@@ -75,39 +79,36 @@ class KomoditasRepository implements CrudInterface, KomoditasRepositoryInterface
             return Komoditas::where('id', $id)->delete();
         } catch (QueryException $e) {
             $this->LogSqlException($e, ['id' => $id]);
-            return false;
-        } catch (\Throwable $e) {
-            return false;
+            throw $e;
+        } catch (Throwable $e) {
+            $this->LogGeneralException($e, ['id' => $id]);
+            throw new DataAccessException('Terjadi kesalahan tak terduga di ' . __METHOD__, 0, $e);
         }
     }
 
-    /**
-     * @throws Exception
-     */
     public function calculateTotal(): int
     {
         try {
             return Komoditas::count();
         } catch (QueryException $e) {
             $this->LogSqlException($e);
-            throw new Exception('Terjadi kesalahan pada query', 500);
-        } catch (\Throwable $e) {
-            throw new Exception('Terjadi kesalahan pada server saat menghitung total komoditas', 500);
+            throw $e;
+        } catch (Throwable $e) {
+            $this->LogGeneralException($e);
+            throw new DataAccessException('Terjadi kesalahan tak terduga di ' . __METHOD__, 0, $e);
         }
     }
 
-    /**
-     * @throws Exception
-     */
     public function GetMusim(): Collection
     {
         try {
             return Komoditas::select(['nama', 'musim'])->get();
         } catch (QueryException $e) {
             $this->LogSqlException($e);
-            throw new Exception('Terjadi kesalahan pada query', 500);
-        } catch (\Throwable $e) {
-            throw new Exception('Terjadi kesalahan direpository', 500);
+            throw $e;
+        } catch (Throwable $e) {
+            $this->LogGeneralException($e);
+            throw new DataAccessException('Terjadi kesalahan tak terduga di ' . __METHOD__, 0, $e);
         }
     }
 }
