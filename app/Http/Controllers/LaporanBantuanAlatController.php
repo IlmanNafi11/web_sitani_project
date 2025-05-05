@@ -73,7 +73,7 @@ class LaporanBantuanAlatController extends Controller
     {
         $request->validate([
             'status' => 'required'
-        ], ['status.required' => 'Silahkan pilih opsi kualitas bibit yang tersedia']);
+        ], ['status.required' => 'Silahkan Pilih Status Verifikasi Laporan Bantuan Alat!']);
         // dd($request->status);
         $result = $this->laporanService->update($id, ['status' => $request->status]);
 
