@@ -5,8 +5,7 @@ namespace App\Services\Api;
 use App\Exceptions\DataAccessException;
 use App\Exceptions\ResourceNotFoundException;
 use App\Models\LaporanKondisiDetail;
-use App\Repositories\Interfaces\CrudInterface;
-use App\Repositories\Interfaces\LaporanRepositoryInterface;
+use App\Repositories\Interfaces\LaporanBibitRepositoryInterface;
 use App\Services\Interfaces\LaporanBibitApiServiceInterface;
 use App\Trait\LoggingError;
 use Carbon\Carbon;
@@ -21,24 +20,25 @@ class LaporanBibitApiService implements LaporanBibitApiServiceInterface
 {
     use LoggingError;
 
-    protected CrudInterface $crudRepository;
-    protected LaporanRepositoryInterface $laporanRepository;
+    protected LaporanBibitRepositoryInterface $repository;
 
-    public function __construct(CrudInterface $crudRepository, LaporanRepositoryInterface $laporanRepository)
+    public function __construct(LaporanBibitRepositoryInterface $repository)
     {
-        $this->crudRepository = $crudRepository;
-        $this->laporanRepository = $laporanRepository;
+        $this->repository = $repository;
     }
 
     /**
-     * @throws Throwable
+     * @inheritDoc
+     * @param array $data
+     * @return Model
      * @throws DataAccessException
+     * @throws Throwable
      */
     public function create(array $data): Model
     {
         DB::beginTransaction();
         try {
-            $laporan = $this->crudRepository->create([
+            $laporan = $this->repository->create([
                 'kelompok_tani_id' => $data['kelompok_tani_id'],
                 'komoditas_id' => $data['komoditas_id'],
                 'penyuluh_id' => $data['penyuluh_id'],
@@ -46,7 +46,7 @@ class LaporanBibitApiService implements LaporanBibitApiServiceInterface
             ]);
 
             if ($laporan === null) {
-                throw new DataAccessException('Failed to create Laporan Bibit data in repository.');
+                throw new DataAccessException('Gagal menyimpan laporan bibit di repository.');
             }
             $file = $data['foto_bibit'] ?? null;
 
@@ -71,7 +71,7 @@ class LaporanBibitApiService implements LaporanBibitApiServiceInterface
                     if (isset($path) && Storage::disk('public')->exists($path)) {
                         Storage::disk('public')->delete($path);
                     }
-                    throw new DataAccessException('Failed to upload file or save report detail.', 0, $fileError);
+                    throw new DataAccessException('Gagal menyimpan detail laporan bibit.', 0, $fileError);
                 }
             }
             DB::commit();
@@ -82,17 +82,20 @@ class LaporanBibitApiService implements LaporanBibitApiServiceInterface
             return $laporan;
         } catch (QueryException $e) {
             DB::rollBack();
-            throw new DataAccessException('Database error during laporan bibit creation transaction.', 0, $e);
+            throw new DataAccessException('Database error saat menyimpan data laporan bibit.', 0, $e);
         } catch (DataAccessException $e) {
             DB::rollBack();
             throw $e;
         } catch (Throwable $e) {
             DB::rollBack();
-            throw new DataAccessException('Unexpected error during laporan bibit creation transaction.', 0, $e);
+            throw new DataAccessException('Terjadi kesalahan tidak terduga saat menyimpan data laporan bibit.', 0, $e);
         }
     }
 
     /**
+     * @inheritDoc
+     * @param string|int $penyuluhId
+     * @return Collection
      * @throws DataAccessException
      * @throws ResourceNotFoundException
      */
@@ -101,7 +104,7 @@ class LaporanBibitApiService implements LaporanBibitApiServiceInterface
         try {
             $conditions = ['penyuluh_id' => $penyuluhId];
             $relations = ['penyuluh.penyuluhTerdaftar', 'komoditas', 'laporanKondisiDetail', 'kelompokTani.desa.kecamatan'];
-            $laporan = $this->laporanRepository->getByPenyuluhId($conditions, $relations);
+            $laporan = $this->repository->getByPenyuluhId($conditions, $relations);
             if ($laporan->isEmpty()) {
                 throw new ResourceNotFoundException('Laporan Bibit tidak ditemukan');
             }
@@ -109,23 +112,26 @@ class LaporanBibitApiService implements LaporanBibitApiServiceInterface
         } catch (ResourceNotFoundException $e) {
             throw $e;
         } catch (QueryException $e) {
-            throw new DataAccessException('Database error while fetching Laporan Bibit by Penyuluh ID.', 0, $e);
+            throw new DataAccessException('Database error saat fetch data laporan bibit berdasarkan penyuluh id.', 0, $e);
         } catch (Throwable $e) {
-            throw new DataAccessException('Unexpected error while fetching Laporan Bibit by Penyuluh ID.', 0, $e);
+            throw new DataAccessException('Terjadi kesalahan tidak terduga saat fetch data laporan bibit berdasarkan penyuluh id.', 0, $e);
         }
     }
 
     /**
+     * @inheritDoc
+     * @param string|int|null $penyuluhId
+     * @return array
      * @throws DataAccessException
      */
-    public function getLaporanStatusCounts(string|int $penyuluhId): array
+    public function getLaporanStatusCounts(string|int|null $penyuluhId): array
     {
         try {
-            return $this->laporanRepository->getLaporanStatusCounts($penyuluhId);
+            return $this->repository->getLaporanStatusCounts($penyuluhId);
         } catch (QueryException $e) {
-            throw new DataAccessException('Database error while calculating report status counts.', 0, $e);
+            throw new DataAccessException('Database error saat menghitung total laporan bibit berdasarkan statusnya.', 0, $e);
         } catch (Throwable $e) {
-            throw new DataAccessException('Unexpected error while calculating report status counts.', 0, $e);
+            throw new DataAccessException('Terjadi kesalahan tidak terduga saat menghitung total laporan bibit berdasarkan statusnya.', 0, $e);
         }
     }
 }

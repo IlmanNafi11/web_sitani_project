@@ -7,7 +7,6 @@ use App\Exceptions\ImportFailedException;
 use App\Exceptions\ResourceNotFoundException;
 use App\Exports\KomoditasExport;
 use App\Imports\KomoditasImport;
-use App\Repositories\Interfaces\CrudInterface;
 use App\Repositories\Interfaces\KomoditasRepositoryInterface;
 use App\Services\Interfaces\KomoditasServiceInterface;
 use App\Trait\LoggingError;
@@ -22,19 +21,23 @@ class KomoditasService implements KomoditasServiceInterface
 {
     use LoggingError;
 
-    protected CrudInterface $crudRepository;
     protected KomoditasRepositoryInterface $repository;
 
-    public function __construct(CrudInterface $crudRepository, KomoditasRepositoryInterface $repository)
+    public function __construct(KomoditasRepositoryInterface $repository)
     {
-        $this->crudRepository = $crudRepository;
         $this->repository = $repository;
     }
 
+    /**
+     * @inheritDoc
+     * @param bool $withRelations
+     * @return Collection
+     * @throws DataAccessException
+     */
     public function getAll(bool $withRelations = false): Collection
     {
         try {
-            return $this->crudRepository->getAll($withRelations);
+            return $this->repository->getAll($withRelations);
         } catch (QueryException $e) {
             throw new DataAccessException('Database error saat fetch data komoditas.', 0, $e);
         } catch (Throwable $e) {
@@ -42,23 +45,21 @@ class KomoditasService implements KomoditasServiceInterface
         }
     }
 
+    /**
+     * @inheritDoc
+     * @param string|int $id
+     * @return Model
+     * @throws DataAccessException
+     * @throws ResourceNotFoundException
+     */
     public function getById(string|int $id): Model
     {
         try {
-            $komoditas = $this->crudRepository->getById($id);
+            $komoditas = $this->repository->getById($id);
 
-            if (empty($komoditas)) {
+            if ($komoditas === null) {
                 throw new ResourceNotFoundException("Komoditas dengan id {$id} tidak ditemukan.");
             }
-
-            // Noted, rencana dihapus
-//            if ($komoditas instanceof Collection) {
-//                $komoditas = $komoditas->first();
-//                if (empty($komoditas)) {
-//                    throw new ResourceNotFoundException("Komoditas with ID {$id} not found or incorrect type returned.");
-//                }
-//            }
-
             return $komoditas;
         } catch (ResourceNotFoundException $e) {
             throw $e;
@@ -69,10 +70,16 @@ class KomoditasService implements KomoditasServiceInterface
         }
     }
 
+    /**
+     * @inheritDoc
+     * @param array $data
+     * @return Model
+     * @throws DataAccessException
+     */
     public function create(array $data): Model
     {
         try {
-            $komoditas = $this->crudRepository->create($data);
+            $komoditas = $this->repository->create($data);
 
             if ($komoditas === null) {
                 throw new DataAccessException('Gagal menyimpan data komoditas di repository.');
@@ -88,10 +95,17 @@ class KomoditasService implements KomoditasServiceInterface
         }
     }
 
+    /**
+     * @inheritDoc
+     * @param string|int $id
+     * @param array $data
+     * @return bool
+     * @throws DataAccessException
+     */
     public function update(string|int $id, array $data): bool
     {
         try {
-            $result = $this->crudRepository->update($id, $data);
+            $result = $this->repository->update($id, $data);
 
             if(!$result) {
                 throw new DataAccessException("Gagal memperbarui komoditas dengan id {$id} direpository.");
@@ -107,10 +121,16 @@ class KomoditasService implements KomoditasServiceInterface
         }
     }
 
+    /**
+     * @inheritDoc
+     * @param string|int $id
+     * @return bool
+     * @throws DataAccessException
+     */
     public function delete(string|int $id): bool
     {
         try {
-            $result = $this->crudRepository->delete($id);
+            $result = $this->repository->delete($id);
 
             if (!$result) {
                 throw new DataAccessException("Gagal menghapus data komoditas dengan id {$id} di repository.");
@@ -126,7 +146,12 @@ class KomoditasService implements KomoditasServiceInterface
         }
     }
 
-    public function calculateTotal(): int
+    /**
+     * @inheritDoc
+     * @return int
+     * @throws DataAccessException
+     */
+    public function getTotal(): int
     {
         try {
             return $this->repository->calculateTotal();
@@ -137,6 +162,13 @@ class KomoditasService implements KomoditasServiceInterface
         }
     }
 
+    /**
+     * @inheritDoc
+     * @param mixed $file
+     * @return array
+     * @throws DataAccessException
+     * @throws ImportFailedException
+     */
     public function import(mixed $file): array
     {
         try {
@@ -154,6 +186,11 @@ class KomoditasService implements KomoditasServiceInterface
         }
     }
 
+    /**
+     * @inheritDoc
+     * @return FromCollection
+     * @throws DataAccessException
+     */
     public function export(): FromCollection
     {
         try {

@@ -6,20 +6,25 @@ use App\Exceptions\DataAccessException;
 use App\Exceptions\ResourceNotFoundException;
 use App\Models\Admin;
 use App\Models\User;
-use App\Repositories\Interfaces\CrudInterface;
+use App\Repositories\Interfaces\Base\BaseRepositoryInterface;
 use App\Trait\LoggingError;
-use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 use Throwable;
 
-class AdminRepository implements CrudInterface
+class AdminRepository implements BaseRepositoryInterface
 {
 
     use LoggingError;
 
+    /**
+     * @inheritDoc
+     * @param bool $withRelations
+     * @return Collection|array
+     * @throws DataAccessException
+     */
     public function getAll(bool $withRelations = false): Collection|array
     {
         try {
@@ -44,7 +49,13 @@ class AdminRepository implements CrudInterface
         }
     }
 
-    public function getById(string|int $id): Model|Collection|array|null
+    /**
+     * @inheritDoc
+     * @param string|int $id
+     * @return Model|null
+     * @throws DataAccessException
+     */
+    public function getById(string|int $id): ?Model
     {
         try {
             return Admin::with([
@@ -64,6 +75,12 @@ class AdminRepository implements CrudInterface
         }
     }
 
+    /**
+     * @inheritDoc
+     * @param array $data
+     * @return Model|null
+     * @throws DataAccessException
+     */
     public function create(array $data): ?Model
     {
         try {
@@ -103,7 +120,15 @@ class AdminRepository implements CrudInterface
         }
     }
 
-    public function update(string|int $id, array $data): Model|int|bool
+    /**
+     * @inheritDoc
+     * @param string|int $id
+     * @param array $data
+     * @return bool
+     * @throws DataAccessException
+     * @throws ResourceNotFoundException
+     */
+    public function update(string|int $id, array $data): bool|int
     {
         try {
             return DB::transaction(function () use ($id, $data) {
@@ -154,7 +179,12 @@ class AdminRepository implements CrudInterface
         }
     }
 
-    public function delete(string|int $id): Model|int|bool
+    /**
+     * @inheritDoc
+     * @throws DataAccessException
+     * @throws ResourceNotFoundException
+     */
+    public function delete(string|int $id): bool|int
     {
         try {
             return DB::transaction(function () use ($id) {
@@ -184,9 +214,7 @@ class AdminRepository implements CrudInterface
         } catch (QueryException $e) {
             $this->LogSqlException($e, ['id' => $id]);
             throw $e;
-        } catch (ResourceNotFoundException $e) {
-            throw $e;
-        } catch (DataAccessException $e) {
+        } catch (ResourceNotFoundException|DataAccessException $e) {
             throw $e;
         } catch (Throwable $e) {
             $this->LogGeneralException($e, ['id' => $id]);

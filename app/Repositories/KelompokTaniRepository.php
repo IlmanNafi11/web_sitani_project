@@ -5,23 +5,22 @@ namespace App\Repositories;
 use App\Exceptions\DataAccessException;
 use App\Exceptions\ResourceNotFoundException;
 use App\Models\KelompokTani;
-use App\Repositories\Interfaces\CrudInterface;
 use App\Repositories\Interfaces\KelompokTaniRepositoryInterface;
 use App\Repositories\Interfaces\ManyRelationshipManagement;
 use App\Trait\LoggingError;
-use Exception;
-use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\QueryException;
 use Throwable;
 
-class KelompokTaniRepository implements CrudInterface, ManyRelationshipManagement, KelompokTaniRepositoryInterface
+class KelompokTaniRepository implements ManyRelationshipManagement, KelompokTaniRepositoryInterface
 {
     use LoggingError;
 
     /**
      * @inheritDoc
+     * @return Collection|array
      * @throws DataAccessException
      */
     public function getAll(bool $withRelations = false): Collection|array
@@ -47,9 +46,10 @@ class KelompokTaniRepository implements CrudInterface, ManyRelationshipManagemen
 
     /**
      * @inheritDoc
+     * @return ?Model
      * @throws DataAccessException
      */
-    public function getById(int|string $id): Model|Collection|array|null
+    public function getById(int|string $id): ?Model
     {
         try {
             return KelompokTani::where('id', $id)->with([
@@ -68,6 +68,7 @@ class KelompokTaniRepository implements CrudInterface, ManyRelationshipManagemen
 
     /**
      * @inheritDoc
+     * @return ?Model
      * @throws DataAccessException
      */
     public function create(array $data): ?Model
@@ -91,10 +92,11 @@ class KelompokTaniRepository implements CrudInterface, ManyRelationshipManagemen
 
     /**
      * @inheritDoc
+     * @return bool|int
      * @throws DataAccessException
      * @throws ResourceNotFoundException
      */
-    public function update(int|string $id, array $data): Model|int|bool
+    public function update(int|string $id, array $data): bool|int
     {
         try {
             $model = KelompokTani::findOrFail($id);
@@ -119,9 +121,10 @@ class KelompokTaniRepository implements CrudInterface, ManyRelationshipManagemen
 
     /**
      * @inheritDoc
+     * @return bool|int
      * @throws DataAccessException|ResourceNotFoundException
      */
-    public function delete(int|string $id): Model|int|bool
+    public function delete(int|string $id): bool|int
     {
         try {
             $model = KelompokTani::findOrFail($id);
@@ -146,6 +149,7 @@ class KelompokTaniRepository implements CrudInterface, ManyRelationshipManagemen
 
     /**
      * @inheritDoc
+     * @return Collection|array
      * @throws DataAccessException
      */
     public function getByPenyuluhId(array $id): Collection|array
@@ -171,6 +175,7 @@ class KelompokTaniRepository implements CrudInterface, ManyRelationshipManagemen
 
     /**
      * @inheritDoc
+     * @return int
      * @throws DataAccessException
      */
     public function calculateTotal(): int
@@ -188,6 +193,7 @@ class KelompokTaniRepository implements CrudInterface, ManyRelationshipManagemen
 
     /**
      * @inheritDoc
+     * @return int
      * @throws DataAccessException
      */
     public function countByKecamatanId(int|string $id): int
@@ -205,9 +211,10 @@ class KelompokTaniRepository implements CrudInterface, ManyRelationshipManagemen
 
     /**
      * @inheritDoc
+     * @return bool
      * @throws DataAccessException
      */
-    public function attach(Model $model, array|int|\Illuminate\Support\Collection $ids, array $attributes = []): bool
+    public function attach(Model $model, array|int|Collection $ids, array $attributes = []): bool
     {
         try {
             if ($model instanceof KelompokTani) {
@@ -228,9 +235,10 @@ class KelompokTaniRepository implements CrudInterface, ManyRelationshipManagemen
 
     /**
      * @inheritDoc
+     * @return bool
      * @throws DataAccessException
      */
-    public function detach(Model $model, int|array|\Illuminate\Support\Collection|null $ids = null): ?int
+    public function detach(Model $model, int|array|Collection|null $ids = null): ?int
     {
         try {
             if ($model instanceof KelompokTani) {
@@ -250,6 +258,7 @@ class KelompokTaniRepository implements CrudInterface, ManyRelationshipManagemen
 
     /**
      * @inheritDoc
+     * @return ?array
      * @throws DataAccessException
      */
     public function sync(Model $model, array $relations, bool $detaching = true): ?array

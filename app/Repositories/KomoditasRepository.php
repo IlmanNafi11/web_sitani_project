@@ -4,18 +4,23 @@ namespace App\Repositories;
 
 use App\Exceptions\DataAccessException;
 use App\Models\Komoditas;
-use App\Repositories\Interfaces\CrudInterface;
 use App\Repositories\Interfaces\KomoditasRepositoryInterface;
 use App\Trait\LoggingError;
-use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\QueryException;
 use Throwable;
 
-class KomoditasRepository implements CrudInterface, KomoditasRepositoryInterface
+class KomoditasRepository implements KomoditasRepositoryInterface
 {
     use LoggingError;
 
+    /**
+     * @inheritDoc
+     * @param $withRelations
+     * @return Collection|array
+     * @throws DataAccessException
+     */
     public function getAll($withRelations = false): Collection|array
     {
         try {
@@ -34,7 +39,13 @@ class KomoditasRepository implements CrudInterface, KomoditasRepositoryInterface
         }
     }
 
-    public function getById($id): Model|Collection|array|null
+    /**
+     * @inheritDoc
+     * @param $id
+     * @return Model|null
+     * @throws DataAccessException
+     */
+    public function getById($id): ?Model
     {
         try {
             return Komoditas::select(['id', 'nama', 'deskripsi', 'musim'])->where('id', $id)->first();
@@ -47,6 +58,12 @@ class KomoditasRepository implements CrudInterface, KomoditasRepositoryInterface
         }
     }
 
+    /**
+     * @inheritDoc
+     * @param array $data
+     * @return Model|null
+     * @throws DataAccessException
+     */
     public function create(array $data): ?Model
     {
         try {
@@ -60,7 +77,14 @@ class KomoditasRepository implements CrudInterface, KomoditasRepositoryInterface
         }
     }
 
-    public function update($id, array $data): Model|bool|int
+    /**
+     * @inheritDoc
+     * @param $id
+     * @param array $data
+     * @return bool|int
+     * @throws DataAccessException
+     */
+    public function update($id, array $data): bool|int
     {
         try {
             return Komoditas::where('id', $id)->update($data);
@@ -73,7 +97,13 @@ class KomoditasRepository implements CrudInterface, KomoditasRepositoryInterface
         }
     }
 
-    public function delete($id): Model|bool|int
+    /**
+     * @inheritDoc
+     * @param $id
+     * @return bool|int
+     * @throws DataAccessException
+     */
+    public function delete($id): bool|int
     {
         try {
             return Komoditas::where('id', $id)->delete();
@@ -86,6 +116,11 @@ class KomoditasRepository implements CrudInterface, KomoditasRepositoryInterface
         }
     }
 
+    /**
+     * @inheritDoc
+     * @return int
+     * @throws DataAccessException
+     */
     public function calculateTotal(): int
     {
         try {
@@ -99,6 +134,11 @@ class KomoditasRepository implements CrudInterface, KomoditasRepositoryInterface
         }
     }
 
+    /**
+     * @inheritDoc
+     * @return Collection
+     * @throws DataAccessException
+     */
     public function GetMusim(): Collection
     {
         try {

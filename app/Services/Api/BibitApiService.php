@@ -4,7 +4,6 @@ namespace App\Services\Api;
 
 use App\Exceptions\DataAccessException;
 use App\Repositories\Interfaces\BibitRepositoryInterface;
-use App\Repositories\Interfaces\CrudInterface;
 use App\Services\Interfaces\BibitApiServiceInterface;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Collection;
@@ -12,22 +11,22 @@ use Throwable;
 
 class BibitApiService implements BibitApiServiceInterface
 {
-    protected CrudInterface $crudRepository;
     protected BibitRepositoryInterface $repository;
 
-    public function __construct(CrudInterface $crudRepository, BibitRepositoryInterface $repository)
+    public function __construct(BibitRepositoryInterface $repository)
     {
-        $this->crudRepository = $crudRepository;
         $this->repository = $repository;
     }
 
     /**
+     * @inheritDoc
+     * @return Collection
      * @throws DataAccessException
      */
     public function getAllApi(): Collection
     {
         try {
-            return $this->crudRepository->getAll(false);
+            return $this->repository->getAll(false);
         } catch (QueryException $e) {
             throw new DataAccessException('Database error saat fetch data bibit.', 0, $e);
         } catch (Throwable $e) {
@@ -36,9 +35,11 @@ class BibitApiService implements BibitApiServiceInterface
     }
 
     /**
+     * @inheritDoc
+     * @return int
      * @throws DataAccessException
      */
-    public function calculateTotal(): int
+    public function getTotal(): int
     {
         try {
             return $this->repository->calculateTotal();

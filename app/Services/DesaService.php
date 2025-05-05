@@ -5,7 +5,6 @@ namespace App\Services;
 use App\Exceptions\DataAccessException;
 use App\Exceptions\ImportFailedException;
 use App\Exceptions\ResourceNotFoundException;
-use App\Repositories\Interfaces\CrudInterface;
 use App\Repositories\Interfaces\DesaRepositoryInterface;
 use App\Services\Interfaces\DesaServiceInterface;
 use App\Trait\LoggingError;
@@ -22,19 +21,23 @@ class DesaService implements DesaServiceInterface
 {
     use LoggingError;
 
-    protected CrudInterface $crudRepository;
     protected DesaRepositoryInterface $repository;
 
-    public function __construct(CrudInterface $crudRepository, DesaRepositoryInterface $repository)
+    public function __construct(DesaRepositoryInterface $repository)
     {
-        $this->crudRepository = $crudRepository;
         $this->repository = $repository;
     }
 
+    /**
+     * @inheritDoc
+     * @param bool $withRelations
+     * @return Collection
+     * @throws DataAccessException
+     */
     public function getAll(bool $withRelations = false): Collection
     {
         try {
-            return $this->crudRepository->getAll($withRelations);
+            return $this->repository->getAll($withRelations);
         } catch (QueryException $e) {
             throw new DataAccessException('Database error saat fetch data desa.', 0, $e);
         } catch (Throwable $e) {
@@ -42,22 +45,21 @@ class DesaService implements DesaServiceInterface
         }
     }
 
+    /**
+     * @inheritDoc
+     * @param string|int $id
+     * @return Model
+     * @throws DataAccessException
+     * @throws ResourceNotFoundException
+     */
     public function getById(string|int $id): Model
     {
         try {
-            $desa = $this->crudRepository->getById($id);
+            $desa = $this->repository->getById($id);
 
-            if (empty($desa)) {
+            if ($desa === null) {
                 throw new ResourceNotFoundException("Desa dengan id {$id} tidak ditemukan.");
             }
-
-//            if ($desa instanceof Collection) {
-//                $desa = $desa->first();
-//                if (empty($desa)) {
-//                    throw new ResourceNotFoundException("Desa with ID {$id} not found or incorrect type returned.");
-//                }
-//            }
-
             return $desa;
         } catch (ResourceNotFoundException $e) {
             throw $e;
@@ -68,10 +70,16 @@ class DesaService implements DesaServiceInterface
         }
     }
 
+    /**
+     * @inheritDoc
+     * @param array $data
+     * @return Model
+     * @throws DataAccessException
+     */
     public function create(array $data): Model
     {
         try {
-            $desa = $this->crudRepository->create($data);
+            $desa = $this->repository->create($data);
 
             if ($desa === null) {
                 throw new DataAccessException('Gagal menyimpan data desa di repository.');
@@ -87,10 +95,17 @@ class DesaService implements DesaServiceInterface
         }
     }
 
+    /**
+     * @inheritDoc
+     * @param string|int $id
+     * @param array $data
+     * @return bool
+     * @throws DataAccessException
+     */
     public function update(string|int $id, array $data): bool
     {
         try {
-            $result = $this->crudRepository->update($id, $data);
+            $result = $this->repository->update($id, $data);
 
             if(!$result) {
                 throw new DataAccessException("Gagal memperbarui data desa dengan id {$id} di repository.");
@@ -106,10 +121,16 @@ class DesaService implements DesaServiceInterface
         }
     }
 
+    /**
+     * @inheritDoc
+     * @param string|int $id
+     * @return bool
+     * @throws DataAccessException
+     */
     public function delete(string|int $id): bool
     {
         try {
-            $result = $this->crudRepository->delete($id);
+            $result = $this->repository->delete($id);
 
             if (!$result) {
                 throw new DataAccessException("Gagal menghapus data desa dengan id {$id} di repository.");
@@ -125,6 +146,12 @@ class DesaService implements DesaServiceInterface
         }
     }
 
+    /**
+     * @inheritDoc
+     * @param string|int $id
+     * @return Collection
+     * @throws DataAccessException
+     */
     public function getByKecamatanId(string|int $id): Collection
     {
         try {
@@ -136,6 +163,13 @@ class DesaService implements DesaServiceInterface
         }
     }
 
+    /**
+     * @inheritDoc
+     * @param mixed $file
+     * @return array
+     * @throws DataAccessException
+     * @throws ImportFailedException
+     */
     public function import(mixed $file): array
     {
         try {
@@ -153,6 +187,11 @@ class DesaService implements DesaServiceInterface
         }
     }
 
+    /**
+     * @inheritDoc
+     * @return FromCollection
+     * @throws DataAccessException
+     */
     public function export(): FromCollection
     {
         try {

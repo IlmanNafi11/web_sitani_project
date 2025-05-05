@@ -7,9 +7,27 @@ use Illuminate\Support\Collection;
 
 interface LaporanBibitApiServiceInterface
 {
+    /**
+     * Menyimpan data laporan bibit
+     *
+     * @param array $data data laporan bibit
+     * @return Model Model laporan bibit
+     */
     public function create(array $data): Model;
 
+    /**
+     * Mengambil data laporan bibit berdasarkan penyuluh id
+     *
+     * @param string|int $penyuluhId penyuluh id
+     * @return Collection Koleksi laporan bibit
+     */
     public function getByPenyuluhId(string|int $penyuluhId): Collection;
 
-    public function getLaporanStatusCounts(string|int $penyuluhId): array;
+    /**
+     * Mengambil data laporan statistik penggunaan bibit berdasarkan laporan yang tersimpan di Sitani
+     *
+     * @param string|int|null $penyuluhId penyuluh id
+     * @return array statistik laporan berdasarkan statusnya(berkualitas, tidak berkualitas, pending)
+     */
+    public function getLaporanStatusCounts(string|int|null $penyuluhId): array;
 }

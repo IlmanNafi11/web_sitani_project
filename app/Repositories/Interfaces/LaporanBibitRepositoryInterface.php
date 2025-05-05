@@ -2,9 +2,10 @@
 
 namespace App\Repositories\Interfaces;
 
-use Illuminate\Database\Eloquent\Collection;
+use App\Repositories\Interfaces\Base\BaseRepositoryInterface;
+use Illuminate\Support\Collection;
 
-interface LaporanRepositoryInterface
+interface LaporanBibitRepositoryInterface extends BaseRepositoryInterface
 {
     /**
      * Mengambil data laporan berdasarkan penyuluh Id

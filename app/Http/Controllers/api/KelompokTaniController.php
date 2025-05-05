@@ -87,7 +87,7 @@ class KelompokTaniController extends Controller
     public function calculateTotal(): JsonResponse
     {
         try {
-            $total = $this->service->calculateTotal();
+            $total = $this->service->getTotal();
 
             return $this->successResponse($total, 'Total Kelompok Tani berhasil diambil');
         } catch (DataAccessException $e) {

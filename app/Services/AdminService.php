@@ -5,7 +5,7 @@ namespace App\Services;
 use App\Exceptions\DataAccessException;
 use App\Exceptions\ImportFailedException;
 use App\Exceptions\ResourceNotFoundException;
-use App\Repositories\Interfaces\CrudInterface;
+use App\Repositories\Interfaces\Base\BaseRepositoryInterface;
 use App\Services\Interfaces\AdminServiceInterface;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Collection;
@@ -14,38 +14,38 @@ use App\Imports\AdminImport;
 use App\Exports\AdminExport;
 use Illuminate\Database\Eloquent\Model;
 use Maatwebsite\Excel\Facades\Excel;
+use Maatwebsite\Excel\Validators\ValidationException;
 use Throwable;
 
 class AdminService implements AdminServiceInterface
 {
-    protected CrudInterface $repository;
+    protected BaseRepositoryInterface $repository;
 
-    public function __construct(CrudInterface $repository)
+    public function __construct(BaseRepositoryInterface $repository)
     {
         $this->repository = $repository;
     }
 
     /**
-     * Mengambil seluruh data admin
-     *
+     * @inheritDoc
+     * @param bool $withRelations
      * @return Collection
      * @throws DataAccessException
      */
-    public function getAll(): Collection
+    public function getAll(bool $withRelations = false): Collection
     {
         try {
             return $this->repository->getAll(true);
         } catch (QueryException $e) {
-            throw new DataAccessException('Database error while fetching admin data.', 0, $e);
+            throw new DataAccessException('Database error saat fetch data admin.', 0, $e);
         } catch (Throwable $e) {
-            throw new DataAccessException('Unexpected error while fetching admin data.', 0, $e);
+            throw new DataAccessException('Terjadi kesalahan tidak terduga saat fetch data admin.', 0, $e);
         }
     }
 
     /**
-     * Mengambil data admin berdasarkan id
-     *
-     * @param string|int $id Id admin
+     * @inheritDoc
+     * @param string|int $id
      * @return Model
      * @throws DataAccessException
      * @throws ResourceNotFoundException
@@ -56,31 +56,22 @@ class AdminService implements AdminServiceInterface
             $admin = $this->repository->getById($id);
 
             if ($admin === null) {
-                throw new ResourceNotFoundException("Admin with ID {$id} not found.");
+                throw new ResourceNotFoundException("Admin dengan id {$id} tidak ditemukan.");
             }
-
-            if ($admin instanceof Collection) {
-                $admin = $admin->first();
-                if ($admin === null) {
-                    throw new ResourceNotFoundException("Admin with ID {$id} not found or incorrect type returned.");
-                }
-            }
-
             return $admin;
         } catch (ResourceNotFoundException $e) {
             throw $e;
         } catch (QueryException $e) {
-            throw new DataAccessException("Database error while fetching admin with ID {$id}.", 0, $e);
+            throw new DataAccessException("Database error saat fetch data admin dengan id {$id}.", 0, $e);
         } catch (Throwable $e) {
-            throw new DataAccessException("Unexpected error while fetching admin with ID {$id}.", 0, $e);
+            throw new DataAccessException("Terjadi kesalahan tidak terduga saat fetch data admin dengan id {$id}.", 0, $e);
         }
     }
 
 
     /**
-     * Membuat data admin baru
-     *
-     * @param array $data Data baru
+     * @inheritDoc
+     * @param array $data
      * @return Model
      * @throws DataAccessException
      */
@@ -100,24 +91,23 @@ class AdminService implements AdminServiceInterface
             $admin = $this->repository->create($dt);
 
             if ($admin === null) {
-                throw new DataAccessException('Failed to create admin data in repository.');
+                throw new DataAccessException('Gagal menyimpan data admin di repository.');
             }
 
             return $admin;
         } catch (QueryException $e) {
-            throw new DataAccessException('Database error while creating admin data.', 0, $e);
+            throw new DataAccessException('Database error saat menyimpan data admin.', 0, $e);
         } catch (DataAccessException $e) {
             throw $e;
         } catch (Throwable $e) {
-            throw new DataAccessException('Unexpected error while creating admin data.', 0, $e);
+            throw new DataAccessException('Terjadi kesalahan tidak terduga saat menyimpan data admin.', 0, $e);
         }
     }
 
     /**
-     * Memperbarui data admin berdasarkan id
-     *
-     * @param string|int $id Id admin
-     * @param array $data Data baru
+     * @inheritDoc
+     * @param string|int $id
+     * @param array $data
      * @return bool
      * @throws DataAccessException
      */
@@ -127,23 +117,22 @@ class AdminService implements AdminServiceInterface
             $updated = $this->repository->update($id, $data);
 
             if (!$updated) {
-                throw new DataAccessException("Failed to update admin with ID {$id}.");
+                throw new DataAccessException("Gagal memperbarui data admin dengan id {$id}.");
             }
 
             return true;
         } catch (QueryException $e) {
-            throw new DataAccessException("Database error while updating admin with ID {$id}.", 0, $e);
+            throw new DataAccessException("Database error saat memperbarui data admin dengan id {$id}.", 0, $e);
         } catch (DataAccessException $e) {
             throw $e;
         } catch (Throwable $e) {
-            throw new DataAccessException("Unexpected error while updating admin with ID {$id}.", 0, $e);
+            throw new DataAccessException("Terjadi kesalahan tidak terduga saat memperbarui data admin dengan id {$id}.", 0, $e);
         }
     }
 
     /**
-     * Menghapus data admin berdasarkan id
-     *
-     * @param string|int $id Id admin
+     * @inheritDoc
+     * @param string|int $id
      * @return bool
      * @throws DataAccessException
      */
@@ -153,41 +142,46 @@ class AdminService implements AdminServiceInterface
             $deleted = $this->repository->delete($id);
 
             if (!$deleted) {
-                throw new DataAccessException("Failed to delete admin with ID {$id}.");
+                throw new DataAccessException("Gagal menghapus data admin dengan id {$id}.");
             }
 
             return true;
         } catch (QueryException $e) {
-            throw new DataAccessException("Database error while deleting admin with ID {$id}.", 0, $e);
+            throw new DataAccessException("Database error saat menghapus data admin dengan id {$id}.", 0, $e);
         } catch (DataAccessException $e) {
             throw $e;
         } catch (Throwable $e) {
-            throw new DataAccessException("Unexpected error while deleting admin with ID {$id}.", 0, $e);
+            throw new DataAccessException("Terjadi kesalahan tidak terduga saat menghapus data admin dengan id {$id}.", 0, $e);
         }
     }
 
     /**
+     * @inheritDoc
+     * @param mixed $file
+     * @return array
      * @throws DataAccessException
      * @throws ImportFailedException
      */
     public function import(mixed $file): array
     {
         try {
-            $import = new AdminImport(); // Use AdminImport
+            $import = new AdminImport();
             Excel::import($import, $file);
 
             return $import->getFailures();
-        } catch (\Maatwebsite\Excel\Validators\ValidationException $e) {
+        } catch (ValidationException $e) {
             $failures = $e->failures();
-            throw new ImportFailedException("Data import validation failed.", 0, $e, collect($failures));
+            throw new ImportFailedException("Data gagal validasi saat import data admin.", 0, $e, collect($failures));
         } catch (QueryException $e) {
-            throw new DataAccessException("Database error during admin import.", 0, $e);
+            throw new DataAccessException("Database error saat import data admin.", 0, $e);
         } catch (Throwable $e) {
-            throw new ImportFailedException("Unexpected error during admin import.", 0, $e);
+            throw new ImportFailedException("Terjadi kesalahan tidak terduga saat import data admin.", 0, $e);
         }
     }
 
     /**
+     * @inheritDoc
+     * @return FromCollection
      * @throws DataAccessException
      */
     public function export(): FromCollection
@@ -195,7 +189,7 @@ class AdminService implements AdminServiceInterface
         try {
             return new AdminExport();
         } catch (Throwable $e) {
-            throw new DataAccessException("Failed to prepare admin data for export.", 0, $e);
+            throw new DataAccessException("Gagal export data admin.", 0, $e);
         }
     }
 }

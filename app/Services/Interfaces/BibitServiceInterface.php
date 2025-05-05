@@ -2,26 +2,30 @@
 
 namespace App\Services\Interfaces;
 
-use App\Exceptions\DataAccessException;
-use App\Exceptions\ResourceNotFoundException;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Collection;
+use App\Services\Interfaces\Base\BaseServiceInterface;
+use Maatwebsite\Excel\Concerns\FromCollection;
 
-interface BibitServiceInterface
+interface BibitServiceInterface extends BaseServiceInterface
 {
-    public function getAll(bool $withRelations = false): Collection;
+    /**
+     * Mengambil total data bibit berkualitas yang terdaftar di Sitani
+     *
+     * @return int total
+     */
+    public function getTotal(): int;
 
-    public function getById(string|int $id): Model;
-
-    public function create(array $data): Model;
-
-    public function update(string|int $id, array $data): bool;
-
-    public function delete(string|int $id): bool;
-
-    public function calculateTotal(): int;
-
+    /**
+     * Import data menggunakan excel
+     *
+     * @param mixed $file file excel
+     * @return array
+     */
     public function import(mixed $file): array;
 
-    public function export();
+    /**
+     * Export data dalam bentuk excel
+     *
+     * @return FromCollection
+     */
+    public function export(): FromCollection;
 }

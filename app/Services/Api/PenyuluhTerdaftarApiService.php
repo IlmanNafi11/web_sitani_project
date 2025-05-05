@@ -19,6 +19,13 @@ class PenyuluhTerdaftarApiService implements PenyuluhTerdaftarApiServiceInterfac
         $this->repository = $repository;
     }
 
+    /**
+     * @inheritDoc
+     * @param string $phone
+     * @return Model
+     * @throws DataAccessException
+     * @throws ResourceNotFoundException
+     */
     public function getByPhone(string $phone): Model
     {
         try {

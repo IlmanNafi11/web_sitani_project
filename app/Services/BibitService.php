@@ -5,14 +5,16 @@ use App\Events\NotifGenerated;
 use App\Exceptions\DataAccessException;
 use App\Exceptions\ResourceNotFoundException;
 use App\Exceptions\ImportFailedException;
+use App\Exports\BibitExport;
 use App\Models\User;
 use App\Repositories\Interfaces\BibitRepositoryInterface;
-use App\Repositories\Interfaces\CrudInterface;
 use App\Services\Interfaces\BibitServiceInterface;
 use App\Trait\LoggingError;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Collection;
+use Maatwebsite\Excel\Concerns\FromCollection;
+use Maatwebsite\Excel\Validators\ValidationException;
 use Throwable;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Imports\BibitImport;
@@ -21,19 +23,23 @@ class BibitService implements BibitServiceInterface
 {
     use LoggingError;
 
-    protected CrudInterface $crudRepository;
     protected BibitRepositoryInterface $repository;
 
-    public function __construct(CrudInterface $crudRepository, BibitRepositoryInterface $repository)
+    public function __construct(BibitRepositoryInterface $repository)
     {
-        $this->crudRepository = $crudRepository;
         $this->repository = $repository;
     }
 
+    /**
+     * @inheritDoc
+     * @param bool $withRelations
+     * @return Collection
+     * @throws DataAccessException
+     */
     public function getAll(bool $withRelations = false): Collection
     {
         try {
-            return $this->crudRepository->getAll($withRelations);
+            return $this->repository->getAll($withRelations);
         } catch (QueryException $e) {
             throw new DataAccessException('Database error saat fetch data.', 500, $e);
         } catch (Throwable $e) {
@@ -41,12 +47,19 @@ class BibitService implements BibitServiceInterface
         }
     }
 
+    /**
+     * @inheritDoc
+     * @param string|int $id
+     * @return Model
+     * @throws DataAccessException
+     * @throws ResourceNotFoundException
+     */
     public function getById(string|int $id): Model
     {
         try {
-            $bibit = $this->crudRepository->getById($id);
+            $bibit = $this->repository->getById($id);
 
-            if (empty($bibit)) {
+            if ($bibit === null) {
                 throw new ResourceNotFoundException("Bibit dengan {$id} tidak ditemukan.");
             }
 
@@ -60,10 +73,16 @@ class BibitService implements BibitServiceInterface
         }
     }
 
+    /**
+     * @inheritDoc
+     * @param array $data
+     * @return Model
+     * @throws DataAccessException
+     */
     public function create(array $data): Model
     {
         try {
-            $bibit = $this->crudRepository->create($data);
+            $bibit = $this->repository->create($data);
             if ($bibit === null) {
                 throw new DataAccessException('Gagal menyimpan data bibit di repository.');
             }
@@ -87,10 +106,17 @@ class BibitService implements BibitServiceInterface
         }
     }
 
+    /**
+     * @inheritDoc
+     * @param string|int $id
+     * @param array $data
+     * @return bool
+     * @throws DataAccessException
+     */
     public function update(string|int $id, array $data): bool
     {
         try {
-            $result = $this->crudRepository->update($id, $data);
+            $result = $this->repository->update($id, $data);
 
             if(!$result) {
                 throw new DataAccessException("Gagal memperbarui data bibit dengan id {$id} di repository.");
@@ -107,10 +133,16 @@ class BibitService implements BibitServiceInterface
         }
     }
 
+    /**
+     * @inheritDoc
+     * @param string|int $id
+     * @return bool
+     * @throws DataAccessException
+     */
     public function delete(string|int $id): bool
     {
         try {
-            $result = $this->crudRepository->delete($id);
+            $result = $this->repository->delete($id);
 
             if (!$result) {
                 throw new DataAccessException("Gagal menghapus data bibit dengan id {$id} di repository.");
@@ -125,7 +157,12 @@ class BibitService implements BibitServiceInterface
         }
     }
 
-    public function calculateTotal(): int
+    /**
+     * @inheritDoc
+     * @return int
+     * @throws DataAccessException
+     */
+    public function getTotal(): int
     {
         try {
             return $this->repository->calculateTotal();
@@ -136,6 +173,13 @@ class BibitService implements BibitServiceInterface
         }
     }
 
+    /**
+     * @inheritDoc
+     * @param mixed $file
+     * @return array
+     * @throws DataAccessException
+     * @throws ImportFailedException
+     */
     public function import(mixed $file): array
     {
         try {
@@ -144,21 +188,26 @@ class BibitService implements BibitServiceInterface
 
             return $import->getFailures();
 
-        } catch (\Maatwebsite\Excel\Validators\ValidationException $e) {
+        } catch (ValidationException $e) {
             $failures = $e->failures();
             throw new ImportFailedException("validasi import gagal.", 400, $e, $failures);
 
         } catch (QueryException $e) {
             throw new DataAccessException("Database error saat import data bibit", 500, $e);
         } catch (Throwable $e) {
-            throw new ImportFailedException("Unexpected error during bibit import.", 500, $e);
+            throw new ImportFailedException("Terjadi kesalahan tidak terduga saat import data.", 500, $e);
         }
     }
 
-    public function export()
+    /**
+     * @inheritDoc
+     * @return FromCollection
+     * @throws DataAccessException
+     */
+    public function export(): FromCollection
     {
         try {
-            return new \App\Exports\BibitExport();
+            return new BibitExport();
         } catch (Throwable $e) {
             throw new DataAccessException("Gagal saat akan export data.", 500, $e);
         }

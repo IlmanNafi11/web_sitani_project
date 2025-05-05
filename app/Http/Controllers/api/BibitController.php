@@ -44,7 +44,7 @@ class BibitController extends Controller
     public function calculateTotal(): JsonResponse
     {
         try {
-            $total = $this->service->calculateTotal();
+            $total = $this->service->getTotal();
             return $this->successResponse(['total' => $total], 'Total bibit berkualitas berhasil diambil');
         } catch (DataAccessException $e) {
             return $this->errorResponse('Gagal menghitung total bibit.', 500);

@@ -2,23 +2,30 @@
 
 namespace App\Services\Interfaces;
 
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Collection;
+use App\Services\Interfaces\Base\BaseServiceInterface;
 use Maatwebsite\Excel\Concerns\FromCollection;
 
-interface KelompokTaniServiceInterface
+interface KelompokTaniServiceInterface extends BaseServiceInterface
 {
-    public function getAll(bool $withRelations = false): Collection;
-
-    public function getById(string|int $id): Model;
-
-    public function create(array $data): Model;
-
-    public function update(string|int $id, array $data): bool;
-
-    public function delete(string|int $id): bool;
-
+    /**
+     * Import data menggunakan file excel
+     *
+     * @param mixed $file file excel
+     * @return array
+     */
     public function import(mixed $file): array;
 
+    /**
+     * Export data dalam bentuk excel
+     *
+     * @return FromCollection
+     */
     public function export(): FromCollection;
+
+    /**
+     * Mengambil total kelompok tani yang terdaftar di Sitani
+     *
+     * @return int total
+     */
+    public function getTotal(): int;
 }

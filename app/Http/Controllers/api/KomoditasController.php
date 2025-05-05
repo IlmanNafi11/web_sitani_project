@@ -62,7 +62,7 @@ class KomoditasController extends Controller
     public function calculateTotal(): JsonResponse
     {
         try {
-            $total = $this->service->calculateTotal();
+            $total = $this->service->getTotal();
             return $this->successResponse(['total' => $total], 'Total komoditas berhasil diambil');
         } catch (DataAccessException $e) {
             return $this->errorResponse('Gagal menghitung total komoditas.', 500);

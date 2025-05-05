@@ -4,7 +4,6 @@ namespace App\Services;
 
 use App\Exceptions\DataAccessException;
 use App\Exceptions\ResourceNotFoundException;
-use App\Repositories\Interfaces\CrudInterface;
 use App\Repositories\Interfaces\RoleRepositoryInterface;
 use App\Services\Interfaces\RoleServiceInterface;
 use App\Trait\LoggingError;
@@ -19,13 +18,11 @@ class RoleService implements RoleServiceInterface
 {
     use LoggingError;
 
-    protected CrudInterface $repository;
-    protected RoleRepositoryInterface $roleRepository;
+    protected RoleRepositoryInterface $repository;
 
-    public function __construct(CrudInterface $repository, RoleRepositoryInterface $roleRepository)
+    public function __construct(RoleRepositoryInterface $repository)
     {
         $this->repository = $repository;
-        $this->roleRepository = $roleRepository;
     }
 
     /**
@@ -36,9 +33,9 @@ class RoleService implements RoleServiceInterface
         try {
             return $this->repository->getAll($withRelations);
         } catch (QueryException $e) {
-            throw new DataAccessException('Database error while fetching roles.', 0, $e);
+            throw new DataAccessException('Database error saat fetch data role.', 0, $e);
         } catch (Throwable $e) {
-            throw new DataAccessException('Unexpected error while fetching roles.', 0, $e);
+            throw new DataAccessException('Terjadi kesalahan tidak terduga saat fetch data role.', 0, $e);
         }
     }
 
@@ -52,24 +49,16 @@ class RoleService implements RoleServiceInterface
             $role = $this->repository->getById($id);
 
             if ($role === null) {
-                throw new ResourceNotFoundException("Role with ID {$id} not found.");
+                throw new ResourceNotFoundException("Role dengan id {$id} tidak ditemukan.");
             }
-
-            if ($role instanceof Collection) {
-                $role = $role->first();
-                if ($role === null) {
-                    throw new ResourceNotFoundException("Role with ID {$id} not found or incorrect type returned.");
-                }
-            }
-
 
             return $role;
         } catch (ResourceNotFoundException $e) {
             throw $e;
         } catch (QueryException $e) {
-            throw new DataAccessException("Database error while fetching role with ID {$id}.", 0, $e);
+            throw new DataAccessException("Database error saat fetch data role dengan id {$id}.", 0, $e);
         } catch (Throwable $e) {
-            throw new DataAccessException("Unexpected error while fetching role with ID {$id}.", 0, $e);
+            throw new DataAccessException("Terjadi kesalahan tidak terduga saat fetch data role dengan id {$id}.", 0, $e);
         }
     }
 
@@ -84,12 +73,12 @@ class RoleService implements RoleServiceInterface
                 $role = $this->repository->create($roleData);
 
                 if ($role === null) {
-                    throw new DataAccessException('Failed to create role data in repository.');
+                    throw new DataAccessException('Gagal menyimpan data role.');
                 }
 
                 $permissionNames = Permission::whereIn('id', $permissionIds)->pluck('name')->toArray();
 
-                $this->roleRepository->syncPermissions($role->id, $permissionNames);
+                $this->repository->syncPermissions($role->id, $permissionNames);
 
                 $role->load('permissions');
 
@@ -97,11 +86,11 @@ class RoleService implements RoleServiceInterface
                 return $role;
             });
         } catch (QueryException $e) {
-            throw new DataAccessException('Database error during role creation transaction.', 0, $e);
+            throw new DataAccessException('Database error saat menyimpan data role.', 0, $e);
         } catch (DataAccessException|ResourceNotFoundException $e) {
             throw $e;
         } catch (Throwable $e) {
-            throw new DataAccessException('Unexpected error during role creation transaction.', 0, $e);
+            throw new DataAccessException('Terjadi kesalahan tidak terduga saat menyimpan data role.', 0, $e);
         }
     }
 
@@ -116,29 +105,29 @@ class RoleService implements RoleServiceInterface
                 $updated = $this->repository->update($id, $roleData);
 
                 if (!$updated) {
-                    throw new DataAccessException("Failed to update role data in repository for ID {$id}.");
+                    throw new DataAccessException("Gagal memperbarui data role dengan id {$id}.");
                 }
 
                 $role = $this->repository->getById($id);
 
                 if ($role === null) {
-                    throw new ResourceNotFoundException("Role with ID {$id} not found after update.");
+                    throw new ResourceNotFoundException("Role dengan id {$id} tidak ditemukan untuk diperbarui.");
                 }
 
                 $permissionNames = Permission::whereIn('id', $permissionIds)->pluck('name')->toArray();
 
-                $this->roleRepository->syncPermissions($role->id, $permissionNames);
+                $this->repository->syncPermissions($role->id, $permissionNames);
 
                 $role->load('permissions');
 
                 return $role;
             });
         } catch (QueryException $e) {
-            throw new DataAccessException('Database error during role update transaction.', 0, $e);
+            throw new DataAccessException('Database error saat memperbarui data role.', 0, $e);
         } catch (DataAccessException|ResourceNotFoundException $e) {
             throw $e;
         } catch (Throwable $e) {
-            throw new DataAccessException('Unexpected error during role update transaction.', 0, $e);
+            throw new DataAccessException('Terjadi kesalahan saat memperbarui data role.', 0, $e);
         }
     }
 
@@ -152,16 +141,15 @@ class RoleService implements RoleServiceInterface
             $deleted = $this->repository->delete($id);
 
             if (!$deleted) {
-                throw new ResourceNotFoundException("Role with ID {$id} not found for deletion.");
+                throw new ResourceNotFoundException("Role dengan id {$id} tidak ditemukan untuk dihapus.");
             }
-
             return true;
         } catch (ResourceNotFoundException $e) {
             throw $e;
         } catch (QueryException $e) {
-            throw new DataAccessException('Database error while deleting role.', 0, $e);
+            throw new DataAccessException('Database error saat menghapus data role.', 0, $e);
         } catch (Throwable $e) {
-            throw new DataAccessException('Unexpected error while deleting role.', 0, $e);
+            throw new DataAccessException('Terjadi kesalahan tidak terduga saat menghapus data role.', 0, $e);
         }
     }
 }

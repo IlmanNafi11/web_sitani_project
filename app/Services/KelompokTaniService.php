@@ -5,20 +5,17 @@ namespace App\Services;
 use App\Exceptions\DataAccessException;
 use App\Exceptions\ImportFailedException;
 use App\Exceptions\ResourceNotFoundException;
-use App\Repositories\Interfaces\CrudInterface;
+use App\Repositories\Interfaces\KelompokTaniRepositoryInterface;
 use App\Repositories\Interfaces\ManyRelationshipManagement;
 use App\Services\Interfaces\KelompokTaniServiceInterface;
 use App\Trait\LoggingError;
-use Exception;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Facades\Excel;
-use Maatwebsite\Excel\Validators\ValidationException;
 use App\Imports\KelompokTaniImport;
 use App\Exports\KelompokTaniExport;
 use Throwable;
@@ -27,70 +24,71 @@ class KelompokTaniService implements KelompokTaniServiceInterface
 {
     use LoggingError;
 
-    protected CrudInterface $crudRepository;
+    protected KelompokTaniRepositoryInterface $repository;
     protected ManyRelationshipManagement $relationManager;
 
-    public function __construct(CrudInterface $crudRepository, ManyRelationshipManagement $relationManager)
+    public function __construct(KelompokTaniRepositoryInterface $repository, ManyRelationshipManagement $relationManager)
     {
-        $this->crudRepository = $crudRepository;
+        $this->repository = $repository;
         $this->relationManager = $relationManager;
     }
 
     /**
+     * @inheritDoc
+     * @param bool $withRelations
+     * @return Collection
      * @throws DataAccessException
      */
     public function getAll(bool $withRelations = false): Collection
     {
         try {
-            return $this->crudRepository->getAll($withRelations);
+            return $this->repository->getAll($withRelations);
         } catch (QueryException $e) {
-            throw new DataAccessException('Database error while fetching kelompok tani data.', 0, $e);
+            throw new DataAccessException('Database error saat fetch data kelompok tani.', 0, $e);
         } catch (Throwable $e) {
-            throw new DataAccessException('Unexpected error while fetching kelompok tani data.', 0, $e);
+            throw new DataAccessException('Terjadi kesalahan tidak terduga saat fetch data kelompok tani.', 0, $e);
         }
     }
 
     /**
-     * @throws ResourceNotFoundException
+     * @inheritDoc
+     * @param int|string $id
+     * @return Model
      * @throws DataAccessException
+     * @throws ResourceNotFoundException
      */
     public function getById(int|string $id): Model
     {
         try {
-            $kelompokTani = $this->crudRepository->getById($id);
+            $kelompokTani = $this->repository->getById($id);
 
             if ($kelompokTani === null) {
-                throw new ResourceNotFoundException("Kelompok Tani with ID {$id} not found.");
+                throw new ResourceNotFoundException("Kelompok tani dengan id {$id} tidak ditemukan.");
             }
-
-            if ($kelompokTani instanceof Collection) {
-                $kelompokTani = $kelompokTani->first();
-                if ($kelompokTani === null) {
-                    throw new ResourceNotFoundException("Kelompok Tani with ID {$id} not found or incorrect type returned.");
-                }
-            }
-
             return $kelompokTani;
         } catch (ResourceNotFoundException $e) {
             throw $e;
         } catch (QueryException $e) {
-            throw new DataAccessException("Database error while fetching Kelompok Tani with ID {$id}.", 0, $e);
+            throw new DataAccessException("Database error saat fetch kelompok tani dengan id {$id}.", 0, $e);
         } catch (Throwable $e) {
-            throw new DataAccessException("Unexpected error while fetching Kelompok Tani with ID {$id}.", 0, $e);
+            throw new DataAccessException("Terjadi kesalahan tidak terduga saat fetch kelompok tani dengan id {$id}.", 0, $e);
         }
     }
 
     /**
+     * @inheritDoc
+     * @param array $data
+     * @return Model
      * @throws DataAccessException
      */
     public function create(array $data): Model
     {
         try {
             return DB::transaction(function () use ($data) {
-                $kelompokTani = $this->crudRepository->create(Arr::except($data, ['penyuluh_terdaftar_id']));
+                $kelompokTani = $this->repository->create(Arr::except($data, ['penyuluh_terdaftar_id']));
 
                 if ($kelompokTani === null) {
-                    throw new DataAccessException('Failed to create Kelompok Tani data in repository.');
+                    throw new DataAccessException('Gagal menyimpan data kelompok tani.');
                 }
 
                 $penyuluhIds = $data['penyuluh_terdaftar_id'] ?? [];
@@ -104,27 +102,31 @@ class KelompokTaniService implements KelompokTaniServiceInterface
                 return $kelompokTani;
             });
         } catch (QueryException $e) {
-            throw new DataAccessException('Database error during Kelompok Tani creation transaction.', 0, $e);
+            throw new DataAccessException('Database error saat menyimpan data kelompok tani.', 0, $e);
         } catch (DataAccessException $e) {
             throw $e;
         } catch (Throwable $e) {
-            throw new DataAccessException('Unexpected error during Kelompok Tani creation transaction.', 0, $e);
+            throw new DataAccessException('Terjadi kesalahan tidak terduga saat menyimpan data kelompok tani.', 0, $e);
         }
     }
 
     /**
-     * @throws ResourceNotFoundException
+     * @inheritDoc
+     * @param int|string $id
+     * @param array $data
+     * @return bool
      * @throws DataAccessException
+     * @throws ResourceNotFoundException
      */
     public function update(int|string $id, array $data): bool
     {
         try {
             return DB::transaction(function () use ($id, $data) {
                 $kelompokTani = $this->getById($id);
-                $updated = $this->crudRepository->update($id, Arr::except($data, ['penyuluh_terdaftar_id']));
+                $updated = $this->repository->update($id, Arr::except($data, ['penyuluh_terdaftar_id']));
 
                 if (!$updated) {
-                    throw new DataAccessException("Failed to update Kelompok Tani data in repository for ID {$id}.");
+                    throw new DataAccessException("Gagal memperbarui kelompok tani dengan id {$id}.");
                 }
 
                 $penyuluhIds = $data['penyuluh_terdaftar_id'] ?? [];
@@ -137,13 +139,16 @@ class KelompokTaniService implements KelompokTaniServiceInterface
         } catch (ResourceNotFoundException|DataAccessException $e) {
             throw $e;
         } catch (QueryException $e) {
-            throw new DataAccessException('Database error during Kelompok Tani update transaction.', 0, $e);
+            throw new DataAccessException('Database error saat memperbarui data kelompok tani.', 0, $e);
         } catch (Throwable $e) {
-            throw new DataAccessException('Unexpected error during Kelompok Tani update transaction.', 0, $e);
+            throw new DataAccessException('Terjadi kesalahan tidak terduga saat memperbarui data kelompok tani.', 0, $e);
         }
     }
 
     /**
+     * @inheritDoc
+     * @param int|string $id
+     * @return bool
      * @throws DataAccessException
      * @throws ResourceNotFoundException
      */
@@ -154,10 +159,10 @@ class KelompokTaniService implements KelompokTaniServiceInterface
                 $kelompokTani = $this->getById($id);
 
                 $this->relationManager->detach($kelompokTani);
-                $deleted = $this->crudRepository->delete($id);
+                $deleted = $this->repository->delete($id);
 
                 if (!$deleted) {
-                    throw new DataAccessException("Failed to delete Kelompok Tani data in repository for ID {$id}.");
+                    throw new DataAccessException("Gagal menghapus data kelompok tani dengan id {$id}.");
                 }
 
                 return true;
@@ -165,13 +170,16 @@ class KelompokTaniService implements KelompokTaniServiceInterface
         } catch (ResourceNotFoundException|DataAccessException $e) {
             throw $e;
         } catch (QueryException $e) {
-            throw new DataAccessException('Database error during Kelompok Tani deletion transaction.', 0, $e);
+            throw new DataAccessException('Database error saat menghapus data kelompok tani.', 0, $e);
         } catch (Throwable $e) {
-            throw new DataAccessException('Unexpected error during Kelompok Tani deletion transaction.', 0, $e);
+            throw new DataAccessException('Terjadi kesalahan tidak terduga saat menghapus data kelompok tani', 0, $e);
         }
     }
 
     /**
+     * @inheritDoc
+     * @param mixed $file
+     * @return array
      * @throws DataAccessException
      * @throws ImportFailedException
      */
@@ -184,21 +192,23 @@ class KelompokTaniService implements KelompokTaniServiceInterface
             $failures = $import->getFailures();
 
             if ($failures->isNotEmpty()) {
-                throw new ImportFailedException("Import completed with failures.", 0, null, $failures);
+                throw new ImportFailedException("Import berhasil dengan beberapa kegagalan.", 0, null, $failures);
             }
             return [];
         } catch (ImportFailedException $e) {
             throw $e;
         } catch (QueryException $e) {
             $this->LogSqlException($e);
-            throw new DataAccessException("Database error during Kelompok Tani import.", 0, $e);
+            throw new DataAccessException("Database error saat import data.", 0, $e);
         } catch (Throwable $e) {
             $this->LogGeneralException($e);
-            throw new ImportFailedException("Unexpected error during Kelompok Tani import.", 0, $e);
+            throw new ImportFailedException("Terjadi kesalahan tidak terduga saat import data.", 0, $e);
         }
     }
 
     /**
+     * @inheritDoc
+     * @return FromCollection
      * @throws DataAccessException
      */
     public function export(): FromCollection
@@ -206,7 +216,25 @@ class KelompokTaniService implements KelompokTaniServiceInterface
         try {
             return new KelompokTaniExport();
         } catch (Throwable $e) {
-            throw new DataAccessException("Failed to prepare Kelompok Tani data for export.", 0, $e);
+            throw new DataAccessException("Gagal export data kelompok tani.", 0, $e);
+        }
+    }
+
+    /**
+     * @inheritDoc
+     * @return int
+     * @throws DataAccessException
+     */
+    public function getTotal(): int
+    {
+        try {
+        return $this->repository->calculateTotal();
+        } catch (QueryException $e) {
+            throw new DataAccessException('Database error saat menghitung total kelompok tani');
+        } catch (DataAccessException $e) {
+            throw new DataAccessException('Terjadi kesalahan saat menghitung total kelompok tani.');
+        } catch (Throwable $e) {
+            throw new DataAccessException('Terjadi kesalahan tak terduga saat menghitung total kelompok tani.');
         }
     }
 }

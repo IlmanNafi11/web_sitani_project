@@ -4,18 +4,23 @@ namespace App\Repositories;
 
 use App\Exceptions\DataAccessException;
 use App\Models\PenyuluhTerdaftar;
-use App\Repositories\Interfaces\CrudInterface;
 use App\Repositories\Interfaces\PenyuluhTerdaftarRepositoryInterface;
 use App\Trait\LoggingError;
-use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\QueryException;
 use Throwable;
 
-class PenyuluhTerdaftarRepository implements CrudInterface, PenyuluhTerdaftarRepositoryInterface
+class PenyuluhTerdaftarRepository implements PenyuluhTerdaftarRepositoryInterface
 {
     use LoggingError;
 
+    /**
+     * @inheritDoc
+     * @param bool $withRelations
+     * @return Collection|array
+     * @throws DataAccessException
+     */
     public function getAll(bool $withRelations = false): Collection|array
     {
         try {
@@ -36,7 +41,14 @@ class PenyuluhTerdaftarRepository implements CrudInterface, PenyuluhTerdaftarRep
         }
     }
 
-    public function getById(string|int $id): Model|Collection|array|null
+
+    /**
+     * @inheritDoc
+     * @param string|int $id
+     * @return Model|null
+     * @throws DataAccessException
+     */
+    public function getById(string|int $id): ?Model
     {
         try {
             return PenyuluhTerdaftar::where('id', $id)->select(['id', 'nama', 'no_hp', 'alamat', 'kecamatan_id'])->with(['kecamatan:id,nama'])->first();
@@ -49,6 +61,12 @@ class PenyuluhTerdaftarRepository implements CrudInterface, PenyuluhTerdaftarRep
         }
     }
 
+    /**
+     * @inheritDoc
+     * @param array $data
+     * @return Model|null
+     * @throws DataAccessException
+     */
     public function create(array $data): ?Model
     {
         try {
@@ -62,7 +80,14 @@ class PenyuluhTerdaftarRepository implements CrudInterface, PenyuluhTerdaftarRep
         }
     }
 
-    public function update(string|int $id, array $data): Model|bool|int
+    /**
+     * @inheritDoc
+     * @param string|int $id
+     * @param array $data
+     * @return bool|int
+     * @throws DataAccessException
+     */
+    public function update(string|int $id, array $data): bool|int
     {
         try {
             return PenyuluhTerdaftar::where('id', $id)->update($data);
@@ -75,7 +100,13 @@ class PenyuluhTerdaftarRepository implements CrudInterface, PenyuluhTerdaftarRep
         }
     }
 
-    public function delete(string|int $id): Model|bool|int
+    /**
+     * @inheritDoc
+     * @param string|int $id
+     * @return bool|int
+     * @throws DataAccessException
+     */
+    public function delete(string|int $id): bool|int
     {
         try {
             return PenyuluhTerdaftar::where('id', $id)->delete();
@@ -88,6 +119,12 @@ class PenyuluhTerdaftarRepository implements CrudInterface, PenyuluhTerdaftarRep
         }
     }
 
+    /**
+     * @inheritDoc
+     * @param int|string $id
+     * @return Collection
+     * @throws DataAccessException
+     */
     public function getByKecamatanId(int|string $id): Collection
     {
         try {
@@ -101,6 +138,12 @@ class PenyuluhTerdaftarRepository implements CrudInterface, PenyuluhTerdaftarRep
         }
     }
 
+    /**
+     * @inheritDoc
+     * @param string $phone
+     * @return Model|null
+     * @throws DataAccessException
+     */
     public function getByPhone(string $phone): ?Model
     {
         try {
@@ -114,6 +157,11 @@ class PenyuluhTerdaftarRepository implements CrudInterface, PenyuluhTerdaftarRep
         }
     }
 
+    /**
+     * @inheritDoc
+     * @return int
+     * @throws DataAccessException
+     */
     public function calculateTotal(): int
     {
         try {

@@ -4,7 +4,6 @@ namespace App\Services\Api;
 
 use App\Exceptions\DataAccessException;
 use App\Exceptions\ResourceNotFoundException;
-use App\Repositories\Interfaces\CrudInterface;
 use App\Repositories\Interfaces\KelompokTaniRepositoryInterface;
 use App\Services\Interfaces\KelompokTaniApiServiceInterface;
 use App\Trait\LoggingError;
@@ -17,80 +16,84 @@ class KelompokTaniApiService implements KelompokTaniApiServiceInterface
 {
     use LoggingError;
 
-    protected KelompokTaniRepositoryInterface $kelompokTaniRepository;
-    protected CrudInterface $crudRepository;
+    protected KelompokTaniRepositoryInterface $repository;
 
-    public function __construct(KelompokTaniRepositoryInterface $kelompokTaniRepository, CrudInterface $crudRepository)
+    public function __construct(KelompokTaniRepositoryInterface $repository)
     {
-        $this->kelompokTaniRepository = $kelompokTaniRepository;
-        $this->crudRepository = $crudRepository;
+        $this->repository = $repository;
     }
 
+    /**
+     * @inheritDoc
+     * @param array $penyuluhIds
+     * @return Collection
+     * @throws DataAccessException
+     */
     public function getAllByPenyuluhId(array $penyuluhIds): Collection
     {
         try {
-            return $this->kelompokTaniRepository->getByPenyuluhId($penyuluhIds);
+            return $this->repository->getByPenyuluhId($penyuluhIds);
         } catch (QueryException $e) {
-            throw new DataAccessException('Database error while fetching Kelompok Tani by Penyuluh ID.', 0, $e);
+            throw new DataAccessException('Database error saat fetch data kelompok tani berdasarkan penyuluh id.', 0, $e);
         } catch (Throwable $e) {
-            throw new DataAccessException('Unexpected error while fetching Kelompok Tani by Penyuluh ID.', 0, $e);
+            throw new DataAccessException('Terjadi kesalaha tidak terduga saat fetch data kelompok tani berdasarkan penyuluh id.', 0, $e);
         }
     }
 
     /**
+     * @inheritDoc
+     * @param int|string $id
+     * @return Model
      * @throws DataAccessException
      * @throws ResourceNotFoundException
      */
     public function getById(int|string $id): Model
     {
         try {
-            $kelompokTani = $this->crudRepository->getById($id);
+            $kelompokTani = $this->repository->getById($id);
             if ($kelompokTani === null) {
-                throw new ResourceNotFoundException("Kelompok Tani with ID {$id} not found.");
+                throw new ResourceNotFoundException("Kelompok Tani dengan id {$id} tidak ditemukan.");
             }
-
-            if ($kelompokTani instanceof Collection) {
-                $kelompokTani = $kelompokTani->first();
-                if ($kelompokTani === null) {
-                    throw new ResourceNotFoundException("Kelompok Tani with ID {$id} not found or incorrect type returned.");
-                }
-            }
-
             return $kelompokTani;
         } catch (ResourceNotFoundException $e) {
             throw $e;
         } catch (QueryException $e) {
-            throw new DataAccessException("Database error while fetching Kelompok Tani with ID {$id} for API.", 0, $e);
+            throw new DataAccessException("Database error saat fetch data kelompok tani dengan id {$id}.", 0, $e);
         } catch (Throwable $e) {
-            throw new DataAccessException("Unexpected error while fetching Kelompok Tani with ID {$id} for API.", 0, $e);
+            throw new DataAccessException("Terjadi kesalahan tidak terduga saat fetch data Kelompok Tani dengan id {$id}.", 0, $e);
         }
     }
 
     /**
+     * @inheritDoc
+     * @return int
      * @throws DataAccessException
      */
-    public function calculateTotal(): int
+    public function getTotal(): int
     {
         try {
-            return $this->kelompokTaniRepository->calculateTotal();
+            return $this->repository->calculateTotal();
         } catch (QueryException $e) {
-            throw new DataAccessException('Database error while calculating total Kelompok Tani.', 0, $e);
+            throw new DataAccessException('Database error saat menghitung total data kelompok tani.', 0, $e);
         } catch (Throwable $e) {
-            throw new DataAccessException('Unexpected error while calculating total Kelompok Tani.', 0, $e);
+            throw new DataAccessException('Terjadi kesalahan tidak terduga saat menghitung total data kelompok tani.', 0, $e);
         }
     }
 
     /**
+     * @inheritDoc
+     * @param int|string $id
+     * @return int
      * @throws DataAccessException
      */
     public function countByKecamatanId(int|string $id): int
     {
         try {
-            return $this->kelompokTaniRepository->countByKecamatanId($id);
+            return $this->repository->countByKecamatanId($id);
         } catch (QueryException $e) {
-            throw new DataAccessException("Database error while counting Kelompok Tani by Kecamatan ID {$id}.", 0, $e);
+            throw new DataAccessException("Database error saat menghitung total data kelompok tani berdasarkan kecamatan dengan id {$id}.", 0, $e);
         } catch (Throwable $e) {
-            throw new DataAccessException("Unexpected error while counting Kelompok Tani by Kecamatan ID {$id}.", 0, $e);
+            throw new DataAccessException("Terjadi kesalahan tidak terduga saat menghitung total data kelompok tani berdasarkan kecamatan dengan id {$id}.", 0, $e);
         }
     }
 }

@@ -4,22 +4,23 @@ namespace App\Repositories;
 
 use App\Exceptions\DataAccessException;
 use App\Exceptions\ResourceNotFoundException;
-use App\Repositories\Interfaces\CrudInterface;
 use App\Repositories\Interfaces\RoleRepositoryInterface;
 use App\Trait\LoggingError;
-use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Spatie\Permission\Models\Role;
-use Spatie\Permission\Models\Permission;
 use Throwable;
 use Illuminate\Database\QueryException;
 
-class RoleRepository implements CrudInterface, RoleRepositoryInterface
+class RoleRepository implements RoleRepositoryInterface
 {
     use LoggingError;
 
     /**
+     * @inheritDoc
+     * @param bool $withRelations
+     * @return Collection|array
      * @throws DataAccessException
      */
     public function getAll(bool $withRelations = false): Collection|array
@@ -40,9 +41,12 @@ class RoleRepository implements CrudInterface, RoleRepositoryInterface
     }
 
     /**
+     * @inheritDoc
+     * @param string|int $id
+     * @return Model|null
      * @throws DataAccessException
      */
-    public function getById(string|int $id): Model|Collection|array|null
+    public function getById(string|int $id): ?Model
     {
         try {
             return Role::with('permissions')->find($id);
@@ -55,11 +59,17 @@ class RoleRepository implements CrudInterface, RoleRepositoryInterface
         }
     }
 
-    public function create(array $data): ?Role
+    /**
+     * @inheritDoc
+     * @param array $data
+     * @return Model|null
+     * @throws DataAccessException
+     */
+    public function create(array $data): ?Model
     {
         try {
             $role = Role::create([
-                'name'       => $data['name'],
+                'name' => $data['name'],
                 'guard_name' => $data['guard_name'] ?? 'web',
             ]);
 
@@ -80,23 +90,27 @@ class RoleRepository implements CrudInterface, RoleRepositoryInterface
     }
 
     /**
+     * @inheritDoc
+     * @param string|int $id
+     * @param array $data
+     * @return bool|int
      * @throws DataAccessException
      * @throws ResourceNotFoundException
      */
-    public function update(string|int $id, array $data): bool
+    public function update(string|int $id, array $data): bool|int
     {
         try {
             $role = Role::findOrFail($id);
             $result = $role->update([
-                'name'       => $data['name'] ?? $role->name,
+                'name' => $data['name'] ?? $role->name,
                 'guard_name' => $data['guard_name'] ?? $role->guard_name,
             ]);
 
-            if(!$result) {
+            if (!$result) {
                 $this->LogGeneralException(new \Exception("Role update returned false."), ['id' => $id, 'data' => $data]);
             }
 
-            return (bool) $result;
+            return (bool)$result;
         } catch (ModelNotFoundException $e) {
             $this->LogNotFoundException($e, ['id' => $id]);
             throw new ResourceNotFoundException("Role with ID {$id} not found for update.", 0, $e);
@@ -110,16 +124,19 @@ class RoleRepository implements CrudInterface, RoleRepositoryInterface
     }
 
     /**
-     * @throws ResourceNotFoundException
+     * @inheritDoc
+     * @param string|int $id
+     * @return bool|int
      * @throws DataAccessException
+     * @throws ResourceNotFoundException
      */
-    public function delete(string|int $id): bool
+    public function delete(string|int $id): bool|int
     {
         try {
             $role = Role::findOrFail($id);
-            $result = (bool) $role->delete();
+            $result = (bool)$role->delete();
 
-            if(!$result) {
+            if (!$result) {
                 $this->LogGeneralException(new \Exception("Role delete returned false."), ['id' => $id]);
             }
 
@@ -137,7 +154,12 @@ class RoleRepository implements CrudInterface, RoleRepositoryInterface
     }
 
     /**
-     * @throws Throwable
+     * @inheritDoc
+     * @param int $roleId
+     * @param array $permissionNames
+     * @return void
+     * @throws DataAccessException
+     * @throws ResourceNotFoundException
      */
     public function syncPermissions(int $roleId, array $permissionNames): void
     {
@@ -163,8 +185,12 @@ class RoleRepository implements CrudInterface, RoleRepositoryInterface
     }
 
     /**
-     * @throws ResourceNotFoundException
+     * @inheritDoc
+     * @param int $roleId
+     * @param array $permissionNames
+     * @return void
      * @throws DataAccessException
+     * @throws ResourceNotFoundException
      */
     public function assignPermissions(int $roleId, array $permissionNames): void
     {
@@ -187,6 +213,10 @@ class RoleRepository implements CrudInterface, RoleRepositoryInterface
     }
 
     /**
+     * @inheritDoc
+     * @param int $roleId
+     * @param array $permissionNames
+     * @return void
      * @throws DataAccessException
      * @throws ResourceNotFoundException
      */

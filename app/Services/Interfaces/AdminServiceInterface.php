@@ -2,23 +2,23 @@
 
 namespace App\Services\Interfaces;
 
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Collection;
+use App\Services\Interfaces\Base\BaseServiceInterface;
 use Maatwebsite\Excel\Concerns\FromCollection;
 
-interface AdminServiceInterface
+interface AdminServiceInterface extends BaseServiceInterface
 {
-    public function getAll(): Collection;
-
-    public function getById(string|int $id): Model;
-
-    public function create(array $data): Model;
-
-    public function update(string|int $id, array $data): bool;
-
-    public function delete(string|int $id): bool;
-
+    /**
+     * Import data menggunakan excel
+     *
+     * @param mixed $file File Excel
+     * @return array
+     */
     public function import(mixed $file): array;
 
+    /**
+     * Export data dalam bentuk excel
+     *
+     * @return FromCollection
+     */
     public function export(): FromCollection;
 }

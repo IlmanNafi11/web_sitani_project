@@ -2,16 +2,22 @@
 
 namespace App\Services\Interfaces;
 
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Collection;
+use App\Services\Interfaces\Base\BaseServiceInterface;
 
-interface LaporanBibitServiceInterface
+interface LaporanBibitServiceInterface extends BaseServiceInterface
 {
-    public function getAll(bool $withRelations = false): Collection;
+    /**
+     * Mengambil total kelompok tani yang terdaftar di Sitani
+     *
+     * @return int total
+     */
+    public function getTotal(): int;
 
-    public function getById(string|int $id): Model;
-
-    public function update(string|int $id, array $data): bool;
-
-    public function delete(string|int $id): bool;
+    /**
+     * Mengambil total status laporan tiap kategori(berkualitas, tidak berkualitas, dan pending/menunggu konfirmasi)
+     *
+     * @param string|int|null $penyuluhId penyuluh id
+     * @return array data total laporan
+     */
+    public function getLaporanStatusCounts(string|int|null $penyuluhId): array;
 }

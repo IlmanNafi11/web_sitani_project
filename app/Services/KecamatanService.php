@@ -5,7 +5,7 @@ namespace App\Services;
 use App\Exceptions\DataAccessException;
 use App\Exceptions\ImportFailedException;
 use App\Exceptions\ResourceNotFoundException;
-use App\Repositories\Interfaces\CrudInterface;
+use App\Repositories\Interfaces\Base\BaseRepositoryInterface;
 use App\Services\Interfaces\KecamatanServiceInterface;
 use App\Trait\LoggingError;
 use Illuminate\Database\Eloquent\Model;
@@ -21,17 +21,23 @@ class KecamatanService implements KecamatanServiceInterface
 {
     use LoggingError;
 
-    protected CrudInterface $crudRepository;
+    protected BaseRepositoryInterface $repository;
 
-    public function __construct(CrudInterface $crudRepository)
+    public function __construct(BaseRepositoryInterface $repository)
     {
-        $this->crudRepository = $crudRepository;
+        $this->repository = $repository;
     }
 
+    /**
+     * @inheritDoc
+     * @param bool $withRelations
+     * @return Collection
+     * @throws DataAccessException
+     */
     public function getAll(bool $withRelations = false): Collection
     {
         try {
-            return $this->crudRepository->getAll($withRelations);
+            return $this->repository->getAll($withRelations);
         } catch (QueryException $e) {
             throw new DataAccessException('Database error saat fetch data kecamatan.', 0, $e);
         } catch (Throwable $e) {
@@ -39,22 +45,21 @@ class KecamatanService implements KecamatanServiceInterface
         }
     }
 
+    /**
+     * @inheritDoc
+     * @param string|int $id
+     * @return Model
+     * @throws DataAccessException
+     * @throws ResourceNotFoundException
+     */
     public function getById(string|int $id): Model
     {
         try {
-            $kecamatan = $this->crudRepository->getById($id);
+            $kecamatan = $this->repository->getById($id);
 
-            if (empty($kecamatan)) {
+            if ($kecamatan === null) {
                 throw new ResourceNotFoundException("Kecamatan dengan id {$id} tidak ditemukan.");
             }
-
-//            if ($kecamatan instanceof Collection) {
-//                $kecamatan = $kecamatan->first();
-//                if (empty($kecamatan)) {
-//                    throw new ResourceNotFoundException("Kecamatan with ID {$id} not found or incorrect type returned.");
-//                }
-//            }
-
             return $kecamatan;
         } catch (ResourceNotFoundException $e) {
             throw $e;
@@ -65,10 +70,16 @@ class KecamatanService implements KecamatanServiceInterface
         }
     }
 
+    /**
+     * @inheritDoc
+     * @param array $data
+     * @return Model
+     * @throws DataAccessException
+     */
     public function create(array $data): Model
     {
         try {
-            $kecamatan = $this->crudRepository->create($data);
+            $kecamatan = $this->repository->create($data);
 
             if ($kecamatan === null) {
                 throw new DataAccessException('Gagal menyimpan data kecamatan di repository.');
@@ -84,10 +95,17 @@ class KecamatanService implements KecamatanServiceInterface
         }
     }
 
+    /**
+     * @inheritDoc
+     * @param string|int $id
+     * @param array $data
+     * @return bool
+     * @throws DataAccessException
+     */
     public function update(string|int $id, array $data): bool
     {
         try {
-            $result = $this->crudRepository->update($id, $data);
+            $result = $this->repository->update($id, $data);
 
             if(!$result) {
                 throw new DataAccessException("Gagal memperbarui data kecamatan dengan di {$id} di repository.");
@@ -103,10 +121,16 @@ class KecamatanService implements KecamatanServiceInterface
         }
     }
 
+    /**
+     * @inheritDoc
+     * @param string|int $id
+     * @return bool
+     * @throws DataAccessException
+     */
     public function delete(string|int $id): bool
     {
         try {
-            $result = $this->crudRepository->delete($id);
+            $result = $this->repository->delete($id);
 
             if (!$result) {
                 throw new DataAccessException("Gagal menghapus data kecamatan dengan id {$id} di repository.");
@@ -122,6 +146,13 @@ class KecamatanService implements KecamatanServiceInterface
         }
     }
 
+    /**
+     * @inheritDoc
+     * @param mixed $file
+     * @return array
+     * @throws DataAccessException
+     * @throws ImportFailedException
+     */
     public function import(mixed $file): array
     {
         try {
@@ -139,6 +170,11 @@ class KecamatanService implements KecamatanServiceInterface
         }
     }
 
+    /**
+     * @inheritDoc
+     * @return FromCollection
+     * @throws DataAccessException
+     */
     public function export(): FromCollection
     {
         try {

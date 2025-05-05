@@ -4,18 +4,23 @@ namespace App\Repositories;
 
 use App\Exceptions\DataAccessException;
 use App\Models\Desa;
-use App\Repositories\Interfaces\CrudInterface;
-use App\Repositories\Interfaces\DesaRepositoryInterface;
+use App\Repositories\Interfaces\Base\BaseRepositoryInterface;
 use App\Trait\LoggingError;
-use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\QueryException;
 use Throwable;
 
-class DesaRepository implements CrudInterface, DesaRepositoryInterface
+class DesaRepository implements BaseRepositoryInterface
 {
     use LoggingError;
 
+    /**
+     * @inheritDoc
+     * @param bool $withRelations
+     * @return Collection|array
+     * @throws DataAccessException
+     */
     public function getAll(bool $withRelations = false): Collection|array
     {
         try {
@@ -33,7 +38,13 @@ class DesaRepository implements CrudInterface, DesaRepositoryInterface
         }
     }
 
-    public function getById(string|int $id): Model|Collection|array|null
+    /**
+     * @inheritDoc
+     * @param string|int $id
+     * @return Model|null
+     * @throws DataAccessException
+     */
+    public function getById(string|int $id): ?Model
     {
         try {
             return Desa::where('id', $id)->with(['kecamatan:id,nama'])->first();
@@ -46,6 +57,12 @@ class DesaRepository implements CrudInterface, DesaRepositoryInterface
         }
     }
 
+    /**
+     * @inheritDoc
+     * @param array $data
+     * @return Model|null
+     * @throws DataAccessException
+     */
     public function create(array $data): ?Model
     {
         try {
@@ -59,7 +76,14 @@ class DesaRepository implements CrudInterface, DesaRepositoryInterface
         }
     }
 
-    public function update(string|int $id, array $data): Model|bool|int
+    /**
+     * @inheritDoc
+     * @param string|int $id
+     * @param array $data
+     * @return bool|int
+     * @throws DataAccessException
+     */
+    public function update(string|int $id, array $data): bool|int
     {
         try {
             return Desa::where('id', $id)->update($data);
@@ -72,7 +96,13 @@ class DesaRepository implements CrudInterface, DesaRepositoryInterface
         }
     }
 
-    public function delete(string|int $id): Model|bool|int
+    /**
+     * @inheritDoc
+     * @param string|int $id
+     * @return bool|int
+     * @throws DataAccessException
+     */
+    public function delete(string|int $id): bool|int
     {
         try {
             return Desa::destroy($id);
@@ -85,6 +115,12 @@ class DesaRepository implements CrudInterface, DesaRepositoryInterface
         }
     }
 
+    /**
+     * @inheritDoc
+     * @param int|string $id
+     * @return Collection
+     * @throws DataAccessException
+     */
     public function getByKecamatanId(int|string $id): Collection
     {
         try {
@@ -98,6 +134,11 @@ class DesaRepository implements CrudInterface, DesaRepositoryInterface
         }
     }
 
+    /**
+     * @inheritDoc
+     * @return int
+     * @throws DataAccessException
+     */
     public function calculateTotal(): int
     {
         try {

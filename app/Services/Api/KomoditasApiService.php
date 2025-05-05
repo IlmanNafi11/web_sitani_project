@@ -4,7 +4,6 @@ namespace App\Services\Api;
 
 use App\Exceptions\DataAccessException;
 use App\Exceptions\ResourceNotFoundException;
-use App\Repositories\Interfaces\CrudInterface;
 use App\Repositories\Interfaces\KomoditasRepositoryInterface;
 use App\Services\Interfaces\KomoditasApiServiceInterface;
 use Illuminate\Database\Eloquent\Model;
@@ -14,19 +13,23 @@ use Throwable;
 
 class KomoditasApiService implements KomoditasApiServiceInterface
 {
-    protected CrudInterface $crudRepository;
     protected KomoditasRepositoryInterface $repository;
 
-    public function __construct(CrudInterface $crudRepository, KomoditasRepositoryInterface $repository)
+    public function __construct(KomoditasRepositoryInterface $repository)
     {
-        $this->crudRepository = $crudRepository;
         $this->repository = $repository;
     }
 
+    /**
+     * @inheritDoc
+     * @param bool $withRelations
+     * @return Collection
+     * @throws DataAccessException
+     */
     public function getAllApi(bool $withRelations = false): Collection
     {
         try {
-            return $this->crudRepository->getAll($withRelations);
+            return $this->repository->getAll($withRelations);
         } catch (QueryException $e) {
             throw new DataAccessException('Database error saat fetch data komoditas.', 0, $e);
         } catch (Throwable $e) {
@@ -34,24 +37,21 @@ class KomoditasApiService implements KomoditasApiServiceInterface
         }
     }
 
+    /**
+     * @inheritDoc
+     * @param string|int $id
+     * @return Model
+     * @throws DataAccessException
+     * @throws ResourceNotFoundException
+     */
     public function getById(string|int $id): Model
     {
         try {
-            $komoditas = $this->crudRepository->getById($id);
+            $komoditas = $this->repository->getById($id);
 
-            if (empty($komoditas)) {
+            if ($komoditas === null) {
                 throw new ResourceNotFoundException("Komoditas dengan id {$id} tidak ditemukan.");
             }
-
-            // rencana dihapus
-//            if ($komoditas instanceof Collection) {
-//                $komoditas = $komoditas->first();
-//                if (empty($komoditas)) {
-//                    throw new ResourceNotFoundException("Komoditas with ID {$id} not found or incorrect type returned.");
-//                }
-//            }
-
-
             return $komoditas;
         } catch (ResourceNotFoundException $e) {
             throw $e;
@@ -62,6 +62,11 @@ class KomoditasApiService implements KomoditasApiServiceInterface
         }
     }
 
+    /**
+     * @inheritDoc
+     * @return Collection
+     * @throws DataAccessException
+     */
     public function GetMusim(): Collection
     {
         try {
@@ -73,7 +78,12 @@ class KomoditasApiService implements KomoditasApiServiceInterface
         }
     }
 
-    public function calculateTotal(): int
+    /**
+     * @inheritDoc
+     * @return int
+     * @throws DataAccessException
+     */
+    public function getTotal(): int
     {
         try {
             return $this->repository->calculateTotal();

@@ -6,7 +6,6 @@ use App\Exceptions\DataAccessException;
 use App\Exceptions\ImportFailedException;
 use App\Exceptions\ResourceNotFoundException;
 use App\Imports\PenyuluhTerdaftarImport;
-use App\Repositories\Interfaces\CrudInterface;
 use App\Repositories\Interfaces\PenyuluhTerdaftarRepositoryInterface;
 use App\Services\Interfaces\PenyuluhTerdaftarServiceInterface;
 use App\Trait\LoggingError;
@@ -16,25 +15,30 @@ use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use App\Exports\PenyuluhTerdaftarExport;
+use Maatwebsite\Excel\Validators\ValidationException;
 use Throwable;
 
 class PenyuluhTerdaftarService implements PenyuluhTerdaftarServiceInterface
 {
     use LoggingError;
 
-    protected CrudInterface $crudRepository;
     protected PenyuluhTerdaftarRepositoryInterface $repository;
 
-    public function __construct(CrudInterface $crudRepository, PenyuluhTerdaftarRepositoryInterface $repository)
+    public function __construct(PenyuluhTerdaftarRepositoryInterface $repository)
     {
-        $this->crudRepository = $crudRepository;
         $this->repository = $repository;
     }
 
+    /**
+     * @inheritDoc
+     * @param bool $withRelations
+     * @return Collection
+     * @throws DataAccessException
+     */
     public function getAll(bool $withRelations = false): Collection
     {
         try {
-            return $this->crudRepository->getAll($withRelations);
+            return $this->repository->getAll($withRelations);
         } catch (QueryException $e) {
             throw new DataAccessException('Database error saat fetch data penyuluh terdaftar.', 0, $e);
         } catch (Throwable $e) {
@@ -42,12 +46,19 @@ class PenyuluhTerdaftarService implements PenyuluhTerdaftarServiceInterface
         }
     }
 
+    /**
+     * @inheritDoc
+     * @param string|int $id
+     * @return Model
+     * @throws DataAccessException
+     * @throws ResourceNotFoundException
+     */
     public function getById(string|int $id): Model
     {
         try {
-            $penyuluh = $this->crudRepository->getById($id);
+            $penyuluh = $this->repository->getById($id);
 
-            if (empty($penyuluh)) {
+            if ($penyuluh === null) {
                 throw new ResourceNotFoundException("Penyuluh terdaftar dengan id {$id} tidak ditemukan.");
             }
 
@@ -61,10 +72,16 @@ class PenyuluhTerdaftarService implements PenyuluhTerdaftarServiceInterface
         }
     }
 
+    /**
+     * @inheritDoc
+     * @param array $data
+     * @return Model
+     * @throws DataAccessException
+     */
     public function create(array $data): Model
     {
         try {
-            $penyuluh = $this->crudRepository->create($data);
+            $penyuluh = $this->repository->create($data);
 
             if ($penyuluh === null) {
                 throw new DataAccessException('Gagal menyimpan data penyuluh terdaftar di repository.');
@@ -80,10 +97,17 @@ class PenyuluhTerdaftarService implements PenyuluhTerdaftarServiceInterface
         }
     }
 
+    /**
+     * @inheritDoc
+     * @param string|int $id
+     * @param array $data
+     * @return bool
+     * @throws DataAccessException
+     */
     public function update(string|int $id, array $data): bool
     {
         try {
-            $result = $this->crudRepository->update($id, $data);
+            $result = $this->repository->update($id, $data);
 
             if(!$result) {
                 throw new DataAccessException("Gagal memperbarui data penyuluh terdaftar dengan id {$id} di repository.");
@@ -98,10 +122,16 @@ class PenyuluhTerdaftarService implements PenyuluhTerdaftarServiceInterface
         }
     }
 
+    /**
+     * @inheritDoc
+     * @param string|int $id
+     * @return bool
+     * @throws DataAccessException
+     */
     public function delete(string|int $id): bool
     {
         try {
-            $result = $this->crudRepository->delete($id);
+            $result = $this->repository->delete($id);
 
             if (!$result) {
                 throw new DataAccessException("Gagal menghapus data penyuluh terdaftar dengan id {$id} di repository.");
@@ -117,6 +147,12 @@ class PenyuluhTerdaftarService implements PenyuluhTerdaftarServiceInterface
         }
     }
 
+    /**
+     * @inheritDoc
+     * @param string|int $id
+     * @return Collection
+     * @throws DataAccessException
+     */
     public function getByKecamatanId(string|int $id): Collection
     {
         try {
@@ -128,6 +164,11 @@ class PenyuluhTerdaftarService implements PenyuluhTerdaftarServiceInterface
         }
     }
 
+    /**
+     * @inheritDoc
+     * @return int
+     * @throws DataAccessException
+     */
     public function calculateTotal(): int
     {
         try {
@@ -139,6 +180,13 @@ class PenyuluhTerdaftarService implements PenyuluhTerdaftarServiceInterface
         }
     }
 
+    /**
+     * @inheritDoc
+     * @param mixed $file
+     * @return array
+     * @throws DataAccessException
+     * @throws ImportFailedException
+     */
     public function import(mixed $file): array
     {
         try {
@@ -146,7 +194,7 @@ class PenyuluhTerdaftarService implements PenyuluhTerdaftarServiceInterface
             Excel::import($import, $file);
 
             return $import->getFailures();
-        } catch (\Maatwebsite\Excel\Validators\ValidationException $e) {
+        } catch (ValidationException $e) {
             $failures = $e->failures();
             throw new ImportFailedException("Validasi gagal saat import data.", 0, $e, collect($failures));
         } catch (QueryException $e) {
@@ -156,6 +204,11 @@ class PenyuluhTerdaftarService implements PenyuluhTerdaftarServiceInterface
         }
     }
 
+    /**
+     * @inheritDoc
+     * @return FromCollection
+     * @throws DataAccessException
+     */
     public function export(): FromCollection
     {
         try {

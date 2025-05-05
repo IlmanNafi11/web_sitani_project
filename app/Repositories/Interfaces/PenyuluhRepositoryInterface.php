@@ -2,7 +2,9 @@
 
 namespace App\Repositories\Interfaces;
 
-interface PenyuluhRepositoryInterface
+use App\Repositories\Interfaces\Base\BaseRepositoryInterface;
+
+interface PenyuluhRepositoryInterface extends BaseRepositoryInterface
 {
     /**
      * Menghitung total Penyuluh yang sudah menggunakan aplikasi mobile sitani

@@ -2,9 +2,10 @@
 
 namespace App\Repositories\Interfaces;
 
-use Illuminate\Database\Eloquent\Collection;
+use App\Repositories\Interfaces\Base\BaseRepositoryInterface;
+use Illuminate\Support\Collection;
 
-interface KelompokTaniRepositoryInterface
+interface KelompokTaniRepositoryInterface extends BaseRepositoryInterface
 {
     /**
      * Mengambil data kelompok tani berdasarkan penyuluh id

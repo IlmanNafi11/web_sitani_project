@@ -5,17 +5,17 @@ namespace App\Repositories;
 use App\Exceptions\DataAccessException;
 use App\Models\BibitBerkualitas;
 use App\Repositories\Interfaces\BibitRepositoryInterface;
-use App\Repositories\Interfaces\CrudInterface;
 use App\Trait\LoggingError;
-use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\QueryException;
 
-class BibitRepository implements CrudInterface, BibitRepositoryInterface
+class BibitRepository implements BibitRepositoryInterface
 {
     use LoggingError;
 
     /**
+     * @inheritDoc
      * @throws DataAccessException
      */
     public function getAll(bool $withRelations = false): Collection|array
@@ -36,9 +36,10 @@ class BibitRepository implements CrudInterface, BibitRepositoryInterface
     }
 
     /**
+     * @inheritDoc
      * @throws DataAccessException
      */
-    public function getById(string|int $id): Model|Collection|array|null
+    public function getById(string|int $id): ?Model
     {
         try {
             return BibitBerkualitas::find($id);
@@ -52,6 +53,7 @@ class BibitRepository implements CrudInterface, BibitRepositoryInterface
     }
 
     /**
+     * @inheritDoc
      * @throws DataAccessException
      */
     public function create(array $data): ?Model
@@ -68,9 +70,10 @@ class BibitRepository implements CrudInterface, BibitRepositoryInterface
     }
 
     /**
+     * @inheritDoc
      * @throws DataAccessException
      */
-    public function update(string|int $id, array $data): Model|bool|int
+    public function update(string|int $id, array $data): bool|int
     {
         try {
             return BibitBerkualitas::where('id', $id)->update($data);
@@ -84,9 +87,10 @@ class BibitRepository implements CrudInterface, BibitRepositoryInterface
     }
 
     /**
+     * @inheritDoc
      * @throws DataAccessException
      */
-    public function delete(string|int $id): Model|bool|int
+    public function delete(string|int $id): bool|int
     {
         try {
             return BibitBerkualitas::destroy($id);

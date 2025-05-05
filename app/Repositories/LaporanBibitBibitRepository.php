@@ -5,21 +5,26 @@ namespace App\Repositories;
 use App\Exceptions\DataAccessException;
 use App\Exceptions\ResourceNotFoundException;
 use App\Models\LaporanKondisi;
-use App\Repositories\Interfaces\CrudInterface;
-use App\Repositories\Interfaces\LaporanRepositoryInterface;
+use App\Repositories\Interfaces\LaporanBibitRepositoryInterface;
 use App\Trait\LoggingError;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\DB;
 use Throwable;
 
-class LaporanBibitRepository implements CrudInterface, LaporanRepositoryInterface
+class LaporanBibitBibitRepository implements LaporanBibitRepositoryInterface
 {
     use LoggingError;
 
+    /**
+     * @inheritDoc
+     * @param bool $withRelations
+     * @return Collection|array
+     * @throws DataAccessException
+     */
     public function getAll(bool $withRelations = false): Collection|array
     {
         try {
@@ -45,9 +50,12 @@ class LaporanBibitRepository implements CrudInterface, LaporanRepositoryInterfac
     }
 
     /**
+     * @inheritDoc
+     * @param string|int $id
+     * @return Model|null
      * @throws DataAccessException
      */
-    public function getById(string|int $id): Model|Collection|array|null
+    public function getById(string|int $id): ?Model
     {
         try {
             $query = LaporanKondisi::query();
@@ -74,6 +82,9 @@ class LaporanBibitRepository implements CrudInterface, LaporanRepositoryInterfac
     }
 
     /**
+     * @inheritDoc
+     * @param array $data
+     * @return Model|null
      * @throws DataAccessException
      */
     public function create(array $data): ?Model
@@ -96,10 +107,14 @@ class LaporanBibitRepository implements CrudInterface, LaporanRepositoryInterfac
     }
 
     /**
+     * @inheritDoc
+     * @param string|int $id
+     * @param array $data
+     * @return bool|int
      * @throws DataAccessException
      * @throws ResourceNotFoundException
      */
-    public function update(string|int $id, array $data): Model|bool|int
+    public function update(string|int $id, array $data): bool|int
     {
         try {
             $model = LaporanKondisi::findOrFail($id);
@@ -109,7 +124,7 @@ class LaporanBibitRepository implements CrudInterface, LaporanRepositoryInterfac
                 $this->LogGeneralException(new \Exception("LaporanKondisi update returned false."), ['id' => $id, 'data' => $data]);
             }
 
-            return (bool)$result;
+            return $result;
         } catch (ModelNotFoundException $e) {
             $this->LogNotFoundException($e, ['id' => $id]);
             throw new ResourceNotFoundException("LaporanKondisi with ID {$id} not found for update.", 0, $e);
@@ -123,10 +138,13 @@ class LaporanBibitRepository implements CrudInterface, LaporanRepositoryInterfac
     }
 
     /**
-     * @throws ResourceNotFoundException
+     * @inheritDoc
+     * @param string|int $id
+     * @return bool|int
      * @throws DataAccessException
+     * @throws ResourceNotFoundException
      */
-    public function delete(string|int $id): Model|bool|int
+    public function delete(string|int $id): bool|int
     {
         try {
             $model = LaporanKondisi::findOrFail($id);
@@ -149,6 +167,13 @@ class LaporanBibitRepository implements CrudInterface, LaporanRepositoryInterfac
         }
     }
 
+    /**
+     * @inheritDoc
+     * @param array $conditions
+     * @param array $relations
+     * @return Collection|array
+     * @throws DataAccessException
+     */
     public function getByPenyuluhId(array $conditions = [], array $relations = []): Collection|array
     {
         try {
@@ -172,6 +197,11 @@ class LaporanBibitRepository implements CrudInterface, LaporanRepositoryInterfac
         }
     }
 
+    /**
+     * @inheritDoc
+     * @return int
+     * @throws DataAccessException
+     */
     public function calculateTotal(): int
     {
         try {
@@ -186,6 +216,9 @@ class LaporanBibitRepository implements CrudInterface, LaporanRepositoryInterfac
     }
 
     /**
+     * @inheritDoc
+     * @param int|null $penyuluhId
+     * @return array
      * @throws DataAccessException
      */
     public function getLaporanStatusCounts(?int $penyuluhId = null): array
