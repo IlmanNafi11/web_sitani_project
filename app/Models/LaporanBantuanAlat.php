@@ -6,15 +6,19 @@ use Illuminate\Database\Eloquent\Model;
 
 class LaporanBantuanAlat extends Model
 {
+    protected $table = 'permintaan_bantuan_alat';
     protected $fillable = [
         'kelompok_tani_id',
         'penyuluh_id',
-        'status'
+        'status',
+        'alat_diminta',
+        'path_proposal'
     ];
+
     //Relasi One to One
     public function LaporanBantuanAlatDetail()
     {
-        return $this->hasOne(LaporanBantuanAlatDetail::class);
+        return $this->hasOne(LaporanBantuanAlatDetail::class, 'permintaan_bantuan_alat_id', 'id');
     }
     //Relasi One to Many
     public function KelompokTani()

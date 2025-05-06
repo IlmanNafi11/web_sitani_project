@@ -6,12 +6,14 @@ use Illuminate\Database\Eloquent\Model;
 
 class LaporanBantuanAlatDetail extends Model
 {
+    protected $table = 'permintaan_bantuan_alat_detail';
     protected $fillable = [
         'permintaan_bantuan_alat_id',
         'nama_ketua',
         'no_hp_ketua',
         'npwp',
         'email_kelompok_tani',
+        'password_email',
         'path_ktp_ketua',
         'path_badan_hukum',
         'path_piagam',
@@ -24,6 +26,6 @@ class LaporanBantuanAlatDetail extends Model
     ];
     public function LaporanBantuanAlat()
     {
-        return $this->belongsTo(LaporanBantuanAlat::class);
+        return $this->belongsTo(LaporanBantuanAlat::class, 'permintaan_bantuan_alat_id', 'id');
     }
 }
