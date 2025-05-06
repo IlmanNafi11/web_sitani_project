@@ -151,4 +151,28 @@ class LaporanBibitApiService implements LaporanBibitApiServiceInterface
             }
         }
     }
+
+    /**
+     * @inheritDoc
+     * @throws DataAccessException
+     * @throws ResourceNotFoundException
+     */
+    public function getTotalByKecamatanId(int|string $kecamatanId): int
+    {
+        try {
+            $total = $this->repository->getTotalByKecamatanId($kecamatanId);
+
+            if ($total === 0) {
+                throw new ResourceNotFoundException('Laporan pada kecamatan: ' . $kecamatanId . ' tidak ditemukan');
+            }
+
+            return $total;
+        } catch (QueryException $e) {
+            throw new DataAccessException('Terjadi kesalahan saat menghitung total laporan.');
+        } catch (ResourceNotFoundException $e) {
+            throw $e;
+        } catch (Throwable $e) {
+            throw new DataAccessException('Terjadi kesalahan tak terduga saat mengambil total laporan berdasarkan kecamatan id');
+        }
+    }
 }

@@ -79,7 +79,7 @@ class LaporanBibitBibitRepository implements LaporanBibitRepositoryInterface
             throw $e;
         } catch (Throwable $e) {
             $this->LogGeneralException($e, ['id' => $id]);
-            throw new DataAccessException('Terjadi kesalahan tidak terduga saat fetch data laporan dengan id: ' . $id , 0, $e);
+            throw new DataAccessException('Terjadi kesalahan tidak terduga saat fetch data laporan dengan id: ' . $id, 0, $e);
         }
     }
 
@@ -278,7 +278,30 @@ class LaporanBibitBibitRepository implements LaporanBibitRepositoryInterface
             $this->LogSqlException($e, $data);
             throw $e;
         } catch (Throwable $e) {
-            $this->LogGeneralException($e, $data );
+            $this->LogGeneralException($e, $data);
+            throw new DataAccessException('Terjadi kesalahan tak terduga saat menyimpan detail laporan.', 0, $e);
+        }
+    }
+
+    /**
+     * @inheritDoc
+     * @throws DataAccessException
+     */
+    public function getTotalByKecamatanId(int|string $kecamatanId): int
+    {
+        try {
+            $currentYear = Carbon::now()->year;
+
+            return LaporanKondisi::whereHas('kelompokTani', function ($query) use ($kecamatanId) {
+                $query->where('kecamatan_id', $kecamatanId);
+            })
+                ->whereYear('created_at', $currentYear)
+                ->count();
+        } catch (QueryException $e) {
+            $this->LogSqlException($e, ['kecamatan_id' => $kecamatanId]);
+            throw $e;
+        } catch (Throwable $e) {
+            $this->LogGeneralException($e, ['kecamatan_id' => $kecamatanId]);
             throw new DataAccessException('Terjadi kesalahan tak terduga saat menyimpan detail laporan.', 0, $e);
         }
     }

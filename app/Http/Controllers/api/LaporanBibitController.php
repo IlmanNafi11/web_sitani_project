@@ -73,4 +73,18 @@ class LaporanBibitController extends Controller
             return $this->errorResponse('Terjadi kesalahan diserver.', 500);
         }
     }
+
+    public function getTotalByKecamatanId(string|int $id): JsonResponse
+    {
+        try {
+            $total = $this->service->getTotalByKecamatanId($id);
+            return $this->successResponse(['total' => $total], 'Total laporan bibit berhasil diambil');
+        } catch (ResourceNotFoundException $e) {
+            return $this->errorResponse($e->getMessage(), Response::HTTP_NOT_FOUND);
+        } catch (DataAccessException $e) {
+            return $this->errorResponse('Gagal mengambil total laporan bibit', Response::HTTP_INTERNAL_SERVER_ERROR);
+        } catch (Throwable $e) {
+            return $this->errorResponse('Terjadi kesalahan di server.', Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
 }

@@ -30,4 +30,12 @@ interface LaporanBibitApiServiceInterface
      * @return array statistik laporan berdasarkan statusnya(berkualitas, tidak berkualitas, pending)
      */
     public function getLaporanStatusCounts(string|int|null $penyuluhId): array;
+
+    /**
+     * Mengambil total laporan bibit berdasarkan kecamatan id
+     *
+     * @param string|int $kecamatanId Kecamatan id
+     * @return int Total
+     */
+    public function getTotalByKecamatanId(string|int $kecamatanId): int;
 }

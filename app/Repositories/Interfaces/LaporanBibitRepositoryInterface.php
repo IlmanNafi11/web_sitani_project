@@ -40,4 +40,12 @@ interface LaporanBibitRepositoryInterface extends BaseRepositoryInterface
      */
     public function insertDetailLaporan(array $data): ?Model;
 
+    /**
+     * Mengambil total laporan bibit pada kecamatan tertentu.
+     *
+     * @param string|int $kecamatanId Kecamatan id
+     * @return int Total
+     */
+    public function getTotalByKecamatanId(string|int $kecamatanId): int;
+
 }
