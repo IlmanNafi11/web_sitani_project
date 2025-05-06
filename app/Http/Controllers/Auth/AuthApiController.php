@@ -88,7 +88,11 @@ class AuthApiController extends Controller
 
         try {
             $penyuluh = $this->penyuluhService->create($data);
-            return $this->successResponse($penyuluh, 'Registrasi berhasil', Response::HTTP_CREATED);
+            return $this->successResponse([
+                'id' => $penyuluh->user_id,
+                'email' => $penyuluh->user->email,
+                'created_at' => $penyuluh->created_at,
+            ], 'Registrasi berhasil', Response::HTTP_CREATED);
 
         } catch (DataAccessException $e) {
             return $this->errorResponse($e->getMessage(), $e->getCode() ?: Response::HTTP_INTERNAL_SERVER_ERROR);
