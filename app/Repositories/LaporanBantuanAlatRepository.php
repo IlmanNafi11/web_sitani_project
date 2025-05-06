@@ -2,11 +2,11 @@
 namespace App\Repositories;
 
 use App\Models\LaporanBantuanAlat;
-use App\Repositories\Interfaces\CrudInterface;
+use App\Repositories\Interfaces\Base\BaseRepositoryInterface;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Collection;
 
-class LaporanBantuanAlatRepository implements CrudInterface
+class LaporanBantuanAlatRepository implements BaseRepositoryInterface
 {
     public function getAll($withRelations = false): Collection|array
     {
@@ -15,14 +15,14 @@ class LaporanBantuanAlatRepository implements CrudInterface
                 'kelompokTani:id,nama',
                 'penyuluh:id,penyuluh_terdaftar_id',
                 'penyuluh.penyuluhTerdaftar:id,nama,no_hp',
-                'bantuanAlatDetail'
-            ])->select(['id', 'kelompok_tani_id', 'penyuluh_id', 'status', 'created_at'])->get();
+                'LaporanBantuanAlatDetail'
+            ])->select(['id', 'kelompok_tani_id', 'penyuluh_id', 'status', 'alat_diminta', 'created_at'])->get();
         }
 
         return LaporanBantuanAlat::all();
     }
 
-    public function find($id): Model|Collection|null
+    public function getById($id): ?Model
     {
         return LaporanBantuanAlat::with([
             'kelompokTani:id,nama',
@@ -39,12 +39,12 @@ class LaporanBantuanAlatRepository implements CrudInterface
         return LaporanBantuanAlat::create($data);
     }
 
-    public function update(string|int $id, array $data): Model|int|bool
+    public function update(string|int $id, array $data): bool|int
     {
         return LaporanBantuanAlat::where('id', $id)->update($data);
     }
 
-    public function delete(string|int $id): Model|int|bool
+    public function delete(string|int $id): bool|int
     {
         return LaporanBantuanAlat::destroy($id);
     }
