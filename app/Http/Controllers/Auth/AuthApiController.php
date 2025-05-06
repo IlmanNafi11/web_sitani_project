@@ -33,10 +33,11 @@ class AuthApiController extends Controller
     protected UserServiceInterface $userService;
 
     public function __construct(
-        PenyuluhServiceInterface $penyuluhService,
+        PenyuluhServiceInterface    $penyuluhService,
         PenyuluhTerdaftarApiService $penyuluhTerdaftarService,
-        UserServiceInterface $userService
-    ) {
+        UserServiceInterface        $userService
+    )
+    {
         $this->penyuluhService = $penyuluhService;
         $this->penyuluhTerdaftarService = $penyuluhTerdaftarService;
         $this->userService = $userService;
@@ -136,7 +137,7 @@ class AuthApiController extends Controller
             ], 'Kode OTP berhasil dikirim.');
 
         } catch (ResourceNotFoundException $e) {
-            return $this->errorResponse("User tidak ditemukan", Response::HTTP_NOT_FOUND);
+            return $this->errorResponse("Pengguna tidak ditemukan", Response::HTTP_NOT_FOUND);
         } catch (DataAccessException $e) {
             return $this->errorResponse($e->getMessage(), $e->getCode() ?: Response::HTTP_INTERNAL_SERVER_ERROR);
         } catch (Throwable $e) {
@@ -196,16 +197,11 @@ class AuthApiController extends Controller
     public function updatePasswordViaProfile(PasswordRequest $request): JsonResponse
     {
         $validated = $request->validated();
-        $user = Auth::user();
-
-        if (!$user) {
-            return $this->errorResponse('Unauthorized', Response::HTTP_UNAUTHORIZED);
-        }
-
-        $email = $user->email;
-        $newPassword = $validated['password'];
-
+        $email = $request->input('email');
         try {
+            $this->userService->findUser(['email' => $email]);
+
+            $newPassword = $validated['password'];
             $this->userService->processPasswordResetFlow(
                 $email,
                 $newPassword,
