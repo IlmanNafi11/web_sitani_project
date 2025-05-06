@@ -76,5 +76,5 @@ Route::controller(KelompokTaniController::class)->group(function () {
 Route::controller(LaporanBibitController::class)->group(function () {
     Route::post('laporan-kondisi', 'saveReport');
     Route::get('laporan-kondisi/count/{id}', 'getLaporanStatusCounts');
-    Route::get('history-laporan/{id}', 'getByPenyuluhId');
+    Route::get('history-laporan/{id}', 'getByKecamatanId');
 });

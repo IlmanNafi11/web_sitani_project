@@ -4,6 +4,7 @@ namespace App\Repositories;
 
 use App\Exceptions\DataAccessException;
 use App\Exceptions\ResourceNotFoundException;
+use App\Models\KelompokTani;
 use App\Models\LaporanKondisi;
 use App\Models\LaporanKondisiDetail;
 use App\Repositories\Interfaces\LaporanBibitRepositoryInterface;
@@ -46,7 +47,7 @@ class LaporanBibitBibitRepository implements LaporanBibitRepositoryInterface
             throw $e;
         } catch (Throwable $e) {
             $this->LogGeneralException($e);
-            throw new DataAccessException('Unexpected repository error in getAll.', 0, $e);
+            throw new DataAccessException('Terjadi kesalahan tidak terduga saat fetch data laporan.', 0, $e);
         }
     }
 
@@ -78,7 +79,7 @@ class LaporanBibitBibitRepository implements LaporanBibitRepositoryInterface
             throw $e;
         } catch (Throwable $e) {
             $this->LogGeneralException($e, ['id' => $id]);
-            throw new DataAccessException('Unexpected repository error in getById.', 0, $e);
+            throw new DataAccessException('Terjadi kesalahan tidak terduga saat fetch data laporan dengan id: ' . $id , 0, $e);
         }
     }
 
@@ -97,7 +98,7 @@ class LaporanBibitBibitRepository implements LaporanBibitRepositoryInterface
             throw $e;
         } catch (Throwable $e) {
             $this->LogGeneralException($e, $data);
-            throw new DataAccessException('Unexpected repository error during create.', 0, $e);
+            throw new DataAccessException('Terjadi kesalahan tidak terduga saat menyimpan laporan bibit.', 0, $e);
         }
     }
 
@@ -116,19 +117,19 @@ class LaporanBibitBibitRepository implements LaporanBibitRepositoryInterface
             $result = $model->update($data);
 
             if (!$result) {
-                $this->LogGeneralException(new \Exception("LaporanKondisi update returned false."), ['id' => $id, 'data' => $data]);
+                $this->LogGeneralException(new \Exception("Gagal memperbarui data laporan bibit."), ['id' => $id, 'data' => $data]);
             }
 
             return $result;
         } catch (ModelNotFoundException $e) {
             $this->LogNotFoundException($e, ['id' => $id]);
-            throw new ResourceNotFoundException("LaporanKondisi with ID {$id} not found for update.", 0, $e);
+            throw new ResourceNotFoundException("Laporan bibit dengan id {$id} tidak ditemukan untuk diperbarui.", 0, $e);
         } catch (QueryException $e) {
             $this->LogSqlException($e, ['id' => $id, 'data_baru' => $data]);
             throw $e;
         } catch (Throwable $e) {
             $this->LogGeneralException($e, ['id' => $id, 'data_baru' => $data]);
-            throw new DataAccessException('Unexpected repository error during update.', 0, $e);
+            throw new DataAccessException('Terjadi kesalahan saat memperbarui data laporan bibit.', 0, $e);
         }
     }
 
@@ -146,43 +147,39 @@ class LaporanBibitBibitRepository implements LaporanBibitRepositoryInterface
             $result = $model->delete();
 
             if (!$result) {
-                $this->LogGeneralException(new \Exception("LaporanKondisi delete returned false."), ['id' => $id]);
+                $this->LogGeneralException(new \Exception("Gagal menghapus laporan bibit."), ['id' => $id]);
             }
 
             return (bool)$result;
         } catch (ModelNotFoundException $e) {
             $this->LogNotFoundException($e, ['id' => $id]);
-            throw new ResourceNotFoundException("LaporanKondisi with ID {$id} not found for deletion.", 0, $e);
+            throw new ResourceNotFoundException("Laporan bibit dengan id {$id} tidak ditemukan untuk dihapus.", 0, $e);
         } catch (QueryException $e) {
             $this->LogSqlException($e, ['id' => $id]);
             throw $e;
         } catch (Throwable $e) {
             $this->LogGeneralException($e, ['id' => $id]);
-            throw new DataAccessException('Unexpected repository error during delete.', 0, $e);
+            throw new DataAccessException('Terjadi kesalahan tidak terduga saat menghapus laporan bibit.', 0, $e);
         }
     }
 
     /**
      * @inheritDoc
-     * @param array $conditions
-     * @param array $relations
+     * @param string|int $kecamatanId
      * @return Collection|array
      * @throws DataAccessException
      */
-    public function getByPenyuluhId(array $conditions = [], array $relations = []): Collection|array
+    public function getByKecamatanId(string|int $kecamatanId): Collection|array
     {
         try {
-            $query = LaporanKondisi::query();
-
-            if (!empty($relations)) {
-                $query->with($relations);
-            }
-
-            foreach ($conditions as $column => $value) {
-                $query->where($column, $value);
-            }
-
-            return $query->get();
+            return KelompokTani::where('kecamatan_id', $kecamatanId)->with([
+                'desa:id,nama',
+                'kecamatan:id,nama',
+                'laporanKondisi:id,penyuluh_id,komoditas_id,kelompok_tani_id,status,created_at',
+                'laporanKondisi.komoditas:id,nama',
+                'laporanKondisi.penyuluh.penyuluhTerdaftar:id,nama',
+                'laporanKondisi.laporanKondisiDetail:id,laporan_kondisi_id,luas_lahan,estimasi_panen,jenis_bibit,foto_bibit,lokasi_lahan,path_foto_lokasi',
+            ])->select(['id', 'nama', 'desa_id', 'kecamatan_id'])->get();
         } catch (QueryException $e) {
             $this->LogSqlException($e);
             throw $e;
@@ -206,7 +203,7 @@ class LaporanBibitBibitRepository implements LaporanBibitRepositoryInterface
             throw $e;
         } catch (Throwable $e) {
             $this->LogGeneralException($e);
-            throw new DataAccessException('Unexpected repository error in calculateTotal.', 0, $e);
+            throw new DataAccessException('Terjadi kesalahan tidak terduga saat menghitung total laporan bibit.', 0, $e);
         }
     }
 
@@ -255,7 +252,7 @@ class LaporanBibitBibitRepository implements LaporanBibitRepositoryInterface
             throw $e;
         } catch (Throwable $e) {
             $this->LogGeneralException($e, ['penyuluh_id' => $penyuluhId]);
-            throw new DataAccessException('Unexpected repository error in getLaporanStatusCounts.', 0, $e);
+            throw new DataAccessException('Terjadi kesalahan tidak terduga saat menghitung total laporan berdasarkan statusnya.', 0, $e);
         }
     }
 

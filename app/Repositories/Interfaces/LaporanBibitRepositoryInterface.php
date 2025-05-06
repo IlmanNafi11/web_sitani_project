@@ -10,13 +10,12 @@ use Illuminate\Support\Collection;
 interface LaporanBibitRepositoryInterface extends BaseRepositoryInterface
 {
     /**
-     * Mengambil data laporan berdasarkan penyuluh Id
+     * Mengambil data laporan berdasarkan kecamatan id
      *
-     * @param array $conditions Kondisi(where) untuk filter data
-     * @param array $relations Relasi
-     * @return Collection|array
+     * @param string|int $kecamatanId Kecamatan id
+     * @return Collection|array Koleksi laporan
      */
-    public function getByPenyuluhId(array $conditions = [], array $relations = []): Collection|array;
+    public function getByKecamatanId(string|int $kecamatanId): Collection|array;
 
     /**
      * Menghitung total laporan yang masuk ke aplikasi

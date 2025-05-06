@@ -21,7 +21,7 @@ interface LaporanBibitApiServiceInterface
      * @param string|int $penyuluhId penyuluh id
      * @return Collection Koleksi laporan bibit
      */
-    public function getByPenyuluhId(string|int $penyuluhId): Collection;
+    public function getByKecamatanId(string|int $penyuluhId): Collection;
 
     /**
      * Mengambil data laporan statistik penggunaan bibit berdasarkan laporan yang tersimpan di Sitani

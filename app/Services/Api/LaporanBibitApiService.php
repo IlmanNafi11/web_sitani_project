@@ -109,12 +109,10 @@ class LaporanBibitApiService implements LaporanBibitApiServiceInterface
      * @throws DataAccessException
      * @throws ResourceNotFoundException
      */
-    public function getByPenyuluhId(string|int $penyuluhId): Collection
+    public function getByKecamatanId(string|int $penyuluhId): Collection
     {
         try {
-            $conditions = ['penyuluh_id' => $penyuluhId];
-            $relations = ['penyuluh.penyuluhTerdaftar', 'komoditas', 'laporanKondisiDetail', 'kelompokTani.desa.kecamatan'];
-            $laporan = $this->repository->getByPenyuluhId($conditions, $relations);
+            $laporan = $this->repository->getByKecamatanId($penyuluhId);
             if ($laporan->isEmpty()) {
                 throw new ResourceNotFoundException('Laporan Bibit tidak ditemukan');
             }

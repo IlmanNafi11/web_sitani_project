@@ -10,6 +10,7 @@ use App\Http\Resources\LaporanKondisiResource;
 use App\Services\Interfaces\LaporanBibitApiServiceInterface;
 use App\Trait\ApiResponse;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpFoundation\Response;
 use Throwable;
 
@@ -42,16 +43,17 @@ class LaporanBibitController extends Controller
         }
     }
 
-    public function getByPenyuluhId(string|int $id): JsonResponse
+    public function getByKecamatanId(string|int $id): JsonResponse
     {
         try {
-            $laporans = $this->service->getByPenyuluhId($id);
+            $laporans = $this->service->getByKecamatanId($id);
             return $this->successResponse(LaporanKondisiResource::collection($laporans), 'Laporan bibit ditemukan');
         } catch (ResourceNotFoundException) {
             return $this->errorResponse('Laporan Bibit tidak ditemukan', 404);
         } catch (DataAccessException $e) {
             return $this->errorResponse('Gagal fetch data laporan bibit.', 500);
         } catch (Throwable $e) {
+            Log::error($e);
             return $this->errorResponse('Terjadi kesalahan diserver.', 500);
         }
     }
