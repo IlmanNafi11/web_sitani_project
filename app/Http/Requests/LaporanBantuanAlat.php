@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
 class LaporanBantuanAlat extends FormRequest
@@ -11,19 +12,19 @@ class LaporanBantuanAlat extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
      * Get the validation rules that apply to the request.
      *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
+     * @return array<string, ValidationRule|array|string>
      */
     public function rules(): array
     {
         return [
-            'kelompok_tani_id' => 'required|exists:kelompok_tani_id',
-            'penyuluh_id' => 'required|exist:penyuluh_id',
+            'kelompok_tani_id' => 'required|exists:kelompok_tanis,id',
+            'penyuluh_id' => 'required|exists:penyuluhs,id',
             'alat_diminta' => 'required', 'regex:/^[a-zA-Z0-9\s]+$/',
             'path_proposal' => 'required|string',
             'status' => 'required|string',
