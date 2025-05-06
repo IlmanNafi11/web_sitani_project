@@ -40,16 +40,21 @@ class LaporanBantuanAlatObserver
             }
 
             LaporanBantuanAlatDetail::create([
-                'laporan_bantuan_alat_id' => $laporan->id,
+                'permintaan_bantuan_alat_id' => $laporan->id,
+                'nama_ketua' => $data['nama_ketua'],
+                'no_hp_ketua' => $data['no_hp_ketua'],
+                'npwp' => $data['npwp'],
+                'email_kelompok_tani' => $data['email_kelompok_tani'],
+                'password_email' => $data['password_email'],
                 'path_ktp_ketua' => $paths['ktp_ketua'],
-                'path_ktp_sekretaris' => $paths['ktp_sekretaris'],
-                'path_ktp_ketua_upkk' => $paths['ktp_ketua_upkk'],
-                'path_ktp_anggota1' => $paths['ktp_anggota1'],
-                'path_ktp_anggota2' => $paths['ktp_anggota2'],
                 'path_badan_hukum' => $paths['badan_hukum'],
                 'path_piagam' => $paths['piagam'],
                 'path_surat_domisili' => $paths['surat_domisili'],
                 'path_foto_lokasi' => $paths['foto_lokasi'],
+                'path_ktp_sekretaris' => $paths['ktp_sekretaris'],
+                'path_ktp_ketua_upkk' => $paths['ktp_ketua_upkk'],
+                'path_ktp_anggota1' => $paths['ktp_anggota1'],
+                'path_ktp_anggota2' => $paths['ktp_anggota2'],
             ]);
         } catch (\Throwable $th) {
             Log::error('Gagal menyimpan laporan bantuan alat: ' . $th->getMessage());
