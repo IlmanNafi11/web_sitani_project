@@ -2,14 +2,14 @@
 
 namespace App\Services;
 
-use App\Repositories\Interfaces\CrudInterface;
+use App\Repositories\Interfaces\Base\BaseRepositoryInterface;
 use Illuminate\Support\Facades\Log;
 
 class LaporanBantuanAlatService
 {
-    protected CrudInterface $repository;
+    protected BaseRepositoryInterface $repository;
 
-    public function __construct(CrudInterface $repository)
+    public function __construct(BaseRepositoryInterface $repository)
     {
         $this->repository = $repository;
     }
@@ -28,7 +28,7 @@ class LaporanBantuanAlatService
     public function getById(int|string $id)
     {
         try {
-            return $this->repository->find($id);
+            return $this->repository->getById($id);
         } catch (\Throwable $th) {
             Log::error("Gagal mengambil laporan bantuan alat ID $id: " . $th->getMessage());
         }
@@ -43,7 +43,8 @@ class LaporanBantuanAlatService
                 'kelompok_tani_id' => $data['kelompok_tani_id'],
                 'penyuluh_id' => $data['penyuluh_id'],
                 'status' => '2',
-                // tambahkan kolom lain sesuai kebutuhan
+                'alat_diminta' => $data['alat_diminta'],
+                'path_proposal' => $data['path_proposal'],
             ]);
         } catch (\Throwable $th) {
             Log::error('Gagal menyimpan laporan bantuan alat: ' . $th->getMessage());
