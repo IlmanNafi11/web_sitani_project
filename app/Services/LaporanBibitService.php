@@ -148,7 +148,7 @@ class LaporanBibitService implements LaporanBibitServiceInterface
     public function getTotal(): int
     {
         try {
-            return $this->repository->calculateTotal();
+            return $this->repository->getTotal();
         } catch (QueryException $e) {
             throw new DataAccessException('Database error saat menghitung total laporan bibit.');
         } catch (DataAccessException $e) {

@@ -18,11 +18,11 @@ interface LaporanBibitRepositoryInterface extends BaseRepositoryInterface
     public function getByKecamatanId(string|int $kecamatanId): Collection|array;
 
     /**
-     * Menghitung total laporan yang masuk ke aplikasi
+     * Mengambil total laporan bibit yang masuk ke aplikasi secara keseluruhan
      *
      * @return int Total Data laporan
      */
-    public function calculateTotal(): int;
+    public function getTotal(): int;
 
     /**
      * Menghitung total penggunaan bibit berkualitas

@@ -194,7 +194,7 @@ class LaporanBibitBibitRepository implements LaporanBibitRepositoryInterface
      * @return int
      * @throws DataAccessException
      */
-    public function calculateTotal(): int
+    public function getTotal(): int
     {
         try {
             return LaporanKondisi::count();
