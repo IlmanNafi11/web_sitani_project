@@ -5,6 +5,7 @@ namespace App\Repositories;
 use App\Exceptions\DataAccessException;
 use App\Exceptions\ResourceNotFoundException;
 use App\Models\LaporanKondisi;
+use App\Models\LaporanKondisiDetail;
 use App\Repositories\Interfaces\LaporanBibitRepositoryInterface;
 use App\Trait\LoggingError;
 use Carbon\Carbon;
@@ -68,7 +69,7 @@ class LaporanBibitBibitRepository implements LaporanBibitRepositoryInterface
                 'penyuluh' => fn($q) => $q->select(['id', 'penyuluh_terdaftar_id'])->with([
                     'penyuluhTerdaftar' => fn($q2) => $q2->select(['id', 'nama', 'no_hp']),
                 ]),
-                'laporanKondisiDetail' => fn($q) => $q->select(['id', 'laporan_kondisi_id', 'luas_lahan', 'estimasi_panen', 'jenis_bibit', 'foto_bibit', 'lokasi_lahan']),
+                'laporanKondisiDetail' => fn($q) => $q->select(['id', 'laporan_kondisi_id', 'luas_lahan', 'estimasi_panen', 'jenis_bibit', 'foto_bibit', 'lokasi_lahan', 'path_foto_lokasi']),
             ]);
 
             return $query->find($id);
@@ -90,18 +91,12 @@ class LaporanBibitBibitRepository implements LaporanBibitRepositoryInterface
     public function create(array $data): ?Model
     {
         try {
-            $model = LaporanKondisi::create($data);
-            if (!$model) {
-                throw new DataAccessException('Failed to create LaporanKondisi model.');
-            }
-            return $model;
+            return LaporanKondisi::create($data);
         } catch (QueryException $e) {
             $this->LogSqlException($e, $data);
             throw $e;
-        } catch (DataAccessException $e) {
-            throw $e;
         } catch (Throwable $e) {
-            $this->LogGeneralException($e, ['data' => $data]);
+            $this->LogGeneralException($e, $data);
             throw new DataAccessException('Unexpected repository error during create.', 0, $e);
         }
     }
@@ -261,6 +256,33 @@ class LaporanBibitBibitRepository implements LaporanBibitRepositoryInterface
         } catch (Throwable $e) {
             $this->LogGeneralException($e, ['penyuluh_id' => $penyuluhId]);
             throw new DataAccessException('Unexpected repository error in getLaporanStatusCounts.', 0, $e);
+        }
+    }
+
+    /**
+     * @param LaporanKondisi $laporan
+     * @param array $data
+     * @inheritDoc
+     * @throws DataAccessException
+     */
+    public function insertDetailLaporan(array $data): ?Model
+    {
+        try {
+            return LaporanKondisiDetail::create([
+                'laporan_kondisi_id' => $data['laporan_id'],
+                'luas_lahan' => $data['luas_lahan'],
+                'estimasi_panen' => $data['estimasi_panen'],
+                'jenis_bibit' => $data['jenis_bibit'],
+                'foto_bibit' => $data['path_bibit'],
+                'lokasi_lahan' => $data['lokasi_lahan'],
+                'path_foto_lokasi' => $data['path_lokasi'],
+            ]);
+        } catch (QueryException $e) {
+            $this->LogSqlException($e, $data);
+            throw $e;
+        } catch (Throwable $e) {
+            $this->LogGeneralException($e, $data );
+            throw new DataAccessException('Terjadi kesalahan tak terduga saat menyimpan detail laporan.', 0, $e);
         }
     }
 }

@@ -10,6 +10,7 @@ use App\Http\Resources\LaporanKondisiResource;
 use App\Services\Interfaces\LaporanBibitApiServiceInterface;
 use App\Trait\ApiResponse;
 use Illuminate\Http\JsonResponse;
+use Symfony\Component\HttpFoundation\Response;
 use Throwable;
 
 class LaporanBibitController extends Controller
@@ -26,17 +27,18 @@ class LaporanBibitController extends Controller
     public function saveReport(LaporanBibitRequest $request): JsonResponse
     {
         $validated = $request->validated();
-        if ($request->hasFile('foto_bibit')) {
+        if ($request->hasFile('foto_bibit') && request()->file('foto_lokasi')) {
             $validated['foto_bibit'] = $request->file('foto_bibit');
+            $validated['foto_lokasi'] = $request->file('foto_lokasi');
         }
 
         try {
             $laporan = $this->service->create($validated);
-            return $this->successResponse($laporan, 'Laporan berhasil disimpan', 201);
+            return $this->successResponse(new LaporanKondisiResource($laporan), 'Laporan berhasil disimpan', Response::HTTP_CREATED);
         } catch (DataAccessException $e) {
-            return $this->errorResponse('Gagal menyimpan laporan: ' . ($e->getMessage() ?? 'Terjadi kesalahan database.'), 500);
+            return $this->errorResponse('Laporan Gagal disimpan',Response::HTTP_INTERNAL_SERVER_ERROR);
         } catch (Throwable $e) {
-            return $this->errorResponse('Terjadi kesalahan tak terduga saat menyimpan laporan.', 500);
+            return $this->errorResponse('Terjadi kesalahan tak terduga saat menyimpan laporan.',Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 

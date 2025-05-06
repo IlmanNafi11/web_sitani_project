@@ -2,7 +2,9 @@
 
 namespace App\Repositories\Interfaces;
 
+use App\Models\LaporanKondisi;
 use App\Repositories\Interfaces\Base\BaseRepositoryInterface;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 
 interface LaporanBibitRepositoryInterface extends BaseRepositoryInterface
@@ -30,5 +32,13 @@ interface LaporanBibitRepositoryInterface extends BaseRepositoryInterface
      * @return array Hasil rekap Penggunaan Bibit(berkualitas, tidak berkualitas, dan laporan yang masih pending)
      */
     public function getLaporanStatusCounts(?int $penyuluhId = null): array;
+
+    /**
+     * Menyimpan detail laporan bibit
+     *
+     * @param array $data Data detail laporan
+     * @return Model|null
+     */
+    public function insertDetailLaporan(array $data): ?Model;
 
 }

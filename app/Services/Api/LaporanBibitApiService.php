@@ -14,6 +14,7 @@ use Illuminate\Database\QueryException;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Throwable;
 
 class LaporanBibitApiService implements LaporanBibitApiServiceInterface
@@ -48,37 +49,46 @@ class LaporanBibitApiService implements LaporanBibitApiServiceInterface
             if ($laporan === null) {
                 throw new DataAccessException('Gagal menyimpan laporan bibit di repository.');
             }
-            $file = $data['foto_bibit'] ?? null;
+            $fotoBibit = $data['foto_bibit'] ?? null;
+            $fotoLokasi = $data['foto_lokasi'] ?? null;
 
-            if ($file && $file->isValid()) {
-                try {
+            if ($fotoBibit && $fotoLokasi && $fotoBibit->isValid() && $fotoLokasi->isValid()) {
                     $now = date('Y-m-d');
+                    $fileBibit = $fotoBibit->getClientOriginalName();
+                    $fileLokasi = $fotoLokasi->getClientOriginalName();
                     $waktuPanen = Carbon::parse($data['estimasi_panen'])->format('Y-m-d');
-                    $filename = time() . '_' . $file->getClientOriginalName();
-                    $path = $file->storeAs('foto_bibit/' . $data['kelompok_tani_id'] . '/' . $now, $filename, 'public');
-
-                    LaporanKondisiDetail::create([
-                        'laporan_kondisi_id' => $laporan->id,
+                    $pathBibit = $fotoBibit->storeAs('laporan_bibit/' . $data['kelompok_tani_id'] . '/' . $now, Str::random(10) . $fileBibit, 'public');
+                    $pathLokasi = $fotoLokasi->storeAs('laporan_bibit/' . $data['kelompok_tani_id'] . '/' . $now,  Str::random(10) . $fileLokasi, 'public');
+                    $detail = [
+                        'laporan_id' => $laporan->id,
                         'luas_lahan' => $data['luas_lahan'],
                         'estimasi_panen' => $waktuPanen,
                         'jenis_bibit' => $data['jenis_bibit'],
-                        'foto_bibit' => $path,
+                        'path_bibit' => $pathBibit,
                         'lokasi_lahan' => $data['lokasi_lahan'],
-                    ]);
-
-                } catch (Throwable $fileError) {
-                    DB::rollBack();
-                    if (isset($path) && Storage::disk('public')->exists($path)) {
-                        Storage::disk('public')->delete($path);
+                        'path_lokasi' => $pathLokasi,
+                    ];
+                try {
+                    $laporanDetail = $this->repository->insertDetailLaporan($detail);
+                    if ($laporanDetail === null) {
+                        throw new DataAccessException('Gagal menyimpan detail laporan bibit di repository.');
                     }
-                    throw new DataAccessException('Gagal menyimpan detail laporan bibit.', 0, $fileError);
+                } catch (QueryException $e) {
+                    $this->deleteFile([$pathBibit, $pathLokasi]);
+                    DB::rollBack();
+                    throw new DataAccessException('Database error saat menyimpan detail laporan bibit di repository.');
+                } catch (DataAccessException $e) {
+                    DB::rollBack();
+                    $this->deleteFile([$pathBibit, $pathLokasi]);
+                    throw $e;
+                } catch (Throwable $fileError) {
+                    $this->deleteFile([$pathBibit, $pathLokasi]);
+                    DB::rollBack();
+                    throw new DataAccessException('Terjadi kesalahan tidak terduga saat menyimpan detail laporan bibit.', 0, $fileError);
                 }
             }
             DB::commit();
-
             $laporan->load('laporanKondisiDetail');
-
-
             return $laporan;
         } catch (QueryException $e) {
             DB::rollBack();
@@ -132,6 +142,15 @@ class LaporanBibitApiService implements LaporanBibitApiServiceInterface
             throw new DataAccessException('Database error saat menghitung total laporan bibit berdasarkan statusnya.', 0, $e);
         } catch (Throwable $e) {
             throw new DataAccessException('Terjadi kesalahan tidak terduga saat menghitung total laporan bibit berdasarkan statusnya.', 0, $e);
+        }
+    }
+
+    private function deleteFile(array $path): void
+    {
+        foreach ($path as $file) {
+            if (isset($file) && Storage::disk('public')->exists($file)) {
+                Storage::disk('public')->delete($file);
+            }
         }
     }
 }
