@@ -38,7 +38,7 @@ class LaporanBibitController extends Controller
         } catch (DataAccessException $e) {
             return $this->errorResponse('Laporan Gagal disimpan',Response::HTTP_INTERNAL_SERVER_ERROR);
         } catch (Throwable $e) {
-            return $this->errorResponse('Terjadi kesalahan tak terduga saat menyimpan laporan.',Response::HTTP_INTERNAL_SERVER_ERROR);
+            return $this->errorResponse('Terjadi kesalahan di server.',Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -50,7 +50,7 @@ class LaporanBibitController extends Controller
         } catch (ResourceNotFoundException) {
             return $this->errorResponse('Laporan Bibit tidak ditemukan', 404);
         } catch (DataAccessException $e) {
-            return $this->errorResponse('Failed to fetch Laporan Bibit data.', 500);
+            return $this->errorResponse('Gagal fetch data laporan bibit.', 500);
         } catch (Throwable $e) {
             return $this->errorResponse('Terjadi kesalahan diserver.', 500);
         }
@@ -66,7 +66,7 @@ class LaporanBibitController extends Controller
             }
             return $this->successResponse($stats, 'Total laporan bibit berhasil diambil');
         } catch (DataAccessException $e) {
-            return $this->errorResponse('Failed to calculate report status counts.', 500);
+            return $this->errorResponse('Gagal menghitung total laporan berdasarkan statusnya.', 500);
         } catch (Throwable $e) {
             return $this->errorResponse('Terjadi kesalahan diserver.', 500);
         }
