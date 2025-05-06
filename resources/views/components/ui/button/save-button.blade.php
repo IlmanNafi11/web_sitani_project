@@ -19,20 +19,12 @@
                     text: "{{ $messageAlert ?? 'Pastikan data telah di isi dengan benar!' }}",
                     icon: "warning",
                     showCancelButton: true,
-                    confirmButtonText: "Ya, Simpan",
-                    cancelButtonText: "Tidak, Batal!",
+                    confirmButtonText: "{{ $titleConfirmButton ?? 'Ya, Simpan' }}",
+                    cancelButtonText: "{{ $titleCancelButton ?? 'Tidak, Batal!' }}",
                     reverseButtons: true
                 }).then((result) => {
                     if (result.isConfirmed) {
                         document.getElementById('{{ $formId }}').submit();
-                    } else if (
-                        result.dismiss === Swal.DismissReason.cancel
-                    ) {
-                        sweetalert.fire({
-                            title: "Dibatalkan",
-                            text: "Data tidak tersimpan",
-                            icon: "info"
-                        });
                     }
                 });
             });

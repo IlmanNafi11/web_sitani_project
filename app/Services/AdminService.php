@@ -2,45 +2,80 @@
 
 namespace App\Services;
 
-use App\Repositories\Interfaces\CrudInterface;
-use Illuminate\Support\Facades\Log;
+use App\Exceptions\DataAccessException;
+use App\Exceptions\ImportFailedException;
+use App\Exceptions\ResourceNotFoundException;
+use App\Repositories\Interfaces\Base\BaseRepositoryInterface;
+use App\Services\Interfaces\AdminServiceInterface;
+use Illuminate\Database\QueryException;
+use Illuminate\Support\Collection;
+use Maatwebsite\Excel\Concerns\FromCollection;
+use App\Imports\AdminImport;
+use App\Exports\AdminExport;
+use Illuminate\Database\Eloquent\Model;
+use Maatwebsite\Excel\Facades\Excel;
+use Maatwebsite\Excel\Validators\ValidationException;
+use Throwable;
 
-class AdminService
+class AdminService implements AdminServiceInterface
 {
-    protected CrudInterface $repository;
-    public function __construct(CrudInterface $repository)
+    protected BaseRepositoryInterface $repository;
+
+    public function __construct(BaseRepositoryInterface $repository)
     {
         $this->repository = $repository;
     }
 
-    public function getAll()
+    /**
+     * @inheritDoc
+     * @param bool $withRelations
+     * @return Collection
+     * @throws DataAccessException
+     */
+    public function getAll(bool $withRelations = false): Collection
     {
         try {
             return $this->repository->getAll(true);
-        } catch (\Throwable $th) {
-            Log::error('Gagal mengambil seluruh data admin', [
-                'error' => $th->getMessage(),
-            ]);
-
-            throw $th;
+        } catch (QueryException $e) {
+            throw new DataAccessException('Database error saat fetch data admin.', 0, $e);
+        } catch (Throwable $e) {
+            throw new DataAccessException('Terjadi kesalahan tidak terduga saat fetch data admin.', 0, $e);
         }
     }
 
-    public function getById($id)
+    /**
+     * @inheritDoc
+     * @param string|int $id
+     * @return Model
+     * @throws DataAccessException
+     * @throws ResourceNotFoundException
+     */
+    public function getById(string|int $id): Model
     {
         try {
-            return $this->repository->find($id);
-        } catch (\Throwable $th) {
-            Log::error('Gagal mengambil data admin berdasarkan id', [
-                'id'    => $id,
-                'error' => $th->getMessage(),
-            ]);
+            $admin = $this->repository->getById($id);
 
-            throw $th;
+            if ($admin === null) {
+                throw new ResourceNotFoundException("Admin dengan id {$id} tidak ditemukan.");
+            }
+            return $admin;
+        } catch (ResourceNotFoundException $e) {
+            throw $e;
+        } catch (QueryException $e) {
+            throw new DataAccessException("Database error saat fetch data admin dengan id {$id}.", 0, $e);
+        } catch (Throwable $e) {
+            throw new DataAccessException("Terjadi kesalahan tidak terduga saat fetch data admin dengan id {$id}.", 0, $e);
         }
     }
 
-    public function create(array $data)
+
+    /**
+     * @inheritDoc
+     * @param array $data
+     * @return Model
+     * @throws DataAccessException
+     */
+    public function create(array $data): Model
     {
         try {
             $dt = [
@@ -53,39 +88,108 @@ class AdminService
                 'is_password_set' => false,
             ];
 
-            return $this->repository->create($dt);
-        } catch (\Throwable $th) {
-            Log::error('Gagal menyimpan data admin: ' . $th->getMessage());
-            return null;
+            $admin = $this->repository->create($dt);
+
+            if ($admin === null) {
+                throw new DataAccessException('Gagal menyimpan data admin di repository.');
+            }
+
+            return $admin;
+        } catch (QueryException $e) {
+            throw new DataAccessException('Database error saat menyimpan data admin.', 0, $e);
+        } catch (DataAccessException $e) {
+            throw $e;
+        } catch (Throwable $e) {
+            throw new DataAccessException('Terjadi kesalahan tidak terduga saat menyimpan data admin.', 0, $e);
         }
     }
 
-    public function update($id, array $data)
+    /**
+     * @inheritDoc
+     * @param string|int $id
+     * @param array $data
+     * @return bool
+     * @throws DataAccessException
+     */
+    public function update(string|int $id, array $data): bool
     {
         try {
-            return $this->repository->update($id, $data);
-        } catch (\Throwable $th) {
-            Log::error('Gagal memperbarui data admin', [
-                'id'    => $id,
-                'data'  => $data,
-                'error' => $th->getMessage(),
-            ]);
+            $updated = $this->repository->update($id, $data);
 
-            return null;
+            if (!$updated) {
+                throw new DataAccessException("Gagal memperbarui data admin dengan id {$id}.");
+            }
+
+            return true;
+        } catch (QueryException $e) {
+            throw new DataAccessException("Database error saat memperbarui data admin dengan id {$id}.", 0, $e);
+        } catch (DataAccessException $e) {
+            throw $e;
+        } catch (Throwable $e) {
+            throw new DataAccessException("Terjadi kesalahan tidak terduga saat memperbarui data admin dengan id {$id}.", 0, $e);
         }
     }
 
-    public function delete($id)
+    /**
+     * @inheritDoc
+     * @param string|int $id
+     * @return bool
+     * @throws DataAccessException
+     */
+    public function delete(string|int $id): bool
     {
         try {
-            return $this->repository->delete($id);
-        } catch (\Throwable $th) {
-            Log::error('Gagal menghapus data admin', [
-                'id'    => $id,
-                'error' => $th->getMessage(),
-            ]);
+            $deleted = $this->repository->delete($id);
 
-            return null;
+            if (!$deleted) {
+                throw new DataAccessException("Gagal menghapus data admin dengan id {$id}.");
+            }
+
+            return true;
+        } catch (QueryException $e) {
+            throw new DataAccessException("Database error saat menghapus data admin dengan id {$id}.", 0, $e);
+        } catch (DataAccessException $e) {
+            throw $e;
+        } catch (Throwable $e) {
+            throw new DataAccessException("Terjadi kesalahan tidak terduga saat menghapus data admin dengan id {$id}.", 0, $e);
+        }
+    }
+
+    /**
+     * @inheritDoc
+     * @param mixed $file
+     * @return array
+     * @throws DataAccessException
+     * @throws ImportFailedException
+     */
+    public function import(mixed $file): array
+    {
+        try {
+            $import = new AdminImport();
+            Excel::import($import, $file);
+
+            return $import->getFailures();
+        } catch (ValidationException $e) {
+            $failures = $e->failures();
+            throw new ImportFailedException("Data gagal validasi saat import data admin.", 0, $e, collect($failures));
+        } catch (QueryException $e) {
+            throw new DataAccessException("Database error saat import data admin.", 0, $e);
+        } catch (Throwable $e) {
+            throw new ImportFailedException("Terjadi kesalahan tidak terduga saat import data admin.", 0, $e);
+        }
+    }
+
+    /**
+     * @inheritDoc
+     * @return FromCollection
+     * @throws DataAccessException
+     */
+    public function export(): FromCollection
+    {
+        try {
+            return new AdminExport();
+        } catch (Throwable $e) {
+            throw new DataAccessException("Gagal export data admin.", 0, $e);
         }
     }
 }

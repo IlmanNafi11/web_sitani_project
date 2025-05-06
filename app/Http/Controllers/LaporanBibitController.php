@@ -2,98 +2,83 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Http\Requests\LaporanBibitRequest;
-use App\Services\LaporanBibitService;
+use App\Services\Interfaces\LaporanBibitServiceInterface;
+use App\Exceptions\DataAccessException;
+use App\Exceptions\ResourceNotFoundException;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\View\View;
+use Throwable;
 
 class LaporanBibitController extends Controller
 {
-    protected LaporanBibitService $laporanService;
-    public function __construct(LaporanBibitService $laporanService)
+    protected LaporanBibitServiceInterface $laporanService;
+
+    public function __construct(LaporanBibitServiceInterface $laporanService)
     {
         $this->laporanService = $laporanService;
     }
 
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    public function index(): View
     {
-        $laporans = $this->laporanService->getAll();
+        try {
+            $laporans = $this->laporanService->getAll(true);
+        } catch (DataAccessException $e) {
+            $laporans = collect();
+            session()->flash('error', 'Gagal memuat data laporan bibit.');
+        } catch (Throwable $e) {
+            $laporans = collect();
+            session()->flash('error', 'Terjadi kesalahan tak terduga.');
+        }
+
         return view('pages.laporan_bibit.index', compact('laporans'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    public function edit(string $id): View
     {
-        //
-    }
+        try {
+            $laporan = $this->laporanService->getById($id);
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(LaporanBibitRequest $request)
-    {
-        $validated = $request->validated();
-
-        $laporan = $this->laporanService->create($validated);
-
-        if ($laporan) {
-            return response()->json([
-                'message' => 'Report sent successfully',
-                'data' => $laporan,
-            ], 201);
+        } catch (ResourceNotFoundException $e) {
+            abort(404, $e->getMessage());
+        } catch (DataAccessException $e) {
+            abort(500, 'Terjadi kesalahan saat memuat data laporan bibit untuk edit. Silakan coba lagi.');
+        } catch (Throwable $e) {
+            abort(500, 'Terjadi kesalahan tak terduga.');
         }
 
-        return response()->json([
-            'message' => 'Laporan gagal disimpan'
-        ], 400);
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        $laporan = $this->laporanService->getById($id);
         return view('pages.laporan_bibit.verifikasi-bibit', compact('laporan'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
+    public function update(LaporanBibitRequest $request, string $id): RedirectResponse
     {
-        $request->validate([
-            'status' => 'required'
-        ], ['status.required' => 'Silahkan pilih opsi kualitas bibit yang tersedia']);
-        // dd($request->status);
-        $result = $this->laporanService->update($id, ['status' => $request->status]);
+        $validated = $request->validated();
 
-        if ($result) {
+        try {
+            $this->laporanService->update($id, ['status' => $validated['status']]);
+
             return redirect()->route('laporan-bibit.index')->with('success', 'Laporan berhasil diverifikasi');
+        } catch (ResourceNotFoundException $e) {
+            return redirect()->route('laporan-bibit.index')->with('error', $e->getMessage());
+        } catch (DataAccessException $e) {
+            return redirect()->back()->withInput()->with('error', 'Gagal memperbarui data laporan bibit. Silakan coba lagi.');
+        } catch (Throwable $e) {
+            return redirect()->back()->withInput()->with('error', 'Terjadi kesalahan tak terduga saat memperbarui data.');
         }
-
-        return redirect()->route('laporan-bibit.index')->with('failed', 'Laporan gagal diverifikasi');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
+    public function destroy(string $id): RedirectResponse
     {
-        $this->laporanService->delete($id);
+        try {
+            $this->laporanService->delete($id);
 
-        return redirect()->route('laporan-bibit.index')->with('success', 'Data berhasil dihapus');
+            return redirect()->route('laporan-bibit.index')->with('success', 'Laporan berhasil dihapus');
+        } catch (ResourceNotFoundException $e) {
+            return redirect()->route('laporan-bibit.index')->with('error', $e->getMessage());
+        } catch (DataAccessException $e) {
+            return redirect()->route('laporan-bibit.index')->with('error', 'Gagal menghapus data laporan bibit. Silakan coba lagi.');
+        } catch (Throwable $e) {
+            return redirect()->route('laporan-bibit.index')->with('error', 'Terjadi kesalahan tak terduga saat menghapus data.');
+        }
     }
 }

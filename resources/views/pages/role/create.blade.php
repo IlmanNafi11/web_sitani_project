@@ -20,7 +20,6 @@
                             return explode('.', $perm->name)[0];
                         });
                         $menuLabels = [
-                            'dashboard' => 'Dashboard',
                             'bibit' => 'Kelola Bibit',
                             'komoditas' => 'Kelola Komoditas',
                             'penyuluh' => 'Kelola Penyuluh',
@@ -68,7 +67,7 @@
                 </div>
             </div>
             <div class="flex gap-2.5">
-                <x-ui.button.back-button :style="'btn-soft'" :title="'Kembali'"/>
+                <x-ui.button.back-button :style="'btn-soft'" :title="'Kembali'" :routes="'admin.roles.index'" />
                 <x-ui.button.save-button :style="'btn-soft'" formId="form-tambah-role"/>
             </div>
         </form>

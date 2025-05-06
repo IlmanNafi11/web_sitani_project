@@ -18,11 +18,7 @@
     <script src="https://cdn.jsdelivr.net/npm/flowbite@3.1.2/dist/flowbite.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <div class="layout mx-auto md:w-full md:min-h-screen md:h-auto md:mx-0 bg-[#F5F7FF]">
-        <div class="grid grid-cols-2 grid-rows-1">
-            <x-partials.header />
-        </div>
-        {{-- <x-ui.title :title="'Hello'"/>
-        <x-ui.sub-title :title="'halaman hello world'"/> --}}
+
     </div>
     <script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4="
         crossorigin="anonymous"></script>

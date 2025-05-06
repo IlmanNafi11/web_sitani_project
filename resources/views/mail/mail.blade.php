@@ -23,7 +23,7 @@
                             </p>
                             <div style="width:100%; text-align:center; margin:32px 0;">
                                 <span style="display:inline-block; padding:18px 36px; font-size:2rem; background:#f0fff3; color:#217335; border-radius:8px; letter-spacing:6px; font-weight: bold; border:1.5px solid #bfeaca;">
-                                    {{ $code }}
+                                    <?php echo e($code); ?>
                                 </span>
                             </div>
                             <p style="color: #555; font-size:15px; text-align:center; line-height:1.6;">

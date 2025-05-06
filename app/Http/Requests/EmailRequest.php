@@ -23,7 +23,7 @@ class EmailRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'email' => 'required|email'
+            'email' => 'required|email|exists:users,email',
         ];
     }
 
@@ -32,6 +32,7 @@ class EmailRequest extends FormRequest
         return [
             'required' => ':attribute wajib diisi.',
             'email' => ':attribute tidak valid.',
+            'exists' => ':attribute tidak terdaftar.',
         ];
     }
 }

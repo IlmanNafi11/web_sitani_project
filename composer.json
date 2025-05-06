@@ -7,9 +7,14 @@
     "license": "MIT",
     "require": {
         "php": "^8.2",
+        "google/apiclient": "^2.18",
+        "kreait/firebase-php": "^7.10",
+        "kreait/laravel-firebase": "^5.8",
+        "laravel-notification-channels/fcm": "^4.5",
         "laravel/framework": "^11.31",
         "laravel/sanctum": "^4.0",
         "laravel/tinker": "^2.9",
+        "maatwebsite/excel": "^3.1",
         "spatie/laravel-permission": "^6.17",
         "tymon/jwt-auth": "^2.2"
     },

@@ -1,81 +1,220 @@
 <?php
+
 namespace App\Services;
 
-use App\Repositories\Interfaces\CrudInterface;
-use App\Repositories\Interfaces\PenyuluhTerdaftarCustomQueryInterface;
-use Illuminate\Support\Facades\Log;
+use App\Exceptions\DataAccessException;
+use App\Exceptions\ImportFailedException;
+use App\Exceptions\ResourceNotFoundException;
+use App\Imports\PenyuluhTerdaftarImport;
+use App\Repositories\Interfaces\PenyuluhTerdaftarRepositoryInterface;
+use App\Services\Interfaces\PenyuluhTerdaftarServiceInterface;
+use App\Trait\LoggingError;
+use Illuminate\Database\QueryException;
+use Illuminate\Database\Eloquent\Model;
+use Maatwebsite\Excel\Facades\Excel;
+use Illuminate\Support\Collection;
+use Maatwebsite\Excel\Concerns\FromCollection;
+use App\Exports\PenyuluhTerdaftarExport;
+use Maatwebsite\Excel\Validators\ValidationException;
+use Throwable;
 
-class PenyuluhTerdaftarService {
-    protected CrudInterface $penyuluhRepository;
-    protected PenyuluhTerdaftarCustomQueryInterface $penyuluhTerdaftarCustomQuery;
+class PenyuluhTerdaftarService implements PenyuluhTerdaftarServiceInterface
+{
+    use LoggingError;
 
-    public function __construct(CrudInterface $penyuluhRepository, PenyuluhTerdaftarCustomQueryInterface $penyuluhTerdaftarCustomQuery)
+    protected PenyuluhTerdaftarRepositoryInterface $repository;
+
+    public function __construct(PenyuluhTerdaftarRepositoryInterface $repository)
     {
-        $this->penyuluhRepository = $penyuluhRepository;
-        $this->penyuluhTerdaftarCustomQuery = $penyuluhTerdaftarCustomQuery;
+        $this->repository = $repository;
     }
 
-    public function getAll()
+    /**
+     * @inheritDoc
+     * @param bool $withRelations
+     * @return Collection
+     * @throws DataAccessException
+     */
+    public function getAll(bool $withRelations = false): Collection
     {
         try {
-            return $this->penyuluhRepository->getAll();
-        } catch (\Throwable $th) {
-            Log::error('Gagal mengambil seluruh data penyuluh terdaftar: ' . $th->getMessage());
+            return $this->repository->getAll($withRelations);
+        } catch (QueryException $e) {
+            throw new DataAccessException('Database error saat fetch data penyuluh terdaftar.', 0, $e);
+        } catch (Throwable $e) {
+            throw new DataAccessException('Terjadi kesalahan tak terduga saat saat fetch data penyuluh terdaftar.', 0, $e);
         }
     }
 
-    public function getAllWithKecamatan()
+    /**
+     * @inheritDoc
+     * @param string|int $id
+     * @return Model
+     * @throws DataAccessException
+     * @throws ResourceNotFoundException
+     */
+    public function getById(string|int $id): Model
     {
         try {
-            $penyuluh = $this->penyuluhRepository->getAll();
-            return $penyuluh->load('kecamatan');
-        } catch (\Throwable $th) {
-            Log::error('Gagal mengambil seluruh data penyuluh terdaftar beserta kecamatan: ' . $th->getMessage());
+            $penyuluh = $this->repository->getById($id);
+
+            if ($penyuluh === null) {
+                throw new ResourceNotFoundException("Penyuluh terdaftar dengan id {$id} tidak ditemukan.");
+            }
+
+            return $penyuluh;
+        } catch (ResourceNotFoundException $e) {
+            throw $e;
+        } catch (QueryException $e) {
+            throw new DataAccessException("Database error saat fetch data penyuluh terdaftar dengan id {$id}.", 0, $e);
+        } catch (Throwable $e) {
+            throw new DataAccessException("Terjadi kesalahan tak terduga saat fetch data penyuluh terdaftar dengan id {$id}.", 0, $e);
         }
     }
 
-    public function getById($id)
+    /**
+     * @inheritDoc
+     * @param array $data
+     * @return Model
+     * @throws DataAccessException
+     */
+    public function create(array $data): Model
     {
         try {
-            return $this->penyuluhRepository->find($id);
-        } catch (\Throwable $th) {
-            Log::error('Gagal mengambil data penyuluh terdaftar berdasarkan id: ' . $th->getMessage());
+            $penyuluh = $this->repository->create($data);
+
+            if ($penyuluh === null) {
+                throw new DataAccessException('Gagal menyimpan data penyuluh terdaftar di repository.');
+            }
+
+            return $penyuluh;
+        } catch (QueryException $e) {
+            throw new DataAccessException('Database error saat menyimpan data penyuluh terdaftar.', 0, $e);
+        } catch (DataAccessException $e) {
+            throw $e;
+        } catch (Throwable $e) {
+            throw new DataAccessException('Terjadi kesalahan tak terduga saat menyimpan data penyuluh terdaftar.', 0, $e);
         }
     }
 
-    public function create(array $data)
+    /**
+     * @inheritDoc
+     * @param string|int $id
+     * @param array $data
+     * @return bool
+     * @throws DataAccessException
+     */
+    public function update(string|int $id, array $data): bool
     {
         try {
-            return $this->penyuluhRepository->create($data);
-        } catch (\Throwable $th) {
-            Log::error('Gagal menyimpan data penyuluh terdaftar: ' . $th->getMessage());
+            $result = $this->repository->update($id, $data);
+
+            if(!$result) {
+                throw new DataAccessException("Gagal memperbarui data penyuluh terdaftar dengan id {$id} di repository.");
+            }
+            return (bool) $result;
+        } catch (QueryException $e) {
+            throw new DataAccessException("Database error saat memperbarui data penyuluh terdaftar dengan id {$id}.", 0, $e);
+        } catch (DataAccessException $e) {
+            throw $e;
+        } catch (Throwable $e) {
+            throw new DataAccessException("Terjadi kesalahan tak terduga saat memperbarui data penyuluh terdaftar dengan id {$id}.", 0, $e);
         }
     }
 
-    public function update($id, array $data)
+    /**
+     * @inheritDoc
+     * @param string|int $id
+     * @return bool
+     * @throws DataAccessException
+     */
+    public function delete(string|int $id): bool
     {
         try {
-            return $this->penyuluhRepository->update($id, $data);
-        } catch (\Throwable $th) {
-            Log::error('Gagal memperbarui data penyuluh terdaftar: ' . $th->getMessage());
+            $result = $this->repository->delete($id);
+
+            if (!$result) {
+                throw new DataAccessException("Gagal menghapus data penyuluh terdaftar dengan id {$id} di repository.");
+            }
+
+            return (bool) $result;
+        } catch (QueryException $e) {
+            throw new DataAccessException("Database error saat menghapus data penyuluh terdaftar dengan id {$id}.", 0, $e);
+        } catch (DataAccessException $e) {
+            throw $e;
+        } catch (Throwable $e) {
+            throw new DataAccessException("Terjadi kesalahan tak terduga saat menghapus data penyuluh terdaftar dengan id {$id}.", 0, $e);
         }
     }
 
-    public function delete($id)
+    /**
+     * @inheritDoc
+     * @param string|int $id
+     * @return Collection
+     * @throws DataAccessException
+     */
+    public function getByKecamatanId(string|int $id): Collection
     {
         try {
-            return $this->penyuluhRepository->delete($id);
-        } catch (\Throwable $th) {
-            Log::error('Gagal menghapus data penyuluh terdaftar: ' . $th->getMessage());
+            return $this->repository->getByKecamatanId($id);
+        } catch (QueryException $e) {
+            throw new DataAccessException("Database error saat fetch data penyuluh terdaftar berdasarkan kecamatan dengan id {$id}.", 0, $e);
+        } catch (Throwable $e) {
+            throw new DataAccessException("Terjadi kesalahan tak terduga saat fetch data penyuluh terdaftar berdasarkan kecamatan dengan id {$id}.", 0, $e);
         }
     }
 
-    public function getByKecamatanId($id)
+    /**
+     * @inheritDoc
+     * @return int
+     * @throws DataAccessException
+     */
+    public function calculateTotal(): int
     {
         try {
-            return $this->penyuluhTerdaftarCustomQuery->getByKecamatanId($id);
-        } catch (\Throwable $th) {
-            Log::error('Gagal mengambil data penyuluh terdaftar berdasarkan id kecamatan: ' . $th->getMessage());
+            return $this->repository->calculateTotal();
+        } catch (QueryException $e) {
+            throw new DataAccessException('Database error saat menghitung total penyuluh terdaftar.', 0, $e);
+        } catch (Throwable $e) {
+            throw new DataAccessException('Terjadi kesalahan tak terduga saat menghitung total penyuluh terdaftar.', 0, $e);
+        }
+    }
+
+    /**
+     * @inheritDoc
+     * @param mixed $file
+     * @return array
+     * @throws DataAccessException
+     * @throws ImportFailedException
+     */
+    public function import(mixed $file): array
+    {
+        try {
+            $import = new PenyuluhTerdaftarImport();
+            Excel::import($import, $file);
+
+            return $import->getFailures();
+        } catch (ValidationException $e) {
+            $failures = $e->failures();
+            throw new ImportFailedException("Validasi gagal saat import data.", 0, $e, collect($failures));
+        } catch (QueryException $e) {
+            throw new DataAccessException("Database error saat import data penyuluh terdaftar.", 0, $e);
+        } catch (Throwable $e) {
+            throw new ImportFailedException("Terjadi kesalahan tak terduga saat import data penyuluh terdaftar.", 0, $e);
+        }
+    }
+
+    /**
+     * @inheritDoc
+     * @return FromCollection
+     * @throws DataAccessException
+     */
+    public function export(): FromCollection
+    {
+        try {
+            return new PenyuluhTerdaftarExport();
+        } catch (Throwable $e) {
+            throw new DataAccessException("Gagal export data penyuluh terdaftar.", 0, $e);
         }
     }
 }

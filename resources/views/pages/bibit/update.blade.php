@@ -16,7 +16,7 @@
                     :extraClassOption="'col-span-2'" :defaultValue="$bibit->deskripsi" />
             </div>
             <div class="flex gap-2.5">
-                <x-ui.button.back-button :style="'btn-soft'" :title="'Kembali'" />
+                <x-ui.button.back-button :style="'btn-soft'" :title="'Kembali'" :routes="'bibit.index'" />
                 <x-ui.button.save-button :formId="'form-update-bibit'" :style="'btn-soft'" />
             </div>
         </form>

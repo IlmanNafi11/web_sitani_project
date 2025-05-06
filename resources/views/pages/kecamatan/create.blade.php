@@ -11,7 +11,7 @@
                 <x-form.input-text :keyId="'nama'" :label="'Nama Kecamatan'" :name="'nama'" :placeholder="'Masukan nama kecamatan'" />
             </div>
             <div class="flex gap-2.5">
-                <x-ui.button.back-button :style="'btn-soft'" :title="'Kembali'" />
+                <x-ui.button.back-button :style="'btn-soft'" :title="'Kembali'" :routes="'kecamatan.index'" />
                 <x-ui.button.save-button :style="'btn-soft'" formId="form-tambah-kecamatan" />
             </div>
         </form>

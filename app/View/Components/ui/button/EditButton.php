@@ -4,27 +4,37 @@ namespace App\View\Components\ui\button;
 
 use Closure;
 use Illuminate\Contracts\View\View;
+use Illuminate\Routing\Route;
 use Illuminate\View\Component;
 
 class EditButton extends Component
 {
-    public $color;
-    public $icon;
-    public $style;
-    public $title;
-    public $route;
-    public $extraClassOption;
-    public $permission;
+    public string $color;
+    public string $icon;
+    public string $style;
+    public string $title;
+    public Route $route;
+    public string $extraClassOption;
+    public string $permission;
 
-    public function __construct(
-        $color = 'primary',             // Default value for color
-        $icon = 'edit',                 // Default value for icon
-        $style = 'default',             // Default value for style
-        $title = 'Edit',                // Default value for title
-        $route = '',                    // Default value for route (optional, can be empty)
-        $extraClassOption = '',         // Default empty class for options
-        $permission = null              // Default permission (optional)
-    ){
+    /**
+     * @param string $color warna button
+     * @param string $icon icon button(opsional)
+     * @param string $style style button
+     * @param string $title title button
+     * @param ?Route $route route
+     * @param string $extraClassOption class tailwind tambahan untuk custom style button
+     * @param string $permission permission
+     */
+    public function __construct(string $color = 'btn-warning',
+                                string $icon = 'icon-[hugeicons--file-edit]',
+                                string $style = 'btn-soft',
+                                string $title = 'Perbarui',
+                                ?Route $route = null,
+                                string $extraClassOption = '',
+                                string $permission = ''
+    )
+    {
         $this->color = $color;
         $this->icon = $icon;
         $this->style = $style;

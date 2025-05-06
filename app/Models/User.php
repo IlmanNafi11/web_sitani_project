@@ -91,4 +91,24 @@ class User extends Authenticatable implements JWTSubject
     {
         return $this->hasOne(OtpCode::class);
     }
+
+    /**
+     * Relasi one to one dengan model penyuluh
+     *
+     * @return HasOne
+     */
+    public function penyuluh(): HasOne
+    {
+        return $this->hasOne(Penyuluh::class);
+    }
+
+    /**
+     * Getter user FCM token
+     *
+     * @return string|array
+     */
+    public function routeNotificationForFcm()
+    {
+        return $this->fcm_token;
+    }
 }

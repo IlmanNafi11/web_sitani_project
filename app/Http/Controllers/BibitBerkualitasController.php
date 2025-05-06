@@ -2,93 +2,141 @@
 
 namespace App\Http\Controllers;
 
+use App\Exceptions\DataAccessException;
+use App\Exceptions\ResourceNotFoundException;
+use App\Exports\template\BibitTemplate;
 use App\Http\Requests\BibitRequest;
-use App\Services\BibitService;
-use App\Services\KomoditasService;
-use Illuminate\Http\Request;
+use App\Http\Requests\FileExcelRequest;
+use App\Services\Interfaces\BibitServiceInterface;
+use App\Services\Interfaces\KomoditasServiceInterface;
+use App\Exceptions\ImportFailedException;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\View\View;
+use Maatwebsite\Excel\Facades\Excel;
 
 class BibitBerkualitasController extends Controller
 {
-    protected BibitService $bibitService;
+    protected BibitServiceInterface $bibitService;
 
-    public function __construct(BibitService $bibitService)
+    public function __construct(BibitServiceInterface $bibitService)
     {
         $this->bibitService = $bibitService;
     }
 
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    public function index(): View
     {
-        $datas = $this->bibitService->getAllWithKomoditas();
-
+        try {
+            $datas = $this->bibitService->getAll(true);
+        } catch (DataAccessException $e) {
+            $datas = collect();
+            session()->flash('error', 'Gagal memuat data bibit.');
+        }
         return view('pages.bibit.index', compact('datas'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create(KomoditasService $komoditasService)
+    public function create(KomoditasServiceInterface $komoditasService): View
     {
-        $datas = $komoditasService->getAll();
+        try {
+            $datas = $komoditasService->getAll();
+        } catch (DataAccessException $e) {
+            $datas = collect();
+            session()->flash('error', 'Gagal memuat data komoditas.');
+        }
         return view('pages.bibit.create', compact('datas'));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(BibitRequest $request)
+    public function store(BibitRequest $request): RedirectResponse
     {
-        $result = $this->bibitService->create($request->validated());
-
-        if ($result) {
+        try {
+            $this->bibitService->create($request->validated());
             return redirect()->route('bibit.index')->with('success', 'Data berhasil disimpan');
+        } catch (DataAccessException $e) {
+            return redirect()->route('bibit.index')->with('error', 'Data gagal disimpan. Silakan coba lagi.');
         }
-
-        return redirect()->route('bibit.index')->with('failed', 'Data gagal disimpan');
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
+    public function edit(string $id, KomoditasServiceInterface $komoditasService): View
     {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id, KomoditasService $komoditasService)
-    {
-        $bibit = $this->bibitService->getById($id);
-        $komoditas = $komoditasService->getAll();
+        try {
+            $bibit = $this->bibitService->getById($id);
+            $komoditas = $komoditasService->getAll();
+        } catch (ResourceNotFoundException $e) {
+            abort(404, $e->getMessage());
+        } catch (DataAccessException $e) {
+            abort(500, 'Terjadi kesalahan saat memuat data untuk edit. Silakan coba lagi.');
+        }
 
         return view('pages.bibit.update', compact('bibit', 'komoditas'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(BibitRequest $request, string $id)
+    public function update(BibitRequest $request, string $id): RedirectResponse
     {
-        $result = $this->bibitService->update($id, $request->validated());
-
-        if ($result) {
+        try {
+            $this->bibitService->update($id, $request->validated());
             return redirect()->route('bibit.index')->with('success', 'Data berhasil diperbarui');
+        } catch (DataAccessException $e) {
+            return redirect()->route('bibit.index')->with('error', 'Data gagal diperbarui. Silakan coba lagi.');
+        } catch (ResourceNotFoundException $e) {
+            abort(404, $e->getMessage());
         }
-
-        return redirect()->route('bibit.index')->with('success', 'Data gagal diperbarui');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
+    public function destroy(string $id): RedirectResponse
     {
-        $this->bibitService->delete($id);
+        try {
+            $this->bibitService->delete($id);
+            return redirect()->route('bibit.index')->with('success', 'Data berhasil dihapus');
+        } catch (DataAccessException $e) {
+            return redirect()->route('bibit.index')->with('error', 'Data gagal dihapus. Silakan coba lagi.');
+        } catch (ResourceNotFoundException $e) {
+            abort(404, $e->getMessage());
+        }
+    }
 
-        return redirect()->route('bibit.index')->with('success', 'Data berhasil dihapus');
+    public function downloadTemplate()
+    {
+        try {
+            return Excel::download(new BibitTemplate(), 'bibit_berkualitas_template.xlsx');
+        } catch (\Throwable $e) {
+            return redirect()->back()->with('error', 'Gagal mengunduh template.');
+        }
+    }
+
+    public function import(FileExcelRequest $request): RedirectResponse
+    {
+        $data = $request->validated();
+
+        try {
+            $failures = $this->bibitService->import($data['file']);
+
+            if (!empty($failures)) {
+                return redirect()->route('bibit.index')->with([
+                    'success' => 'Data berhasil diimport, namun ada beberapa data yang gagal diproses.',
+                    'failures' => $failures
+                ]);
+            }
+
+            return redirect()->route('bibit.index')->with('success', 'Data berhasil diimport');
+
+        } catch (ImportFailedException $e) {
+            return redirect()->route('bibit.index')->with([
+                'error' => $e->getMessage(),
+                'failures' => $e->getFailures()
+            ]);
+        } catch (DataAccessException $e) {
+            return redirect()->route('bibit.index')->with('error', 'Terjadi kesalahan database saat mengimport data.');
+        } catch (\Throwable $e) {
+            return redirect()->route('bibit.index')->with('error', 'Terjadi kesalahan tak terduga saat mengimport data.');
+        }
+    }
+
+    public function export()
+    {
+        try {
+            $exporter = $this->bibitService->export();
+            return Excel::download($exporter, 'bibit_berkualitas.xlsx');
+        } catch (\Throwable $e) {
+            return redirect()->back()->with('error', 'Gagal mengunduh data export.');
+        }
     }
 }

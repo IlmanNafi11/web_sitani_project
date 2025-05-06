@@ -1,6 +1,6 @@
 <nav class="navbar w-full bg-base-100 border-b border-gray-200 sm:z-1 relative">
     <button type="button" class="btn btn-text max-sm:btn-square sm:hidden me-2" aria-haspopup="dialog"
-        aria-expanded="false" aria-controls="with-navbar-sidebar" data-overlay="#with-navbar-sidebar">
+        aria-expanded="false" aria-controls="with-navbar-sidebar" data-overlay="#with-navbar-sidebar" data-overlay-options='{ "backdropExtraClasses": "!absolute transition duration-300 fixed inset-0 bg-base-content/60 overlay-backdrop"}'>
         <span class="icon-[tabler--menu-2] size-5"></span>
     </button>
     <div class="flex flex-1 items-center">
@@ -12,7 +12,7 @@
         <div class="dropdown relative inline-flex [--auto-close:inside] [--offset:8] [--placement:bottom-end]">
             <button id="dropdown-scrollable" type="button" class="dropdown-toggle flex items-center"
                 aria-haspopup="menu" aria-expanded="false" aria-label="Dropdown">
-                <div class="avatar">
+                <div class="avatar cursor-pointer">
                     <div class="size-9.5 rounded-full">
                         <picture>
                             <source srcset="{{ asset('storage/profile/profile.jpg') }}" type="image/jpeg"/>
@@ -33,12 +33,12 @@
                         </div>
                     </div>
                     <div>
-                        <h6 class="text-base-content text-base font-semibold">Afi</h6>
-                        <small class="text-base-content/50">Admin</small>
+                        <h6 class="text-base-content text-base font-semibold">{{ $user->admin->nama ?? $user->email }}</h6>
+                        <small class="text-base-content/50">{{ $role->first() }}</small>
                     </div>
                 </li>
                 <li>
-                    <a class="dropdown-item" href="#">
+                    <a href="{{ route('profile.index') }}" id="btn-profil" class="dropdown-item cursor-pointer">
                         <span class="icon-[tabler--user]"></span>
                         Profil Saya
                     </a>

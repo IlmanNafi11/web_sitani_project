@@ -8,24 +8,39 @@ use Illuminate\View\Component;
 
 class SaveButton extends Component
 {
-    public $color;
-    public $icon;
-    public $style;
-    public $title;
-    public $formId;
-    public $extraClassElement;
-    public $titleAlert;
-    public $messageAlert;
+    public string $color;
+    public string $icon;
+    public string $style;
+    public string $title;
+    public string $formId;
+    public string $extraClassElement;
+    public string $titleAlert;
+    public string $messageAlert;
+    public string $titleConfirmButton;
+    public string $titleCancelButton;
 
-    public function __construct(
-        $color = 'primary',
-        $icon = 'fa-save',
-        $style = 'solid',
-        $title = 'Simpan',
-        $formId = null,
-        $extraClassElement = '',
-        $titleAlert = 'Konfirmasi Simpan',
-        $messageAlert = 'Yakin ingin menyimpan data ini?'
+    /**
+     * @param string $color warna button
+     * @param string $icon icon button(opsional)
+     * @param string $style style button
+     * @param string $title title button
+     * @param string $formId form id yang akan disubmit
+     * @param string $extraClassElement class tailwind tambahan untuk style custom button
+     * @param string $titleAlert title sweet alert
+     * @param string $messageAlert description sweet alert
+     * @param string $titleConfirmButton title button confirm
+     * @param string $titleCancelButton title button cancel
+     */
+    public function __construct(string $color = 'btn-accent',
+                                string $icon = 'icon-[fluent--document-save-24-regular]',
+                                string $style = 'btn-soft',
+                                string $title = 'Simpan',
+                                string $formId = 'form',
+                                string $extraClassElement = '',
+                                string $titleAlert = 'Simpan data?',
+                                string $messageAlert = 'Pastikan data telah valid!',
+                                string $titleConfirmButton = 'Simpan',
+                                string $titleCancelButton = 'Batal',
     )
     {
         $this->color = $color;
@@ -36,6 +51,8 @@ class SaveButton extends Component
         $this->extraClassElement = $extraClassElement;
         $this->titleAlert = $titleAlert;
         $this->messageAlert = $messageAlert;
+        $this->titleConfirmButton = $titleConfirmButton;
+        $this->titleCancelButton = $titleCancelButton;
     }
 
     /**

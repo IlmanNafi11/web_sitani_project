@@ -8,40 +8,56 @@ use Illuminate\View\Component;
 
 class AdvancedSelect extends Component
 {
-    public $keyId;
-    public $label;
-    public $name;
-    public $placeholder;
-    public $options;
-    public $optionValue;
-    public $optionLabel;
-    public $selected;
-    public $helperText;
-    public $extraClassOptions;
-    public $extraClassElement;
-    public $isMultiple;
-    public $hasSearch;
-    public $searchPlaceholder;
-    public $noResultText;
+    public string $keyId;
+    public string $label;
+    public string $name;
+    public string $placeholder;
+    public array|null $options;
+    public string $optionValue;
+    public string $optionLabel;
+    public array|string|null $selected;
+    public string $helperText;
+    public string $extraClassOptions;
+    public string $extraClassElement;
+    public bool $isMultiple;
+    public bool $hasSearch;
+    public string $searchPlaceholder;
+    public string $noResultText;
 
-
-    public function __construct(
-        $keyId = '',
-        $label = '',
-        $name = '',
-        $placeholder = '',
-        $options = [],
-        $optionValue = '',
-        $optionLabel = '',
-        $selected = null,
-        $helperText = '',
-        $extraClassElement = '',
-        $extraClassOptions = '',
-        $isMultiple = false,
-        $hasSearch = false,
-        $searchPlaceholder = 'Search...',
-        $noResultText = 'No results found'
-    ){
+    /**
+     * @param string $keyId id select
+     * @param string $label label select
+     * @param string $name name select
+     * @param string $placeholder placeholder
+     * @param array|null $options options select
+     * @param string|null $optionValue options value
+     * @param string|null $optionLabel options label
+     * @param array|string|null $selected option yang terselect
+     * @param string $helperText helper text
+     * @param string $extraClassElement class tailwind tambahan untuk custom style element select
+     * @param string $extraClassOptions class tailwind tambahan untuk custom style container element select
+     * @param bool $isMultiple set true untuk multiple select
+     * @param bool $hasSearch set true untuk menambahkan fitur pencarian
+     * @param string $searchPlaceholder placeholder fitur pencarian, Note: Hanya berfungsi jika hasSearch=true
+     * @param string $noResultText placeholder ketika data tidak ditemukan, Not : Hanya berfungsi jika hasSearch=true
+     */
+    public function __construct(string $keyId = 'select-advance',
+                                string $label = 'label',
+                                string $name = 'select-advance',
+                                string $placeholder = 'placeholder',
+                                ?array $options = null,
+                                ?string $optionValue = '',
+                                ?string $optionLabel = '',
+                                array|string|null $selected = null,
+                                string $helperText = 'helper text',
+                                string $extraClassElement = '',
+                                string $extraClassOptions = '',
+                                bool $isMultiple = false,
+                                bool $hasSearch = false,
+                                string $searchPlaceholder = 'search placeholder',
+                                string $noResultText = 'no result',
+    )
+    {
         $this->keyId = $keyId;
         $this->label = $label;
         $this->name = $name;

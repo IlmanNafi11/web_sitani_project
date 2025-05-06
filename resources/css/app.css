@@ -6,6 +6,8 @@
 @plugin "flyonui";
 @import "flyonui/variants.css";
 @source "../node_modules/flyonui/flyonui.js";
+@import "apexcharts/src/assets/apexcharts.css";
+@import "flyonui/src/vendor/apexcharts.css";
 @plugin "@iconify/tailwind4";
 
 .datatable-dropdown, .datatable-search

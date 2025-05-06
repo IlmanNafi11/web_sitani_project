@@ -14,7 +14,7 @@
                 <x-form.select :name="'kecamatan_id'" :label="'Kecamatan'" :options="$kecamatans" :optionLabel="'nama'" :optionValue="'id'" :placeholder="'Pilih Kecamatan'" :selected="null" />
             </div>
             <div class="flex gap-2.5">
-                <x-ui.button.back-button :style="'btn-soft'" :title="'Kembali'" />
+                <x-ui.button.back-button :style="'btn-soft'" :title="'Kembali'" :routes="'penyuluh-terdaftar.index'" />
                 <x-ui.button.save-button :style="'btn-soft'" formId="form-tambah-penyuluh" />
             </div>
         </form>
