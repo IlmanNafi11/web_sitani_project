@@ -56,7 +56,7 @@
                                    data-fancybox="data-foto" data-caption="Foto Bibit">
                                     <img src="{{ asset('storage/' . $laporan->laporanKondisiDetail->path_foto_lokasi)}}"
                                          alt="foto-bibit"
-                                         class="image-bibit w-full h-full object-cover rounded-md shadow absolute cursor-not-allowed"
+                                         class="image-bibit w-full h-full object-cover rounded-md shadow absolute cursor-pointer"
                                          onload="document.getElementById('skeleton-image-bibit').style.display='none';"/>
                                 </a>
                             </div>
@@ -69,7 +69,7 @@
                                    data-fancybox="data-foto" data-caption="Foto Lokasi Penanaman">
                                     <img src="{{ asset('storage/' . $laporan->laporanKondisiDetail->path_foto_lokasi)}}"
                                          alt="foto-lokasi"
-                                         class="image-lokasi w-full h-full object-cover rounded-md shadow absolute cursor-not-allowed"
+                                         class="image-lokasi w-full h-full object-cover rounded-md shadow absolute cursor-pointer"
                                          onload="document.getElementById('skeleton-image-lokasi').style.display='none';"/>
                                 </a>
                             </div>
