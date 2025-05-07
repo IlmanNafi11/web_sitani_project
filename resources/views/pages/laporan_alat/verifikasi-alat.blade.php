@@ -1,4 +1,4 @@
-<?php
+
 @extends('layouts.layout')
 @section('title', 'Laporan Bantuan Alat | Sitani')
 @section('content')

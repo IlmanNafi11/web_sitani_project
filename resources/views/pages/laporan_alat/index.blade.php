@@ -70,7 +70,7 @@
                 perPage: 5,
                 perPageSelect: [5, 10, 15, 20, 25],
                 sortable: true,
-                searcable: true,
+                    searchable: true,
                 labels: {
                     placeholder: "Cari data",
                     searchTitle: "Search within table",
