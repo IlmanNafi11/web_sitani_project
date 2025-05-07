@@ -6,6 +6,7 @@ use App\Exceptions\DataAccessException;
 use App\Models\Komoditas;
 use App\Repositories\Interfaces\KomoditasRepositoryInterface;
 use App\Trait\LoggingError;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\QueryException;
@@ -26,8 +27,31 @@ class KomoditasRepository implements KomoditasRepositoryInterface
     {
         try {
             $query = Komoditas::select(['id', 'nama', 'deskripsi', 'musim']);
+
+            $searchKomoditas = Arr::get($criteria, 'search_komoditas');
+            $searchBibit = Arr::get($criteria, 'search_bibit');
+
+            if ($searchKomoditas || $searchBibit) {
+                $query->where(function ($query) use ($searchKomoditas, $searchBibit) {
+                    if ($searchKomoditas) {
+                        $query->where('nama', 'like', '%' . $searchKomoditas . '%');
+                    }
+
+                    if ($searchBibit) {
+                        $query->orWhereHas('bibitBerkualitas', function ($relationQuery) use ($searchBibit) {
+                            $relationQuery->where('nama', 'like', '%' . $searchBibit . '%');
+                        });
+                    }
+                });
+            }
+
             if ($withRelations) {
-                $query->with(['bibitBerkualitas:id,komoditas_id,nama,deskripsi']);
+                $query->with(['bibitBerkualitas' => function ($relationQuery) use ($searchBibit) {
+                    $relationQuery->select('id', 'komoditas_id', 'nama', 'deskripsi');
+                    if ($searchBibit) {
+                        $relationQuery->where('nama', 'like', '%' . $searchBibit . '%');
+                    }
+                }]);
             }
 
             return $query->get();

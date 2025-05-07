@@ -9,6 +9,7 @@ use App\Http\Resources\KomoditasResource;
 use App\Services\Interfaces\KomoditasApiServiceInterface;
 use App\Trait\ApiResponse;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
 class KomoditasController extends Controller
@@ -73,10 +74,11 @@ class KomoditasController extends Controller
         }
     }
 
-    public function getAllWithBibit(): JsonResponse
+    public function getAllWithBibit(Request $request): JsonResponse
     {
         try {
-            $komoditas = $this->service->getAll(true);
+            $criteria = $request->query();
+            $komoditas = $this->service->getAll(true, $criteria);
             return $this->successResponse(KomoditasResource::collection($komoditas), 'Data komoditas berhasil diambil');
         } catch (DataAccessException $e) {
             return $this->errorResponse('Gagal fetch data komoditas.', 500);

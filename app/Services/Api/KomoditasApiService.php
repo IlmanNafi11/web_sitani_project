@@ -21,15 +21,16 @@ class KomoditasApiService implements KomoditasApiServiceInterface
     }
 
     /**
-     * @inheritDoc
      * @param bool $withRelations
+     * @param array $criteria
+     * @inheritDoc
      * @return Collection
      * @throws DataAccessException
      */
-    public function getAll(bool $withRelations = false): Collection
+    public function getAll(bool $withRelations = false, array $criteria = []): Collection
     {
         try {
-            return $this->repository->getAll($withRelations, []);
+            return $this->repository->getAll($withRelations, $criteria);
         } catch (QueryException $e) {
             throw new DataAccessException('Database error saat fetch data komoditas.', 0, $e);
         } catch (Throwable $e) {
