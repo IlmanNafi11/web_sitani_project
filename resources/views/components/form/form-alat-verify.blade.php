@@ -51,7 +51,7 @@
                 <div>
                     <label for="path_ktp_ketua">KTP Ketua</label>
                     @if($laporan->LaporanBantuanAlatDetail->path_ktp_ketua)
-                        <img src="{{ asset('storage/' . $laporan->LaporanBantuanAlatDetail->path_ktp_ketua) }}" alt="KTP Ketua" class="max-w-md w-full h-auto mx-auto">
+                        <img src="{{ asset('storage/' . $laporan->LaporanBantuanAlatDetail->path_ktp_ketua) }}" alt="KTP Ketua" class="object-cover w-full h-48 rounded-lg">
                     @else
                         <p>No image available</p>
                     @endif
@@ -89,7 +89,7 @@
                 <div>
                     <label for="path_foto_lokasi">Foto Lokasi</label>
                     @if($laporan->LaporanBantuanAlatDetail->path_foto_lokasi)
-                        <img src="{{ asset('storage/' . $laporan->LaporanBantuanAlatDetail->path_foto_lokasi) }}" alt="Foto Lokasi" class="w-full h-auto">
+                        <img src="{{ asset('storage/' . $laporan->LaporanBantuanAlatDetail->path_foto_lokasi) }}" alt="Foto Lokasi" class="object-cover w-full h-48 rounded-lg">
                     @else
                         <p>No image available</p>
                     @endif
@@ -97,7 +97,7 @@
                 <div>
                     <label for="path_ktp_sekretaris">KTP Sekretaris</label>
                     @if($laporan->LaporanBantuanAlatDetail->path_ktp_sekretaris)
-                        <img src="{{ asset('storage/' . $laporan->LaporanBantuanAlatDetail->path_ktp_sekretaris) }}" alt="KTP Sekretaris" class="w-full h-auto">
+                        <img src="{{ asset('storage/' . $laporan->LaporanBantuanAlatDetail->path_ktp_sekretaris) }}" alt="KTP Sekretaris" class="object-cover w-full h-48 rounded-lg">
                     @else
                         <p>No image available</p>
                     @endif
@@ -107,7 +107,7 @@
                 <div>
                     <label for="path_ktp_ketua_upkk">KTP Ketua UPKK</label>
                     @if($laporan->LaporanBantuanAlatDetail->path_ktp_ketua_upkk)
-                        <img src="{{ asset('storage/' . $laporan->LaporanBantuanAlatDetail->path_ktp_ketua_upkk) }}" alt="KTP Ketua UPKK" class="w-full h-auto">
+                        <img src="{{ asset('storage/' . $laporan->LaporanBantuanAlatDetail->path_ktp_ketua_upkk) }}" alt="KTP Ketua UPKK" class="object-cover w-full h-48 rounded-lg">
                     @else
                         <p>No image available</p>
                     @endif
@@ -115,7 +115,7 @@
                 <div>
                     <label for="path_ktp_anggota1">KTP Anggota 1</label>
                     @if($laporan->LaporanBantuanAlatDetail->path_ktp_anggota1)
-                        <img src="{{ asset('storage/' . $laporan->LaporanBantuanAlatDetail->path_ktp_anggota1) }}" alt="KTP Anggota 1" class="w-full h-auto">
+                        <img src="{{ asset('storage/' . $laporan->LaporanBantuanAlatDetail->path_ktp_anggota1) }}" alt="KTP Anggota 1" class="object-cover w-full h-48 rounded-lg">
                     @else
                         <p>No image available</p>
                     @endif
@@ -125,7 +125,7 @@
                 <div>
                     <label for="path_ktp_anggota2">KTP Anggota 2</label>
                     @if($laporan->LaporanBantuanAlatDetail->path_ktp_anggota2)
-                        <img src="{{ asset('storage/' . $laporan->LaporanBantuanAlatDetail->path_ktp_anggota2) }}" alt="KTP Anggota 2" class="w-full h-auto">
+                        <img src="{{ asset('storage/' . $laporan->LaporanBantuanAlatDetail->path_ktp_anggota2) }}" alt="KTP Anggota 2" class="object-cover w-full h-48 rounded-lg">
                     @else
                         <p>No image available</p>
                     @endif
