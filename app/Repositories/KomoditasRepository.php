@@ -18,10 +18,11 @@ class KomoditasRepository implements KomoditasRepositoryInterface
     /**
      * @inheritDoc
      * @param $withRelations
+     * @param array $criteria
      * @return Collection|array
      * @throws DataAccessException
      */
-    public function getAll($withRelations = false): Collection|array
+    public function getAll($withRelations = false, array $criteria = []): Collection|array
     {
         try {
             $query = Komoditas::select(['id', 'nama', 'deskripsi', 'musim']);

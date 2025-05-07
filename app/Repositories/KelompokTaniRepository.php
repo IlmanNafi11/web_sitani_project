@@ -19,11 +19,12 @@ class KelompokTaniRepository implements ManyRelationshipManagement, KelompokTani
     use LoggingError;
 
     /**
+     * @param array $criteria
      * @inheritDoc
      * @return Collection|array
      * @throws DataAccessException
      */
-    public function getAll(bool $withRelations = false): Collection|array
+    public function getAll(bool $withRelations = false, array $criteria = []): Collection|array
     {
         try {
             $query = KelompokTani::query();

@@ -18,10 +18,11 @@ class PenyuluhTerdaftarRepository implements PenyuluhTerdaftarRepositoryInterfac
     /**
      * @inheritDoc
      * @param bool $withRelations
+     * @param array $criteria
      * @return Collection|array
      * @throws DataAccessException
      */
-    public function getAll(bool $withRelations = false): Collection|array
+    public function getAll(bool $withRelations = false, array $criteria = []): Collection|array
     {
         try {
             $query = PenyuluhTerdaftar::select(['id' , 'nama', 'no_hp', 'alamat', 'kecamatan_id']);

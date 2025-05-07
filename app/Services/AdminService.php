@@ -35,7 +35,7 @@ class AdminService implements AdminServiceInterface
     public function getAll(bool $withRelations = false): Collection
     {
         try {
-            return $this->repository->getAll(true);
+            return $this->repository->getAll(true, []);
         } catch (QueryException $e) {
             throw new DataAccessException('Database error saat fetch data admin.', 0, $e);
         } catch (Throwable $e) {

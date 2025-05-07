@@ -29,7 +29,7 @@ class KomoditasApiService implements KomoditasApiServiceInterface
     public function getAll(bool $withRelations = false): Collection
     {
         try {
-            return $this->repository->getAll($withRelations);
+            return $this->repository->getAll($withRelations, []);
         } catch (QueryException $e) {
             throw new DataAccessException('Database error saat fetch data komoditas.', 0, $e);
         } catch (Throwable $e) {

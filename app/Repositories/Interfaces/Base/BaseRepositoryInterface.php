@@ -11,9 +11,10 @@ interface BaseRepositoryInterface
      * Mengambil seluruh data
      *
      * @param bool $withRelations Default false, set true untuk mengambil data beserta relasi
+     * @param array $criteria Set dengan nilai dari query parameter untuk menerapkan pencarian data berdasarkan query parameter
      * @return Collection|array Data
      */
-    public function getAll(bool $withRelations = false): Collection|array;
+    public function getAll(bool $withRelations = false, array $criteria = []): Collection|array;
 
     /**
      * Mengambil data berdasarkan id

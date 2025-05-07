@@ -18,10 +18,11 @@ class DesaRepository implements BaseRepositoryInterface
     /**
      * @inheritDoc
      * @param bool $withRelations
+     * @param array $criteria
      * @return Collection|array
      * @throws DataAccessException
      */
-    public function getAll(bool $withRelations = false): Collection|array
+    public function getAll(bool $withRelations = false, array $criteria = []): Collection|array
     {
         try {
             $query = Desa::select(['id', 'nama', 'kecamatan_id']);

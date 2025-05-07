@@ -42,7 +42,7 @@ class KelompokTaniService implements KelompokTaniServiceInterface
     public function getAll(bool $withRelations = false): Collection
     {
         try {
-            return $this->repository->getAll($withRelations);
+            return $this->repository->getAll($withRelations, []);
         } catch (QueryException $e) {
             throw new DataAccessException('Database error saat fetch data kelompok tani.', 0, $e);
         } catch (Throwable $e) {

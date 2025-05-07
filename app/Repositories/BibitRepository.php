@@ -15,10 +15,11 @@ class BibitRepository implements BibitRepositoryInterface
     use LoggingError;
 
     /**
+     * @param array $criteria
      * @inheritDoc
      * @throws DataAccessException
      */
-    public function getAll(bool $withRelations = false): Collection|array
+    public function getAll(bool $withRelations = false, array $criteria = []): Collection|array
     {
         try {
             $query = BibitBerkualitas::select(['id', 'nama', 'deskripsi', 'komoditas_id']);

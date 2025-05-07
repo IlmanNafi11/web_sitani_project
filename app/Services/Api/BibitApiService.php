@@ -26,7 +26,7 @@ class BibitApiService implements BibitApiServiceInterface
     public function getAllApi(): Collection
     {
         try {
-            return $this->repository->getAll(false);
+            return $this->repository->getAll(false, []);
         } catch (QueryException $e) {
             throw new DataAccessException('Database error saat fetch data bibit.', 0, $e);
         } catch (Throwable $e) {

@@ -20,10 +20,11 @@ class RoleRepository implements RoleRepositoryInterface
     /**
      * @inheritDoc
      * @param bool $withRelations
+     * @param array $criteria
      * @return Collection|array
      * @throws DataAccessException
      */
-    public function getAll(bool $withRelations = false): Collection|array
+    public function getAll(bool $withRelations = false, array $criteria = []): Collection|array
     {
         try {
             $query = Role::query();

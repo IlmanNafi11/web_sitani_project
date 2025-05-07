@@ -33,7 +33,7 @@ class PenyuluhService implements PenyuluhServiceInterface
     public function getAll(bool $withRelations = false): Collection
     {
         try {
-            return $this->repository->getAll(true);
+            return $this->repository->getAll(true, []);
         } catch (QueryException $e) {
             $this->LogSqlException($e, [], 'Database error saat mengambil semua data penyuluh.');
             throw new DataAccessException('Gagal mengambil data penyuluh.', 0, $e);
