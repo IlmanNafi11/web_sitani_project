@@ -44,35 +44,37 @@
                 <div>
                     <label for="path_ktp_ketua">KTP Ketua</label>
                     @if($laporan->LaporanBantuanAlatDetail->path_ktp_ketua)
-                        <img src="{{ asset('storage/' . $laporan->LaporanBantuanAlatDetail->path_ktp_ketua) }}" alt="KTP Ketua" class="w-full h-auto">
+                        <img src="{{ asset('storage/' . $laporan->LaporanBantuanAlatDetail->path_ktp_ketua) }}" alt="KTP Ketua" class="max-w-md w-full h-auto mx-auto">
                     @else
                         <p>No image available</p>
                     @endif
                 </div>
                 <div>
-                    <label for="path_badan_hukum">Badan Hukum</label>
+                    <label for="path_badan_hukum">Badan Hukum (PDF)</label>
                     @if($laporan->LaporanBantuanAlatDetail->path_badan_hukum)
-                        <img src="{{ asset('storage/' . $laporan->LaporanBantuanAlatDetail->path_badan_hukum) }}" alt="Badan Hukum" class="w-full h-auto">
+                        <a href="{{ asset('storage/' . $laporan->LaporanBantuanAlatDetail->path_badan_hukum) }}" target="_blank" class="text-blue-500">View Badan Hukum (PDF)</a>
                     @else
-                        <p>No image available</p>
+                        <p>No file available</p>
                     @endif
                 </div>
+
+            </div>
             </div>
             <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
                 <div>
-                    <label for="path_piagam">Piagam</label>
+                    <label for="path_piagam">Piagam Pengesahan (PDF)</label>
                     @if($laporan->LaporanBantuanAlatDetail->path_piagam)
-                        <img src="{{ asset('storage/' . $laporan->LaporanBantuanAlatDetail->path_piagam) }}" alt="Piagam" class="w-full h-auto">
+                        <a href="{{ asset('storage/' . $laporan->LaporanBantuanAlatDetail->path_piagam) }}" target="_blank" class="text-blue-500">View Piagam (PDF)</a>
                     @else
-                        <p>No image available</p>
+                        <p>No file available</p>
                     @endif
                 </div>
                 <div>
-                    <label for="path_surat_domisili">Surat Domisili</label>
+                    <label for="path_surat_domisili">Surat Domisili (PDF)</label>
                     @if($laporan->LaporanBantuanAlatDetail->path_surat_domisili)
-                        <img src="{{ asset('storage/' . $laporan->LaporanBantuanAlatDetail->path_surat_domisili) }}" alt="Surat Domisili" class="w-full h-auto">
+                        <a href="{{ asset('storage/' . $laporan->LaporanBantuanAlatDetail->path_surat_domisili) }}" target="_blank" class="text-blue-500">View Surat Domisili (PDF)</a>
                     @else
-                        <p>No image available</p>
+                        <p>No file available</p>
                     @endif
                 </div>
             </div>
