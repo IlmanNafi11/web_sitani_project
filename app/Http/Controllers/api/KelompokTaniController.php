@@ -40,29 +40,7 @@ class KelompokTaniController extends Controller
 
         try {
             $kelompokTanis = $this->service->getAllByPenyuluhId($ids);
-            $formattedData = $kelompokTanis->map(function($item) {
-                return [
-                    'id' => $item->id,
-                    'nama' => $item->nama,
-                    'desa' => [
-                        'id' => $item->desa->id ?? null,
-                        'nama' => $item->desa->nama ?? null,
-                    ],
-                    'kecamatan' => [
-                        'id' => $item->desa->kecamatan->id ?? null,
-                        'nama' => $item->desa->kecamatan->nama ?? null,
-                    ],
-                    'penyuluhs' => $item->penyuluhTerdaftars->map(function($penyuluh) {
-                        return [
-                            'id' => $penyuluh->id,
-                            'nama' => $penyuluh->nama,
-                            'no_hp' => $penyuluh->no_hp,
-                            'alamat' => $penyuluh->alamat,
-                        ];
-                    })
-                ];
-            });
-            return $this->successResponse($formattedData, 'Data kelompok tani ditemukan');
+            return $this->successResponse(KelompokTaniResource::collection($kelompokTanis), 'Data kelompok tani ditemukan');
         } catch (DataAccessException $e) {
             return $this->errorResponse('Failed to fetch Kelompok Tani data.', 500);
         } catch (Throwable $e) {

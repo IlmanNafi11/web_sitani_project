@@ -161,7 +161,7 @@ class KelompokTaniRepository implements ManyRelationshipManagement, KelompokTani
             })
                 ->with([
                     'desa:id,nama,kecamatan_id',
-                    'desa.kecamatan:id,nama',
+                    'kecamatan:id,nama',
                     'penyuluhTerdaftars:id,nama,no_hp,alamat',
                 ])
                 ->get();
