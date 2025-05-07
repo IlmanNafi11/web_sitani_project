@@ -12,4 +12,12 @@ interface PenyuluhRepositoryInterface extends BaseRepositoryInterface
      * @return int Total Data Penyuluh
      */
     public function calculateTotal(): int;
+
+    /**
+     * Mengecek apakah penyuluh sudah memiliki akun Sitani(mobile)
+     *
+     * @param string|int $penyuluhTerdaftarId Penyuluh Terdaftar Id
+     * @return bool Hasil
+     */
+    public function existsByPenyuluhTerdaftarId(string|int $penyuluhTerdaftarId): bool;
 }

@@ -172,4 +172,23 @@ class PenyuluhRepository implements PenyuluhRepositoryInterface
             throw $e;
         }
     }
+
+    /**
+     * @inheritDoc
+     * @throws Throwable
+     */
+    public function existsByPenyuluhTerdaftarId(int|string $penyuluhTerdaftarId): bool
+    {
+        try {
+            return Penyuluh::whereHas('penyuluhTerdaftar', function ($query) use ($penyuluhTerdaftarId) {
+                $query->where('id', $penyuluhTerdaftarId);
+            })->exists();
+        } catch (QueryException $e) {
+            $this->LogSqlException($e, [], 'Database error saat mengecek akun terdaftar penyuluh.');
+            throw $e;
+        } catch (Throwable $e) {
+            $this->LogGeneralException($e, [], 'Terjadi kesalahan tak terduga saat mengecek akun terdaftar penyuluh.');
+            throw $e;
+        }
+    }
 }

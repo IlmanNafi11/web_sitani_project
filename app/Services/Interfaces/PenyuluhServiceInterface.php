@@ -14,4 +14,12 @@ interface PenyuluhServiceInterface extends BaseServiceInterface
      * @throws DataAccessException
      */
     public function calculateTotal(): int;
+
+    /**
+     * Mengecek apakah penyuluh sudah memiliki akun
+     *
+     * @param string|int $penyuluhTerdaftarId Penyuluh Terdaftar id
+     * @return bool Hasil
+     */
+    public function existsByPenyuluhTerdaftarId(string|int $penyuluhTerdaftarId): bool;
 }

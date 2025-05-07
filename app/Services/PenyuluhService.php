@@ -160,4 +160,19 @@ class PenyuluhService implements PenyuluhServiceInterface
             throw new DataAccessException('Terjadi kesalahan tak terduga saat menghitung total penyuluh.', 0, $e);
         }
     }
+
+    /**
+     * @inheritDoc
+     * @throws DataAccessException
+     */
+    public function existsByPenyuluhTerdaftarId(int|string $penyuluhTerdaftarId): bool
+    {
+        try {
+            return $this->repository->existsByPenyuluhTerdaftarId($penyuluhTerdaftarId);
+        } catch (QueryException $e) {
+            throw new DataAccessException('Gagal mengecek akun penyuluh.', 0, $e);
+        } catch (Throwable $e) {
+            throw new DataAccessException('Terjadi kesalahan tak terduga saat mengecek akun penyuluh.', 0, $e);
+        }
+    }
 }

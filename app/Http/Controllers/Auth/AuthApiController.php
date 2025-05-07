@@ -72,6 +72,12 @@ class AuthApiController extends Controller
 
         try {
             $penyuluhTerdaftar = $this->penyuluhTerdaftarService->getByPhone($phone);
+
+            $exists = $this->penyuluhService->existsByPenyuluhTerdaftarId($penyuluhTerdaftar->id);
+            if ($exists) {
+                return $this->errorResponse('Nomor telah terdaftar, silahkan login,',  Response::HTTP_CONFLICT);
+            }
+
             return $this->successResponse($penyuluhTerdaftar, 'Nomor HP terdaftar sebagai penyuluh.');
 
         } catch (ResourceNotFoundException $e) {
