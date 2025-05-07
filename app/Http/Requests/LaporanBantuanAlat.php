@@ -33,16 +33,15 @@ class LaporanBantuanAlat extends FormRequest
             'password_email' => 'required|string|max:255',
             'path_proposal' => 'required|file|mimes:pdf|max:2048',
             'path_ktp_ketua' => 'required|file|mimes:jpg,jpeg|max:2048',
-            'path_badan_hukum' => 'required|file|mimes:jpg,jpeg|max:2048',
-            'path_piagam' => 'required|file|mimes:jpg,jpeg|max:2048',
-            'path_surat_domisili' => 'required|file|mimes:jpg,jpeg|max:2048',
+            'path_badan_hukum' => 'required|file|mimes:pdf|max:2048',
+            'path_piagam' => 'required|file|mimes:pdf|max:2048',
+            'path_surat_domisili' => 'required|file|mimes:pdf|max:2048',
             'path_foto_lokasi' => 'required|file|mimes:jpg,jpeg|max:2048',
             'path_ktp_sekretaris' => 'required|file|mimes:jpg,jpeg|max:2048',
             'path_ktp_ketua_upkk' => 'required|file|mimes:jpg,jpeg|max:2048',
             'path_ktp_anggota1' => 'required|file|mimes:jpg,jpeg|max:2048',
             'path_ktp_anggota2' => 'required|file|mimes:jpg,jpeg|max:2048',
 
-            'status' => 'required|string',
         ];
     }
 
@@ -53,6 +52,9 @@ class LaporanBantuanAlat extends FormRequest
             'penyuluh_id.exists' => 'Penyuluh tidak ditemukan',
             'alat_diminta.regex' => 'Alat diminta hanya boleh berisi huruf, angka, dan spasi',
             'path_proposal.mimes' => 'Proposal harus berupa file PDF',
+            'path_badan_hukum.mimes' => 'Badan Hukum harus berupa file PDF',
+            'path_piagam.mimes' => 'Piagam harus berupa file PDF',
+            'path_surat_domisili.mimes' => 'Surat Domisili harus berupa file PDF',
             '*.mimes' => 'File harus berupa JPG atau JPEG',
         ];
     }
