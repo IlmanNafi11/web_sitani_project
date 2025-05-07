@@ -26,7 +26,7 @@ class KomoditasApiService implements KomoditasApiServiceInterface
      * @return Collection
      * @throws DataAccessException
      */
-    public function getAllApi(bool $withRelations = false): Collection
+    public function getAll(bool $withRelations = false): Collection
     {
         try {
             return $this->repository->getAll($withRelations);

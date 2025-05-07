@@ -56,8 +56,9 @@ Route::controller(BibitController::class)->group(function () {
 Route::controller(KomoditasController::class)->group(function () {
     Route::get('komoditas/musim', 'getMusim');
     Route::get('komoditas/count', 'calculateTotal');
+    Route::get('komoditas/bibit', 'getAllWithBibit');
     Route::get('komoditas/{id}','show');
-    Route::get('komoditas','index');
+    Route::get('komoditas','getAll');
 });
 
 /**

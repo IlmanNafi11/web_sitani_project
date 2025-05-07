@@ -5,9 +5,11 @@ namespace App\Http\Controllers\api;
 use App\Exceptions\DataAccessException;
 use App\Exceptions\ResourceNotFoundException;
 use App\Http\Controllers\Controller;
+use App\Http\Resources\KomoditasResource;
 use App\Services\Interfaces\KomoditasApiServiceInterface;
 use App\Trait\ApiResponse;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Log;
 
 class KomoditasController extends Controller
 {
@@ -20,10 +22,10 @@ class KomoditasController extends Controller
         $this->service = $service;
     }
 
-    public function index(): JsonResponse
+    public function getAll(): JsonResponse
     {
         try {
-            $datas = $this->service->getAllApi();
+            $datas = $this->service->getAll();
             return $this->successResponse($datas->toArray(), 'Data komoditas berhasil diambil');
         } catch (DataAccessException $e) {
             return $this->errorResponse('Gagal fetch data komoditas.', 500);
@@ -67,6 +69,19 @@ class KomoditasController extends Controller
         } catch (DataAccessException $e) {
             return $this->errorResponse('Gagal menghitung total komoditas.', 500);
         } catch (\Throwable $e) {
+            return $this->errorResponse('Terjadi kesalahan di server.', 500);
+        }
+    }
+
+    public function getAllWithBibit(): JsonResponse
+    {
+        try {
+            $komoditas = $this->service->getAll(true);
+            return $this->successResponse(KomoditasResource::collection($komoditas), 'Data komoditas berhasil diambil');
+        } catch (DataAccessException $e) {
+            return $this->errorResponse('Gagal fetch data komoditas.', 500);
+        } catch (\Throwable $e) {
+            Log::info($e->getMessage());
             return $this->errorResponse('Terjadi kesalahan di server.', 500);
         }
     }

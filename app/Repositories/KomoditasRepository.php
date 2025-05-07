@@ -26,7 +26,7 @@ class KomoditasRepository implements KomoditasRepositoryInterface
         try {
             $query = Komoditas::select(['id', 'nama', 'deskripsi', 'musim']);
             if ($withRelations) {
-                $query->with(['bibitBerkualitas:id,komoditas_id']);
+                $query->with(['bibitBerkualitas:id,komoditas_id,nama,deskripsi']);
             }
 
             return $query->get();

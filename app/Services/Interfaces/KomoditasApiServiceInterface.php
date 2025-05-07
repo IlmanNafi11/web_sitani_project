@@ -13,7 +13,7 @@ interface KomoditasApiServiceInterface
      * @param bool $withRelations set true untuk mengambil data beserta relasi, default false
      * @return Collection Koleksi model komoditas
      */
-    public function getAllApi(bool $withRelations = false): Collection;
+    public function getAll(bool $withRelations = false): Collection;
 
     /**
      * Mengambil data komoditas berdasarkan komoditas id
