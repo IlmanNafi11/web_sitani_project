@@ -10,6 +10,7 @@ use App\Services\Interfaces\KelompokTaniApiServiceInterface;
 use App\Trait\ApiResponse;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Throwable;
 
 class KelompokTaniController extends Controller
@@ -28,14 +29,14 @@ class KelompokTaniController extends Controller
         $penyuluhIds = $request->query('penyuluhIds');
 
         if (is_null($penyuluhIds)) {
-            return $this->errorResponse('penyuluhIds tidak boleh kosong', 400);
+            return $this->errorResponse('penyuluhIds tidak boleh kosong', Response::HTTP_BAD_REQUEST);
         }
 
         $ids = is_array($penyuluhIds) ? $penyuluhIds : explode(',', $penyuluhIds);
         $ids = array_filter($ids, static fn($id) => !empty($id));
 
         if (empty($ids)) {
-            return $this->successResponse([], 'Tidak ada penyuluh ID yang valid diberikan.');
+            return $this->errorResponse('Tidak ada penyuluh ID yang valid diberikan.', Response::HTTP_BAD_REQUEST);
         }
 
         try {
@@ -54,7 +55,7 @@ class KelompokTaniController extends Controller
             $kelompokTani = $this->service->getById($id);
             return $this->successResponse(new KelompokTaniResource($kelompokTani), 'Data kelompok tani ditemukan');
         } catch (ResourceNotFoundException $e) {
-            return $this->errorResponse($e->getMessage(), 404);
+            return $this->errorResponse('Kelompok tani tidak ditemukan', Response::HTTP_NOT_FOUND);
         } catch (DataAccessException $e) {
             return $this->errorResponse('Failed to fetch Kelompok Tani data.', 500);
         } catch (Throwable $e) {
@@ -85,6 +86,19 @@ class KelompokTaniController extends Controller
             return $this->errorResponse('Failed to count Kelompok Tani by Kecamatan ID.', 500);
         } catch (Throwable $e) {
             return $this->errorResponse('Terjadi kesalahan diserver.', 500);
+        }
+    }
+
+    public function getAllByKecamatanId(Request $request, string|int $id): JsonResponse
+    {
+        try {
+            $criteria = $request->query();
+            $kelompokTanis = $this->service->getAllByKecamatanId($id, $criteria);
+            return $this->successResponse(KelompokTaniResource::collection($kelompokTanis), 'Data kelompok tani ditemukan');
+        } catch (DataAccessException $e) {
+            return $this->errorResponse('Gagal fetch data kelompok tani.', 500);
+        } catch (\Throwable $e) {
+            return $this->errorResponse('Terjadi kesalahan di server.', 500);
         }
     }
 }

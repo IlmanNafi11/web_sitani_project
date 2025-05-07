@@ -96,4 +96,21 @@ class KelompokTaniApiService implements KelompokTaniApiServiceInterface
             throw new DataAccessException("Terjadi kesalahan tidak terduga saat menghitung total data kelompok tani berdasarkan kecamatan dengan id {$id}.", 0, $e);
         }
     }
+
+    /**
+     * @param int|string $kecamatanId
+     * @param array $criteria
+     * @inheritDoc
+     * @throws DataAccessException
+     */
+    public function getAllByKecamatanId(int|string $kecamatanId, array $criteria = []): Collection
+    {
+        try {
+            return $this->repository->getAllByKecamatanId($kecamatanId, $criteria);
+        } catch (QueryException $e) {
+            throw new DataAccessException('Database error saat fetch data kelompok tani berdasarkan kecamatan id.', 0, $e);
+        } catch (Throwable $e) {
+            throw new DataAccessException('Terjadi kesalahan tak terduga saat fetch data kelompok tani berdasarkan kecamatan id.', 0, $e);
+        }
+    }
 }

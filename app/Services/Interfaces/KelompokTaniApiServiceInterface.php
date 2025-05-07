@@ -37,4 +37,12 @@ interface KelompokTaniApiServiceInterface
      * @return int Total
      */
     public function countByKecamatanId(string|int $id): int;
+
+    /**
+     * Mengambil seluruh data kelompok tani berdasarkan kecamatan id
+     *
+     * @param string|int $kecamatanId Kecamatan id
+     * @return Collection Koleksi Kelompok Tani
+     */
+    public function getAllByKecamatanId(string|int $kecamatanId, array $criteria = []): Collection;
 }

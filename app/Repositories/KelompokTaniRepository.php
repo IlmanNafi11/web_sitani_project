@@ -8,6 +8,7 @@ use App\Models\KelompokTani;
 use App\Repositories\Interfaces\KelompokTaniRepositoryInterface;
 use App\Repositories\Interfaces\ManyRelationshipManagement;
 use App\Trait\LoggingError;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -277,6 +278,57 @@ class KelompokTaniRepository implements ManyRelationshipManagement, KelompokTani
         } catch (Throwable $e) {
             $this->LogGeneralException($e, ['model_id' => $model->id ?? 'N/A', 'relations' => $relations]);
             throw new DataAccessException('Unexpected repository error during sync.', 0, $e);
+        }
+    }
+
+    /**
+     * @param int|string $kecamatanId
+     * @param array $criteria
+     * @inheritDoc
+     * @throws DataAccessException
+     */
+    public function getAllByKecamatanId(int|string $kecamatanId, array $criteria = []): Collection
+    {
+        try {
+            $query = KelompokTani::query();
+
+            $query->where('kecamatan_id', $kecamatanId);
+
+            $searchNamaKelompokTani = Arr::get($criteria, 'search_nama_kelompok_tani');
+            $searchNamaDesa = Arr::get($criteria, 'search_nama_desa');
+
+            if ($searchNamaKelompokTani || $searchNamaDesa) {
+                $query->where(function ($query) use ($searchNamaKelompokTani, $searchNamaDesa) {
+                    $firstConditionAdded = false;
+
+                    if ($searchNamaKelompokTani) {
+                        $query->where('nama', 'like', '%' . $searchNamaKelompokTani . '%');
+                        $firstConditionAdded = true;
+                    }
+
+                    if ($searchNamaDesa) {
+                        if ($firstConditionAdded) {
+                            $query->orWhereHas('desa', function ($relationQuery) use ($searchNamaDesa) {
+                                $relationQuery->where('nama', 'like', '%' . $searchNamaDesa . '%');
+                            });
+                        } else {
+                            $query->whereHas('desa', function ($relationQuery) use ($searchNamaDesa) {
+                                $relationQuery->where('nama', 'like', '%' . $searchNamaDesa . '%');
+                            });
+                        }
+                    }
+                });
+            }
+
+            $query->with(['kecamatan:id,nama', 'desa:id,nama']);
+
+            return $query->get();
+        } catch (QueryException $e) {
+            $this->LogSqlException($e);
+            throw $e;
+        } catch (Throwable $e) {
+            $this->LogGeneralException($e);
+            throw new DataAccessException('Terjadi kesalahan tak terduga di ' . __METHOD__, 0, $e);
         }
     }
 }
