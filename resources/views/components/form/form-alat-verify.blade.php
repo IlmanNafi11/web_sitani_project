@@ -33,7 +33,14 @@
                     <input
                         class="bg-gray-50 border border-gray-300 text-gray-600 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 cursor-not-allowed"
                         placeholder="Email Kelompok Tani" type="email" id="email-kelompok-tani" name="email-kelompok-tani"
-                        value="{{ old('email-kelompok-tani', $laporan->LaporanBantuanAlatDetail->email) }}" disabled>
+                        value="{{ old('email-kelompok-tani', $laporan->LaporanBantuanAlatDetail->email_kelompok_tani) }}" disabled>
+                </div>
+                <div>
+                    <label for="password-email-kelompok-tani">Password Email Kelompok Tani</label>
+                    <input
+                        class="bg-gray-50 border border-gray-300 text-gray-600 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 cursor-not-allowed"
+                        placeholder="Email Kelompok Tani" type="email" id="email-kelompok-tani" name="email-kelompok-tani"
+                        value="{{ old('email-kelompok-tani', $laporan->LaporanBantuanAlatDetail->password_email) }}" disabled>
                 </div>
             </div>
         </div>
