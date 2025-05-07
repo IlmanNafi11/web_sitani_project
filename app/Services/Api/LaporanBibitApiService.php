@@ -128,14 +128,14 @@ class LaporanBibitApiService implements LaporanBibitApiServiceInterface
 
     /**
      * @inheritDoc
-     * @param string|int|null $penyuluhId
+     * @param string|int $kecamatanId
      * @return array
      * @throws DataAccessException
      */
-    public function getLaporanStatusCounts(string|int|null $penyuluhId): array
+    public function getLaporanStatusCounts(string|int $kecamatanId): array
     {
         try {
-            return $this->repository->getLaporanStatusCounts($penyuluhId);
+            return $this->repository->getLaporanStatusCounts($kecamatanId);
         } catch (QueryException $e) {
             throw new DataAccessException('Database error saat menghitung total laporan bibit berdasarkan statusnya.', 0, $e);
         } catch (Throwable $e) {

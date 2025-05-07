@@ -54,7 +54,7 @@ class LaporanBibitController extends Controller
             return $this->errorResponse('Gagal fetch data laporan bibit.', 500);
         } catch (Throwable $e) {
             Log::error($e);
-            return $this->errorResponse('Terjadi kesalahan diserver.', 500);
+            return $this->errorResponse('Terjadi kesalahan di server.', 500);
         }
     }
 
@@ -64,13 +64,13 @@ class LaporanBibitController extends Controller
             $stats = $this->service->getLaporanStatusCounts($id);
 
             if (array_sum($stats) === 0) {
-                return $this->errorResponse('Laporan Tidak ditemukan', 404, ['penyuluh_id' => $id]);
+                return $this->errorResponse('Laporan Tidak ditemukan', Response::HTTP_NOT_FOUND, ['kecamatan_id' => $id]);
             }
             return $this->successResponse($stats, 'Total laporan bibit berhasil diambil');
         } catch (DataAccessException $e) {
             return $this->errorResponse('Gagal menghitung total laporan berdasarkan statusnya.', 500);
         } catch (Throwable $e) {
-            return $this->errorResponse('Terjadi kesalahan diserver.', 500);
+            return $this->errorResponse('Terjadi kesalahan di server.', 500);
         }
     }
 

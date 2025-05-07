@@ -26,10 +26,10 @@ interface LaporanBibitApiServiceInterface
     /**
      * Mengambil data laporan statistik penggunaan bibit berdasarkan laporan yang tersimpan di Sitani
      *
-     * @param string|int|null $penyuluhId penyuluh id
+     * @param string|int $kecamatanId Kecamatan id
      * @return array statistik laporan berdasarkan statusnya(berkualitas, tidak berkualitas, pending)
      */
-    public function getLaporanStatusCounts(string|int|null $penyuluhId): array;
+    public function getLaporanStatusCounts(string|int $kecamatanId): array;
 
     /**
      * Mengambil total laporan bibit berdasarkan kecamatan id

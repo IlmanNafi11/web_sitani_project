@@ -209,11 +209,11 @@ class LaporanBibitBibitRepository implements LaporanBibitRepositoryInterface
 
     /**
      * @inheritDoc
-     * @param int|null $penyuluhId
+     * @param int|null $kecamatanId
      * @return array
      * @throws DataAccessException
      */
-    public function getLaporanStatusCounts(?int $penyuluhId = null): array
+    public function getLaporanStatusCounts(?int $kecamatanId = null): array
     {
         $statusCounts = [
             'rejected' => 0,
@@ -222,15 +222,16 @@ class LaporanBibitBibitRepository implements LaporanBibitRepositoryInterface
         ];
 
         try {
-            $startDate = Carbon::now()->startOfYear();
-            $endDate = Carbon::now()->endOfYear();
+            $currentYear = Carbon::now()->year;
 
             $query = LaporanKondisi::select('status', DB::raw('count(*) as total'))
                 ->whereIn('status', [1, 2, 3])
-                ->whereBetween('created_at', [$startDate, $endDate]);
+                ->whereYear('created_at', $currentYear);
 
-            if (!is_null($penyuluhId)) {
-                $query->where('penyuluh_id', $penyuluhId);
+            if (!is_null($kecamatanId)) {
+                $query->whereHas('kelompokTani', function ($query) use ($kecamatanId) {
+                    $query->where('kecamatan_id', $kecamatanId);
+                });
             }
 
             $rawCounts = $query->groupBy('status')
@@ -248,10 +249,10 @@ class LaporanBibitBibitRepository implements LaporanBibitRepositoryInterface
             }
             return $statusCounts;
         } catch (QueryException $e) {
-            $this->LogSqlException($e, ['penyuluh_id' => $penyuluhId]);
+            $this->LogSqlException($e, ['penyuluh_id' => $kecamatanId]);
             throw $e;
         } catch (Throwable $e) {
-            $this->LogGeneralException($e, ['penyuluh_id' => $penyuluhId]);
+            $this->LogGeneralException($e, ['penyuluh_id' => $kecamatanId]);
             throw new DataAccessException('Terjadi kesalahan tidak terduga saat menghitung total laporan berdasarkan statusnya.', 0, $e);
         }
     }

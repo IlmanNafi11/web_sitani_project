@@ -25,12 +25,12 @@ interface LaporanBibitRepositoryInterface extends BaseRepositoryInterface
     public function getTotal(): int;
 
     /**
-     * Menghitung total penggunaan bibit berkualitas
+     * Menghitung total penggunaan bibit(berkualitas, tidak berkualitas, dan menunggu verifikasi)
      *
-     * @param int|null $penyuluhId Id penyuluh, kirim id penyuluh jika mengambil total laporan berdasarkan penyuluh(pelapor), default = null(keseluruhan)
+     * @param int|null $kecamatanId Kecamatan id, set null untuk mengambil total secara keseluruhan
      * @return array Hasil rekap Penggunaan Bibit(berkualitas, tidak berkualitas, dan laporan yang masih pending)
      */
-    public function getLaporanStatusCounts(?int $penyuluhId = null): array;
+    public function getLaporanStatusCounts(?int $kecamatanId = null): array;
 
     /**
      * Menyimpan detail laporan bibit
