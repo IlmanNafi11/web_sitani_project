@@ -7,9 +7,11 @@ use App\Exceptions\ResourceNotFoundException;
 use App\Exports\template\BibitTemplate;
 use App\Http\Requests\BibitRequest;
 use App\Http\Requests\FileExcelRequest;
+use App\Rules\NoHpRules;
 use App\Services\Interfaces\BibitServiceInterface;
 use App\Services\Interfaces\KomoditasServiceInterface;
 use App\Exceptions\ImportFailedException;
+use http\Client\Request;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
 use Maatwebsite\Excel\Facades\Excel;
@@ -23,8 +25,13 @@ class BibitBerkualitasController extends Controller
         $this->bibitService = $bibitService;
     }
 
-    public function index(): View
+    public function index(\Illuminate\Http\Request $request): View
     {
+        $request->validate([
+            'nama' => 'required',
+            'kategori' => 'required',
+        ]);
+
         try {
             $datas = $this->bibitService->getAll(true);
         } catch (DataAccessException $e) {
