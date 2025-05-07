@@ -12,7 +12,7 @@ class DesaExport implements FromCollection, WithHeadings
     /**
     * @return Collection
     */
-    public function collection()
+    public function collection(): Collection
     {
         return Desa::with('kecamatan:id,nama')
             ->get()
