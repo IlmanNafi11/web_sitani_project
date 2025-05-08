@@ -141,13 +141,34 @@
                     @endif
                 </div>
             </div>
+        <div>
+            <label for="radio-verifikasi">Verifikasi Alat</label>
+            <div class="flex flex-wrap gap-2">
+                <div class="flex items-center gap-1">
+                    <input type="radio" name="status" class="radio radio-inset radio-success"
+                           id="alat-diverifikasi" value="1" {{ old('status', $laporan->status) == 1 ? 'checked' : '' }} />
+                    <label class="label-text text-base" for="alat-diverifikasi"> Setujui </label>
+                </div>
+                <div class="flex items-center gap-1">
+                    <input type="radio" name="status" class="radio radio-inset radio-error"
+                           id="alat-ditolak" value="0" {{ old('status', $laporan->status) == 0 ? 'checked' : '' }}/>
+                    <label class="label-text text-base" for="alat-ditolak"> Tolak </label>
+                </div>
+            </div>
+            @error('status')
+            <p class="helper-text text-red-600">{{ $message }}</p>
+            @else
+                <span class="helper-text">Verifikasi permintaan bantuan hibah</span>
+                @enderror
         </div>
-    </div>
+        </div>
 
     {{-- action button --}}
     <div class="button-group flex space-x-4">
         <button class="btn btn-soft btn-secondary" onclick="back()">Kembali</button>
         <x-ui.button.save-button :style="'btn-soft'" :formId="'form-verify-alat'" :title="'Verifikasi'"/>
+    </div>
+
     </div>
 </form>
 <script>

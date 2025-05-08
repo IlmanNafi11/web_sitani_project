@@ -57,7 +57,6 @@ class LaporanBantuanAlatObserver
                 'path_ktp_ketua_upkk' => $paths['path_ktp_ketua_upkk'],
                 'path_ktp_anggota1' => $paths['path_ktp_anggota1'],
                 'path_ktp_anggota2' => $paths['path_ktp_anggota2'],
-                'path_proposal'  => $paths['path_proposal'],
             ]);
         } catch (\Throwable $th) {
             Log::error('Gagal menyimpan laporan bantuan alat: ' . $th->getMessage());
