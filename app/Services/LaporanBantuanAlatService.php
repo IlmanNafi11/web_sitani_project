@@ -2,70 +2,108 @@
 
 namespace App\Services;
 
-use App\Repositories\Interfaces\Base\BaseRepositoryInterface;
-use Illuminate\Support\Facades\Log;
+use App\Exceptions\DataAccessException;
+use App\Exceptions\ResourceNotFoundException;
+use App\Repositories\Interfaces\PermintaanBantuanAlatRepositoryInterface;
+use App\Services\Api\PermintaanBantuanAlatApiService;
+use App\Services\Interfaces\LaporanBantuanAlatServiceInterface;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\QueryException;
+use Illuminate\Support\Collection;
 
-class LaporanBantuanAlatService
+class LaporanBantuanAlatService implements LaporanBantuanAlatServiceInterface
 {
-    protected BaseRepositoryInterface $repository;
+    protected PermintaanBantuanAlatRepositoryInterface $repository;
 
-    public function __construct(BaseRepositoryInterface $repository)
+    public function __construct(PermintaanBantuanAlatRepositoryInterface $repository)
     {
         $this->repository = $repository;
     }
 
-    public function getAll()
+    /**
+     * @throws DataAccessException
+     */
+    public function getAll(bool $withRelations = false): Collection
     {
         try {
-            return $this->repository->getAll(true);
+            return $this->repository->getAll($withRelations);
+        } catch (QueryException $e) {
+            throw new DataAccessException('Database error saat fetch data laporan bantuan alat.', 0, $e);
         } catch (\Throwable $th) {
-            Log::error('Gagal mengambil data laporan bantuan alat: ' . $th->getMessage());
+            throw new DataAccessException('Terjadi kesalahan tak terduga saat fetch data laporan bantuan alat.', 0, $th);
         }
-
-        return collect([]);
     }
 
-    public function getById(int|string $id)
+    /**
+     * @throws ResourceNotFoundException
+     * @throws DataAccessException
+     */
+    public function getById(int|string $id): Model
     {
         try {
-            return $this->repository->getById($id);
+            $laporan = $this->repository->getById($id);
+            if ($laporan === null) {
+                throw new ResourceNotFoundException("Laporan bantuan alat dengan id " . $id . " tidak ditemukan.");
+            }
+            return $laporan;
+        } catch (ResourceNotFoundException $e) {
+            throw $e;
+        } catch (QueryException $e) {
+            throw new DataAccessException("Database error saat fetch data laporan bantuan alat dengan id " . $id . ".", 0, $e);
         } catch (\Throwable $th) {
-            Log::error("Gagal mengambil laporan bantuan alat ID $id: " . $th->getMessage());
+            throw new DataAccessException("Terjadi kesalahan tak terduga saat fetch data laporan bantuan alat dengan id " . $id . ".", 0, $th);
         }
+    }
 
+    /**
+     * Tidak digunakan, proses create resource berada di service khusus api
+     *
+     * @see PermintaanBantuanAlatApiService
+     * @param array $data
+     * @return Model|null
+     */
+    public function create(array $data): ?Model
+    {
         return null;
     }
 
-    public function create(array $data)
+    /**
+     * @throws DataAccessException
+     */
+    public function update(int|string $id, array $data): bool
     {
         try {
-            return $this->repository->create($data);
+            $result = $this->repository->update($id, $data);
+            if (!$result) {
+                throw new DataAccessException("Gagal memperbarui laporan bantuan alat dengan id " . $id . ".");
+            }
+            return true;
+        } catch (QueryException $e) {
+            throw new DataAccessException('Database error saat memperbarui data laporan bantuan alat.', 0, $e);
+        } catch (DataAccessException $e) {
+            throw $e;
         } catch (\Throwable $th) {
-            Log::error('Gagal menyimpan laporan bantuan alat: ' . $th->getMessage());
+            throw new DataAccessException('Terjadi kesalahan tak terduga saat memperbarui data laporan bantuan alat.', 0, $th);
         }
-
-        return null;
     }
 
-    public function update(int|string $id, array $data)
+    /**
+     * @throws DataAccessException
+     */
+    public function delete(int|string $id): bool
     {
         try {
-            return $this->repository->update($id, $data);
+            $result = $this->repository->delete($id);
+            if (!$result) {
+                throw new DataAccessException("Gagal menghapus laporan bantuan alat dengan id " . $id . ".");
+            }
+            return true;
+        } catch (QueryException $e) {
+            throw new DataAccessException('Database error saat menghapus data laporan bantuan alat.', 0, $e);
+        } catch (DataAccessException $e) {
+            throw $e;
         } catch (\Throwable $th) {
-            Log::error("Gagal memperbarui laporan bantuan alat ID $id: " . $th->getMessage());
+            throw new DataAccessException('Terjadi kesalahan tak terduga saat menghapus data laporan bantuan alat.', 0, $th);
         }
-
-        return false;
-    }
-
-    public function delete(int|string $id)
-    {
-        try {
-            return $this->repository->delete($id);
-        } catch (\Throwable $th) {
-            Log::error("Gagal menghapus laporan bantuan alat ID $id: " . $th->getMessage());
-        }
-
-        return false;
     }
 }
