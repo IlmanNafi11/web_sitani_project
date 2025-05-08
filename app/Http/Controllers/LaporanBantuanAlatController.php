@@ -1,22 +1,32 @@
 <?php
 
 namespace App\Http\Controllers;
+
+use App\Exceptions\DataAccessException;
+use App\Exceptions\ResourceNotFoundException;
 use App\Http\Requests\LaporanBantuanAlat;
-use App\Services\LaporanBantuanAlatService;
+use App\Services\Interfaces\LaporanBantuanAlatServiceInterface;
 
 use Illuminate\Http\Request;
 
 class LaporanBantuanAlatController extends Controller
 {
-    protected LaporanBantuanAlatService $laporanService;
-    public function __construct(LaporanBantuanAlatService $laporanService)
+    protected LaporanBantuanAlatServiceInterface $laporanService;
+
+    public function __construct(LaporanBantuanAlatServiceInterface $laporanService)
     {
         $this->laporanService = $laporanService;
     }
 
     public function index()
     {
-        $laporans = $this->laporanService->getAll();
+        try {
+            $laporans = $this->laporanService->getAll(true);
+        } catch (DataAccessException $e) {
+            $laporans = collect();
+            session()->flash('error', 'Gagal memuat data laporan bantuan alat.');
+        }
+
         return view('pages.laporan_alat.index', compact('laporans'));
     }
 
@@ -33,19 +43,7 @@ class LaporanBantuanAlatController extends Controller
      */
     public function store(LaporanBantuanAlat $request)
     {
-        $validated = $request->validated();
-        $laporan = $this->laporanService->create($validated);
-
-        if ($laporan) {
-            return response()->json([
-                'message' => 'Laporan Berhasil Ditambahkan',
-                'data' => $laporan,
-            ], 201);
-        }
-
-        return response()->json([
-            'message' => 'Laporan gagal disimpan'
-        ], 400);
+        //
     }
 
     /**
@@ -61,7 +59,14 @@ class LaporanBantuanAlatController extends Controller
      */
     public function edit(string $id)
     {
-        $laporan = $this->laporanService->getById($id);
+        try {
+            $laporan = $this->laporanService->getById($id);
+        } catch (ResourceNotFoundException $e) {
+            abort(404, $e->getMessage());
+        } catch (DataAccessException $e) {
+            abort(500, 'Terjadi kesalahan saat memuat data laporan bantuan alat untuk edit. Silakan coba lagi.');;
+        }
+
         return view('pages.laporan_alat.verifikasi-alat', compact('laporan'));
     }
 
@@ -73,14 +78,14 @@ class LaporanBantuanAlatController extends Controller
         $request->validate([
             'status' => 'required'
         ], ['status.required' => 'Silahkan Pilih Status Verifikasi Laporan Bantuan Alat!']);
-        // dd($request->status);
-        $result = $this->laporanService->update($id, ['status' => $request->status]);
-
-        if ($result) {
+        try {
+            $this->laporanService->update($id, ['status' => $request->status]);
             return redirect()->route('laporan-alat.index')->with('success', 'Laporan berhasil diverifikasi');
+        } catch (ResourceNotFoundException $e) {
+            abort(404, $e->getMessage());
+        } catch (DataAccessException $e) {
+            return redirect()->back()->withInput()->with('error', 'Gagal memperbarui data laporan bantuan alat. Silakan coba lagi.');
         }
-
-        return redirect()->route('laporan-alat.index')->with('failed', 'Laporan gagal diverifikasi');
     }
 
     /**
@@ -88,9 +93,13 @@ class LaporanBantuanAlatController extends Controller
      */
     public function destroy(string $id)
     {
-        $this->laporanService->delete($id);
-
-        return redirect()->route('laporan-alat.index')->with('success', 'Data berhasil dihapus');
+        try {
+            $this->laporanService->delete($id);
+            return redirect()->route('laporan-alat.index')->with('success', 'Data berhasil dihapus');
+        } catch (ResourceNotFoundException $e) {
+            abort(404, $e->getMessage());
+        } catch (DataAccessException $e) {
+            return redirect()->route('laporan-alat.index')->with('error', 'Gagal menghapus data laporan bantuan alat. Silakan coba lagi.');
+        }
     }
-
 }
