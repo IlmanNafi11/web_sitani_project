@@ -14,6 +14,7 @@ class LaporanBantuanAlatObserver
         try {
             $data = request()->all();
             $now = date('Y-m-d');
+            Log::info($data["path_proposal"]);
             $kelompokTaniId = $data['kelompok_tani_id'];
             $fileFields = [
                 'path_ktp_ketua',
@@ -25,6 +26,7 @@ class LaporanBantuanAlatObserver
                 'path_piagam',
                 'path_surat_domisili',
                 'path_foto_lokasi',
+                'path_proposal'
             ];
 
             $paths = [];
@@ -55,6 +57,7 @@ class LaporanBantuanAlatObserver
                 'path_ktp_ketua_upkk' => $paths['path_ktp_ketua_upkk'],
                 'path_ktp_anggota1' => $paths['path_ktp_anggota1'],
                 'path_ktp_anggota2' => $paths['path_ktp_anggota2'],
+                'path_proposal'  => $paths['path_proposal'],
             ]);
         } catch (\Throwable $th) {
             Log::error('Gagal menyimpan laporan bantuan alat: ' . $th->getMessage());
