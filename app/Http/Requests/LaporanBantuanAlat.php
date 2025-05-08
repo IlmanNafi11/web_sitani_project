@@ -25,7 +25,6 @@ class LaporanBantuanAlat extends FormRequest
             'kelompok_tani_id' => 'required|exists:kelompok_tanis,id',
             'penyuluh_id' => 'required|exists:penyuluhs,id',
             'alat_diminta' => ['required', 'regex:/^[a-zA-Z0-9\s]+$/'],
-
             'nama_ketua' => 'required|string|max:255',
             'no_hp_ketua' => 'required|string|max:255',
             'npwp' => 'required|string|max:255',
