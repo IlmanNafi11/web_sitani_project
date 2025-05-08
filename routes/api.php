@@ -3,12 +3,12 @@
 use App\Http\Controllers\api\BibitController;
 use App\Http\Controllers\api\KelompokTaniController;
 use App\Http\Controllers\api\KomoditasController;
+use App\Http\Controllers\api\LaporanBantuanAlatController;
 use App\Http\Controllers\api\LaporanBibitController;
 use App\Http\Controllers\api\NotificationController;
 use App\Http\Controllers\api\PenyuluhController;
 use App\Http\Controllers\api\UserController;
 use App\Http\Controllers\Auth\AuthApiController;
-use App\Http\Controllers\LaporanBantuanAlatController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Middleware\JwtMiddleware;
 
@@ -84,5 +84,8 @@ Route::controller(LaporanBibitController::class)->group(function () {
  * Route untuk permintaan alat
  */
 Route::controller(LaporanBantuanAlatController::class)->group(function () {
-    Route::post('permintaan-hibah', 'store')->withoutMiddleware(JwtMiddleware::class);
+    Route::post('permintaan-hibah', 'create')->withoutMiddleware(JwtMiddleware::class);
+    Route::get('permintaan-hibah/{id}', 'getAllByKecamatanId')->withoutMiddleware(JwtMiddleware::class);
+    Route::get('permintaan-hibah/count/{id}', 'getTotalByKecamatanId')->withoutMiddleware(JwtMiddleware::class);
+    Route::get('permintaan-hibah/count/status/{id}', 'getStatsTotalByKecamatanId')->withoutMiddleware(JwtMiddleware::class);
 });
