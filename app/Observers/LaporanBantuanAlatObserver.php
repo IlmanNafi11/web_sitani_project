@@ -16,15 +16,15 @@ class LaporanBantuanAlatObserver
             $now = date('Y-m-d');
             $kelompokTaniId = $data['kelompok_tani_id'];
             $fileFields = [
-                'ktp_ketua',
-                'ktp_sekretaris',
-                'ktp_ketua_upkk',
-                'ktp_anggota1',
-                'ktp_anggota2',
-                'badan_hukum',
-                'piagam',
-                'surat_domisili',
-                'foto_lokasi',
+                'path_ktp_ketua',
+                'path_ktp_sekretaris',
+                'path_ktp_ketua_upkk',
+                'path_ktp_anggota1',
+                'path_ktp_anggota2',
+                'path_badan_hukum',
+                'path_piagam',
+                'path_surat_domisili',
+                'path_foto_lokasi',
             ];
 
             $paths = [];
@@ -83,15 +83,15 @@ class LaporanBantuanAlatObserver
 
         if ($laporanDetail) {
             $fileFields = [
-                'ktp_ketua',
-                'ktp_sekretaris',
-                'ktp_ketua_upkk',
-                'ktp_anggota1',
-                'ktp_anggota2',
-                'badan_hukum',
-                'piagam',
-                'surat_domisili',
-                'foto_lokasi',
+                'path_ktp_ketua',
+                'path_ktp_sekretaris',
+                'path_ktp_ketua_upkk',
+                'path_ktp_anggota1',
+                'path_ktp_anggota2',
+                'path_badan_hukum',
+                'path_piagam',
+                'path_surat_domisili',
+                'path_foto_lokasi',
             ];
 
             foreach ($fileFields as $field) {
