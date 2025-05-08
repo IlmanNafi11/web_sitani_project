@@ -21,10 +21,12 @@ class LaporanBantuanAlatRepository implements PermintaanBantuanAlatRepositoryInt
     use LoggingError;
 
     /**
+     * @param false $withRelations
+     * @param array $criteria
      * @inheritDoc
      * @throws DataAccessException
      */
-    public function getAll($withRelations = false): Collection|array
+    public function getAll($withRelations = false, array $criteria = []): Collection|array
     {
         try {
             $query = LaporanBantuanAlat::query();
