@@ -39,13 +39,7 @@ class LaporanBantuanAlatService
     public function create(array $data)
     {
         try {
-            return $this->repository->create([
-                'kelompok_tani_id' => $data['kelompok_tani_id'],
-                'penyuluh_id' => $data['penyuluh_id'],
-                'status' => '2',
-                'alat_diminta' => $data['alat_diminta'],
-                'path_proposal' => $data['path_proposal'],
-            ]);
+            return $this->repository->create($data);
         } catch (\Throwable $th) {
             Log::error('Gagal menyimpan laporan bantuan alat: ' . $th->getMessage());
         }

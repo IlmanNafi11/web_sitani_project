@@ -84,5 +84,5 @@ Route::controller(LaporanBibitController::class)->group(function () {
  * Route untuk permintaan alat
  */
 Route::controller(LaporanBantuanAlatController::class)->group(function () {
-    Route::post('laporan-alat', 'store')->withoutMiddleware(JwtMiddleware::class);
+    Route::post('permintaan-hibah', 'store')->withoutMiddleware(JwtMiddleware::class);
 });
