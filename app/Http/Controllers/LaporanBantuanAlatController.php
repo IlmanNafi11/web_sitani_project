@@ -34,7 +34,6 @@ class LaporanBantuanAlatController extends Controller
     public function store(LaporanBantuanAlat $request)
     {
         $validated = $request->validated();
-
         $laporan = $this->laporanService->create($validated);
 
         if ($laporan) {
