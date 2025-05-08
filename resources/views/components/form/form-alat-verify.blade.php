@@ -134,8 +134,8 @@
             <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
                 <div>
                     <label for="path_proposal">Proposal (PDF)</label>
-                    @if($laporan->LaporanBantuanAlatDetail->path_proposal)
-                        <a href="{{ asset('storage/' . $laporan->LaporanBantuanAlatDetail->path_proposal) }}" target="_blank" class="text-blue-500">View Proposal (PDF)</a>
+                    @if($laporan->path_proposal)
+                        <a href="{{ asset('storage/' . $laporan->path_proposal) }}" target="_blank" class="text-blue-500">View Proposal (PDF)</a>
                     @else
                         <p>No proposal available</p>
                     @endif
