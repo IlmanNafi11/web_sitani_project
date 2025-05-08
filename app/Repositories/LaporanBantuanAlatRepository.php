@@ -32,7 +32,7 @@ class LaporanBantuanAlatRepository implements BaseRepositoryInterface
             'penyuluh:id,penyuluh_terdaftar_id',
             'penyuluh.penyuluhTerdaftar:id,nama,no_hp',
             'LaporanBantuanAlatDetail'
-        ])->select(['id', 'kelompok_tani_id', 'penyuluh_id', 'status', 'created_at'])
+        ])->select(['id', 'kelompok_tani_id', 'penyuluh_id', 'status', 'created_at', 'path_proposal'])
           ->where('id', $id)
           ->first();
     }
