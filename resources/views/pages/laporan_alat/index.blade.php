@@ -43,16 +43,9 @@
                         </x-ui.badge>
                     </td>
                     <td>
-                        <x-ui.dropdown-action :title="'Lihat Aksi'">
-                            <x-ui.button.edit-button :route="route('laporan-alat.edit', $laporan->id)"
-                                                     :title="'Verifikasi'" :style="'btn-soft'" :color="'btn-success'"
-                                                     :icon="'icon-[line-md--check-list-3-filled]'"
-                                                     :extraClassOption="'w-full'" :permission="'laporan-alat.ubah'"/>
-                            <x-ui.button.delete-button :route="route('laporan-alat.destroy', $laporan->id)"
-                                                       :keyId="$laporan->id" :color="'btn-error'" :style="'btn-soft'"
-                                                       :title="'Hapus'"
-                                                       :icon="'icon-[line-md--document-delete]'"
-                                                       :extraClassOption="'w-full'" :permission="'laporan-alat.hapus'"/>
+                        <x-ui.dropdown-action :title="'Lihat Aksi'" :style="'btn-soft'">
+                            <x-ui.button.edit-button :color="'btn-warning'" :style="'btn-soft'" :route="route('laporan-alat.edit', $laporan->id)" :title="'Verifikasi'" :permission="'laporan-hibah.ubah'" :extraClassOption="'w-full'" />
+
                         </x-ui.dropdown-action>
                     </td>
                 </tr>

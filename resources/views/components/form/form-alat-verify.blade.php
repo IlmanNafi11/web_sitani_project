@@ -160,7 +160,7 @@
             @else
                 <span class="helper-text">Verifikasi permintaan bantuan hibah</span>
                 @enderror
-        </div>
+            </div>
         </div>
 
     {{-- action button --}}
