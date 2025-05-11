@@ -6,8 +6,8 @@ use App\Exceptions\DataAccessException;
 use App\Exceptions\ResourceNotFoundException;
 use App\Http\Requests\LaporanBantuanAlat;
 use App\Services\Interfaces\LaporanBantuanAlatServiceInterface;
-
 use Illuminate\Http\Request;
+
 
 class LaporanBantuanAlatController extends Controller
 {
@@ -102,4 +102,5 @@ class LaporanBantuanAlatController extends Controller
             return redirect()->route('laporan-alat.index')->with('error', 'Gagal menghapus data laporan bantuan alat. Silakan coba lagi.');
         }
     }
+
 }
