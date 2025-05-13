@@ -124,8 +124,8 @@
                     @endif
                 </div>
             </div>
-            <div class="relative min-w-8 max-w-96 h-60">
-                <div class="">
+            <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+                <div class="relative min-w-8 max-w-96 h-60">
                     <label for="path_ktp_anggota2">KTP Anggota 2</label>
                     @if($laporan->LaporanBantuanAlatDetail->path_ktp_anggota2)
                         <img src="{{ asset('storage/' . $laporan->LaporanBantuanAlatDetail->path_ktp_anggota2) }}" alt="KTP Anggota 2" class="object-cover w-full h-48 rounded-lg">
@@ -161,19 +161,14 @@
             @else
                 <span class="helper-text">Verifikasi permintaan bantuan hibah</span>
                 @enderror
-            </div>
         </div>
-
+    </div>
 
     {{-- action button --}}
     <div class="button-group flex space-x-4">
         <button class="btn btn-soft btn-secondary" onclick="back()">Kembali</button>
         <x-ui.button.save-button :style="'btn-soft'" :formId="'form-verify-alat'" :title="'Verifikasi'"/>
     </div>
-    <!-- Tombol untuk download ZIP untuk setiap laporan -->
-    <a href="{{ route('laporan-download.download-zip', $laporan->id) }}" class="btn btn-primary">
-        Download ZIP
-    </a>
 </form>
 <script>
     function back(){

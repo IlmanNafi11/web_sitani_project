@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Repositories\LaporanBantuanAlatRepository;
 use App\Services\DashboardService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -9,10 +10,12 @@ use Illuminate\Support\Facades\DB;
 class DashboardController extends Controller
 {
     protected DashboardService $service;
+    protected LaporanBantuanAlatRepository $alatRepo;
 
-    public function __construct(DashboardService $service)
+    public function __construct(DashboardService $service , LaporanBantuanAlatRepository $alatRepo)
     {
         $this->service = $service;
+        $this->alatRepo = $alatRepo;
     }
 
     public function index(Request $request)
@@ -27,34 +30,12 @@ class DashboardController extends Controller
         $percPakaiApp = $stats['percent_penyuluh_pakai_app'];
         $statsBibit = $stats['stats_bibit'];
 
-       // Tambahan logika untuk permintaan hibah alat
-        $selectedYear = $request->input('year', now()->year);
+        $selectedYear = now()->year;
 
-        // Ambil tahun unik dari tabel permintaan_bantuan_alat
-        $years = DB::table('permintaan_bantuan_alat')
-            ->selectRaw('YEAR(updated_at) as year')
-            ->whereYear('updated_at', '<=', now()->year)
-            ->distinct()
-            ->orderByDesc('year')
-            ->pluck('year');
-
-        // Hitung total permintaan hibah alat untuk tahun terpilih dan status 1
-        $totalPermintaanHibah = DB::table('permintaan_bantuan_alat')
-            ->where('status', 1)
-            ->whereYear('updated_at', $selectedYear)
-            ->count();
-
-        // chart data
-        $totalDiterima = DB::table('permintaan_bantuan_alat')
-            ->whereYear('updated_at', $selectedYear)
-            ->where('status', 1)
-            ->count();
-
-        $totalDitolak = DB::table('permintaan_bantuan_alat')
-            ->whereYear('updated_at', $selectedYear)
-            ->where('status', 0)
-            ->count();
-
+        $years = $this->alatRepo->getTahunTersedia();
+        $totalPermintaanHibah = $this->alatRepo->countPermintaanHibah($selectedYear) ?? 0;
+        $totalDiterima = $this->alatRepo->countDiterima($selectedYear) ?? 0;
+        $totalDitolak = $this->alatRepo->countDitolak($selectedYear) ?? 0;
 
         return view('pages.dashboard', compact(
             'totalBibit', 'totalKomoditas', 'totalPenyuluhTerdaftar', 'totalKelompokTani',
