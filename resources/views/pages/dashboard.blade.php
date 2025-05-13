@@ -18,7 +18,7 @@
             <x-ui.card-stats :title="'Total Laporan Bibit'" :stats="$totalLapBibit"
                              :description="'Laporan Bibit pada hari ini'"
                              :icon="'icon-[carbon--report]'" :icon-color="'text-bg-soft-warning'"/>
-            <x-ui.card-stats :title="'Total Permintaan Hibah'" :stats="'10'"
+            <x-ui.card-stats :title="'Total Permintaan Hibah'" :stats="$totalPermintaanHibah"
                              :description="'Permintaan Hibah pada hari ini'" :icon="'icon-[mdi--donation-outline]'"
                              :icon-color="'text-bg-soft-info'"/>
         </div>
@@ -83,9 +83,59 @@
                 </table>
             </x-ui.card>
         </div>
-        <div class="stat-chart-container">
+        <div class="stat-chart-container grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div class="flex flex-col md:flex-row items-start gap-4 w-full">
 
+                <!-- Card Stats -->
+                <x-ui.card-stats
+                    :title="'Total Permintaan Hibah'"
+                    :stats="$totalPermintaanHibah ?? 0"
+                    :description="'Disetujui pada ' . ($selectedYear ?? date('Y'))"
+                    :icon="'icon-[mdi--donation-outline]'"
+                    :icon-color="'text-bg-soft-info'"
+                />
+
+                <!-- Card Statistik Pengajuan Alat dengan Donut Chart -->
+                <div class="bg-white p-6 rounded-lg shadow-md w-full md:w-1/2 flex flex-col justify-between items-center gap-4">
+                    <div class="flex-1 w-full">
+                        <h3 class="text-xl font-semibold mb-2">Statistik Pengajuan Alat</h3>
+                        <p>Persentase alat yang disetujui dan ditolak dalam 1 tahun terakhir.</p>
+                        <div class="flex gap-4 mt-4">
+                            <div class="flex items-center gap-2">
+                                <span class="w-3 h-3 bg-green-500 rounded-full inline-block"></span>
+                                <span>Disetujui</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="w-3 h-3 bg-red-500 rounded-full inline-block"></span>
+                                <span>Ditolak</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Donut Chart atau fallback jika data kosong -->
+                    <div class="relative w-full h-48">
+                        @php
+                            $totalDiterima = $totalDiterima ?? 0;
+                            $totalDitolak = $totalDitolak ?? 0;
+                        @endphp
+
+                        @if ($totalDiterima == 0 && $totalDitolak == 0)
+                            <div class="flex justify-center items-center h-full text-gray-500">
+                                Belum ada data pengajuan alat tahun ini.
+                            </div>
+                        @else
+                            <div id="alatChart" class="js-doughnut-chart"
+                                 data-series='[{{ $totalDiterima }}, {{ $totalDitolak }}]'
+                                 data-labels='["Disetujui", "Ditolak"]'
+                                 data-colors='["#4CAF50", "#F44336"]'>
+                            </div>
+                        @endif
+                    </div>
+                </div>
+            </div>
         </div>
+
+
         <div class="fax-container">
             <x-ui.card>
                 <x-ui.title :title="'FAX'" :custom-class="'font-bold'"/>
