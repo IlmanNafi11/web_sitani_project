@@ -285,20 +285,19 @@
             var totalDitolak = {{ $totalDitolak }};
             var totalPermintaan = totalDiterima + totalDitolak;
 
-            // Calculate percentage
+            // Perhitungan Presentase
             var persentaseDisetujui = (totalDiterima / totalPermintaan) * 100 || 0;
             var persentaseDitolak = (totalDitolak / totalPermintaan) * 100 || 0;
 
-            // Display percentage
+            // Display
             document.getElementById('persentaseDisetujui').textContent = persentaseDisetujui.toFixed(2) + '%';
             document.getElementById('persentaseDitolak').textContent = persentaseDitolak.toFixed(2) + '%';
 
-            // Optionally, update the Donut Chart with data
+            //Update diagram lingkaran
             var chartData = [totalDiterima, totalDitolak];
             var chartLabels = ['Disetujui', 'Ditolak'];
 
-            // Use your chart library to render the chart
-            // Example using Chart.js or any other charting library
+
             new Chart(document.getElementById("alatChart"), {
             type: 'doughnut',
             data: {

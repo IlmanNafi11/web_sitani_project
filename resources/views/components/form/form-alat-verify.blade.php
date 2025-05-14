@@ -168,6 +168,10 @@
     <div class="button-group flex space-x-4">
         <button class="btn btn-soft btn-secondary" onclick="back()">Kembali</button>
         <x-ui.button.save-button :style="'btn-soft'" :formId="'form-verify-alat'" :title="'Verifikasi'"/>
+        <a href="{{ route('laporan.downloadZip', $laporan->id) }}" class="btn btn-soft btn-primary">
+            Download Dokumen (ZIP)
+        </a>
+
     </div>
 </form>
 <script>

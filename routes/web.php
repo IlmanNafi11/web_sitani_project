@@ -144,10 +144,9 @@ Route::middleware(['active.session', 'panel.admin.permission'])->group(function 
         Route::put('{laporan_alat}', 'update')->name('laporan-alat.update');
         Route::delete('{laporan_alat}', 'destroy')->name('laporan-alat.destroy');
         Route::get('{laporan_alat}', 'show')->name('laporan-alat.show');
+        Route::get('/laporan/{id}/download-zip', 'downloadZip')->name('laporan.downloadZip');
 
     });
-    // Route Download Zip
-    Route::get('/admin/laporan-download/laporan/download-zip/{id}', [LaporanDownloadController::class, 'downloadZip'])->name('laporan-download.download-zip');
 
     // Admin User Management
     Route::controller(AdminController::class)->prefix('admin/admin-users')->group(function () {
