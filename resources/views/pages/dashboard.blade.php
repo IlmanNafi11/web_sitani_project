@@ -18,7 +18,7 @@
             <x-ui.card-stats :title="'Total Laporan Bibit'" :stats="$totalLapBibit"
                              :description="'Laporan Bibit pada hari ini'"
                              :icon="'icon-[carbon--report]'" :icon-color="'text-bg-soft-warning'"/>
-            <x-ui.card-stats :title="'Total Permintaan Hibah'" :stats="'10'"
+            <x-ui.card-stats :title="'Total Permintaan Hibah'" :stats="$totalPermintaanHibah"
                              :description="'Permintaan Hibah pada hari ini'" :icon="'icon-[mdi--donation-outline]'"
                              :icon-color="'text-bg-soft-info'"/>
         </div>
@@ -83,9 +83,76 @@
                 </table>
             </x-ui.card>
         </div>
-        <div class="stat-chart-container">
+        <div class="w-full h-fit flex flex-col gap-2.5 mb-2.5">
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700">
+                    Data tahun: <span class="font-semibold">{{ $selectedYear }}</span>
+                </label>
+            </div>
 
+
+            <!-- Card Stats -->
+                <x-ui.card-stats
+                    :title="'Total Permintaan Hibah'"
+                    :stats="$totalPermintaanHibah ?? 0"
+                    :description="'Disetujui pada ' . ($selectedYear ?? date('Y'))"
+                    :icon="'icon-[mdi--donation-outline]'"
+                    :icon-color="'text-bg-soft-info'"
+                />
+
+            <!-- Card Statistik Pengajuan Alat dengan Donut Chart -->
+            <div class="stats-card-container grid grid-cols-2 max-lg:grid-cols-1 gap-2.5">
+                <div class="flex-1 w-full">
+                    <h3 class="text-xl font-semibold mb-2">Statistik Pengajuan Alat</h3>
+                    <p>Persentase alat yang disetujui dan ditolak dalam 1 tahun terakhir.</p>
+                    <div class="flex gap-4 mt-4">
+                        <div class="flex items-center gap-2">
+                            <span class="w-3 h-3 bg-green-500 rounded-full inline-block"></span>
+                            <span>Disetujui</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="w-3 h-3 bg-red-500 rounded-full inline-block"></span>
+                            <span>Ditolak</span>
+                        </div>
+                    </div>
+
+                    <!-- Display Persentase -->
+                    <div class="flex mt-4 gap-4">
+                        <div>
+                            <h4>Persentase Disetujui</h4>
+                            <span id="persentaseDisetujui">0%</span>
+                        </div>
+                        <div>
+                            <h4>Persentase Ditolak</h4>
+                            <span id="persentaseDitolak">0%</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Donut Chart atau fallback jika data kosong -->
+                    <div class="relative w-full h-48">
+                        @php
+                            $totalDiterima = $totalDiterima ?? 0;
+                            $totalDitolak = $totalDitolak ?? 0;
+                        @endphp
+
+                        @if ($totalDiterima == 0 && $totalDitolak == 0)
+                            <div class="flex justify-center items-center h-full text-gray-500">
+                                Belum ada data pengajuan alat tahun ini.
+                            </div>
+                        @else
+                            <div id="alatChart" class="js-doughnut-chart"
+                                 data-series='@json([$totalDiterima, $totalDitolak])'
+                                 data-labels='@json(["Disetujui", "Ditolak"])'
+                                 data-colors='@json(["#4CAF50", "#F44336"])'>
+                            </div>
+                        @endif
+                    </div>
+                </div>
+            </div>
         </div>
+
+
         <div class="fax-container">
             <x-ui.card>
                 <x-ui.title :title="'FAX'" :custom-class="'font-bold'"/>
@@ -182,6 +249,7 @@
                 }));
             });
 
+
             if (document.getElementById("rekap-table") && typeof simpleDatatables.DataTable !== 'undefined') {
                 const dataTable = new simpleDatatables.DataTable("#rekap-table", {
                     paging: true,
@@ -211,4 +279,34 @@
             }
         });
     </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var totalDiterima = {{ $totalDiterima }};
+            var totalDitolak = {{ $totalDitolak }};
+            var totalPermintaan = totalDiterima + totalDitolak;
+
+            var persentaseDisetujui = (totalDiterima / totalPermintaan) * 100 || 0;
+            var persentaseDitolak = (totalDitolak / totalPermintaan) * 100 || 0;
+
+            document.getElementById('persentaseDisetujui').textContent = persentaseDisetujui.toFixed(2) + '%';
+            document.getElementById('persentaseDitolak').textContent = persentaseDitolak.toFixed(2) + '%';
+
+            // var options = {
+            //     chart: {
+            //         type: 'donut',
+            //         height: 200
+            //     },
+            //     series: [totalDiterima, totalDitolak],
+            //     labels: ['Disetujui', 'Ditolak'],
+            //     colors: ['#4CAF50', '#F44336'],
+            //     legend: {
+            //         position: 'top'
+            //     }
+            // };
+            //
+            // var chart = new ApexCharts(document.querySelector("#alatChart"), options);
+            // chart.render();
+        });
+    </script>
+
 @endonce
