@@ -142,7 +142,7 @@
                             </div>
                         @else
                             <div id="alatChart" class="js-doughnut-chart"
-                                 data-series='@json([$totalDiterima ?? 0, $totalDitolak ?? 0])'
+                                 data-series='@json([$totalDiterima, $totalDitolak])'
                                  data-labels='@json(["Disetujui", "Ditolak"])'
                                  data-colors='@json(["#4CAF50", "#F44336"])'>
                             </div>
@@ -280,49 +280,33 @@
         });
     </script>
     <script>
-            document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function() {
             var totalDiterima = {{ $totalDiterima }};
             var totalDitolak = {{ $totalDitolak }};
             var totalPermintaan = totalDiterima + totalDitolak;
 
-            // Perhitungan Presentase
             var persentaseDisetujui = (totalDiterima / totalPermintaan) * 100 || 0;
             var persentaseDitolak = (totalDitolak / totalPermintaan) * 100 || 0;
 
-            // Display
             document.getElementById('persentaseDisetujui').textContent = persentaseDisetujui.toFixed(2) + '%';
             document.getElementById('persentaseDitolak').textContent = persentaseDitolak.toFixed(2) + '%';
 
-            //Update diagram lingkaran
-            var chartData = [totalDiterima, totalDitolak];
-            var chartLabels = ['Disetujui', 'Ditolak'];
-
-
-            new Chart(document.getElementById("alatChart"), {
-            type: 'doughnut',
-            data: {
-            labels: chartLabels,
-            datasets: [{
-            data: chartData,
-            backgroundColor: ['#4CAF50', '#F44336'],
-        }]
-        },
-            options: {
-            responsive: true,
-            plugins: {
-            legend: {
-            position: 'top',
-        },
-            tooltip: {
-            callbacks: {
-            label: function(tooltipItem) {
-            return tooltipItem.raw + '%';
-        }
-        }
-        }
-        }
-        }
-        });
+            // var options = {
+            //     chart: {
+            //         type: 'donut',
+            //         height: 200
+            //     },
+            //     series: [totalDiterima, totalDitolak],
+            //     labels: ['Disetujui', 'Ditolak'],
+            //     colors: ['#4CAF50', '#F44336'],
+            //     legend: {
+            //         position: 'top'
+            //     }
+            // };
+            //
+            // var chart = new ApexCharts(document.querySelector("#alatChart"), options);
+            // chart.render();
         });
     </script>
+
 @endonce
