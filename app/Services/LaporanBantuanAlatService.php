@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Events\NotifGenerated;
 use App\Exceptions\DataAccessException;
 use App\Exceptions\ResourceNotFoundException;
+use App\Exports\LaporanBantuanAlatExport;
 use App\Models\User;
 use App\Repositories\Interfaces\PermintaanBantuanAlatRepositoryInterface;
 use App\Services\Api\PermintaanBantuanAlatApiService;
@@ -160,6 +161,15 @@ class LaporanBantuanAlatService implements LaporanBantuanAlatServiceInterface
                 $pesanNotifikasi,
                 'laporan_bantuan_alat_status'
             ));
+        }
+    }
+
+    public function export()
+    {
+        try {
+            return new LaporanBantuanAlatExport();
+        } catch (Throwable $e) {
+            throw new DataAccessException("Gagal export data laporan hibat alat.", 0, $e);
         }
     }
 }

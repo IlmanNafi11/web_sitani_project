@@ -144,7 +144,7 @@ Route::middleware(['active.session', 'panel.admin.permission'])->group(function 
         Route::put('{laporan_alat}', 'update')->middleware('permission:laporan-hibah.ubah')->name('laporan-alat.update');
         Route::delete('{laporan_alat}', 'destroy')->middleware('permission:laporan-hibah.hapus')->name('laporan-alat.destroy');
         Route::get('/laporan/{id}/download-zip', 'downloadZip')->name('laporan.downloadZip');
-
+        Route::get('export', 'export')->middleware('permission:laporan-hibah.export')->name('laporan-hibah.export');
     });
 
     // Admin User Management
