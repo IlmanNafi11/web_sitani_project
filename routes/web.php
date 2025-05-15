@@ -132,6 +132,7 @@ Route::middleware(['active.session', 'panel.admin.permission'])->group(function 
         Route::get('{laporan_bibit}/edit', 'edit')->middleware('permission:laporan-bibit.ubah')->name('laporan-bibit.edit');
         Route::put('{laporan_bibit}', 'update')->middleware('permission:laporan-bibit.ubah')->name('laporan-bibit.update');
         Route::delete('{laporan_bibit}', 'destroy')->middleware('permission:laporan-bibit.hapus')->name('laporan-bibit.destroy');
+        Route::get('export', 'export')->middleware('permission:laporan-bibit.export')->name('laporan-bibit.export');
     });
 
     //Laporan Alat
