@@ -27,7 +27,7 @@ class RoleRepository implements RoleRepositoryInterface
     public function getAll(bool $withRelations = false, array $criteria = []): Collection|array
     {
         try {
-            $query = Role::query();
+            $query = Role::where('guard_name', '!=', 'api');
             if ($withRelations) {
                 $query->with('permissions');
             }

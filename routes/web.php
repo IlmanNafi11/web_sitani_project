@@ -9,11 +9,15 @@ use App\Http\Controllers\KecamatanController;
 use App\Http\Controllers\KelompokTaniController;
 use App\Http\Controllers\KomoditasController;
 use App\Http\Controllers\LaporanBibitController;
-use App\Http\Controllers\LaporanDownloadController;
 use App\Http\Controllers\PenyuluhTerdaftarController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\LaporanBantuanAlatController;
 use Illuminate\Support\Facades\Route;
+
+/**
+ * Entrypoint(landing page)
+ */
+Route::get('/', fn() => view('landing-page'));
 
 /**
  * Auth Routes (Tanpa middleware)
