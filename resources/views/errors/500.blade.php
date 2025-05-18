@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>404 - Halaman Tidak Ditemukan</title>
+    <title>500 - Kesalahan Server</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
@@ -17,14 +17,14 @@
     <div class="max-w-md w-full">
         <div class="text-center">
             <h1 class="text-8xl font-semibold text-gray-900 mb-6">
-                404
+                500
             </h1>
 
             <h2 class="text-xl font-medium text-gray-800 mb-3">
-                Halaman Tidak Ditemukan
+                Kesalahan Server
             </h2>
             <p class="text-gray-500 mb-8">
-                Maaf, halaman yang Anda cari tidak dapat ditemukan.
+                Maaf, terjadi kesalahan pada server. Kami akan menangani ini secepatnya.
             </p>
 
             <div class="flex flex-col sm:flex-row gap-3 justify-center">
@@ -46,4 +46,4 @@
         </div>
     </div>
 </body>
-</html>
+</html> 
