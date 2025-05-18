@@ -17,7 +17,7 @@ use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\DB;
 use Throwable;
 
-class LaporanBibitBibitRepository implements LaporanBibitRepositoryInterface
+class LaporanBibitRepository implements LaporanBibitRepositoryInterface
 {
     use LoggingError;
 

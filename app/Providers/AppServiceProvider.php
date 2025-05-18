@@ -23,7 +23,7 @@ use App\Repositories\Interfaces\RoleRepositoryInterface;
 use App\Repositories\KecamatanRepository;
 use App\Repositories\KelompokTaniRepository;
 use App\Repositories\KomoditasRepository;
-use App\Repositories\LaporanBibitBibitRepository;
+use App\Repositories\LaporanBibitRepository;
 use App\Repositories\NotificationRepository;
 use App\Repositories\PenyuluhRepository;
 use App\Repositories\LaporanBantuanAlatRepository;
@@ -85,7 +85,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->when(PenyuluhTerdaftarService::class)->needs(PenyuluhTerdaftarRepositoryInterface::class)->give(PenyuluhTerdaftarRepository::class);
         $this->app->when(KelompokTaniService::class)->needs(KelompokTaniRepositoryInterface::class)->give(KelompokTaniRepository::class);
         $this->app->when(KelompokTaniService::class)->needs(ManyRelationshipManagement::class)->give(KelompokTaniRepository::class);
-        $this->app->when(LaporanBibitService::class)->needs(LaporanBibitRepositoryInterface::class)->give(LaporanBibitBibitRepository::class);
+        $this->app->when(LaporanBibitService::class)->needs(LaporanBibitRepositoryInterface::class)->give(LaporanBibitRepository::class);
         $this->app->when(AdminService::class)->needs(BaseRepositoryInterface::class)->give(AdminRepository::class);
         $this->app->when(LaporanBantuanAlatService::class)->needs(PermintaanBantuanAlatRepositoryInterface::class)->give(LaporanBantuanAlatRepository::class);
         $this->app->when(UserService::class)->needs(AuthInterface::class)->give(UserRepository::class);
@@ -121,7 +121,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->when(KelompokTaniApiService::class)->needs(KelompokTaniRepositoryInterface::class)->give(KelompokTaniRepository::class);
         // Laporan Bibit
         $this->app->bind(LaporanBibitApiServiceInterface::class, LaporanBibitApiService::class);
-        $this->app->when(LaporanBibitApiService::class)->needs(LaporanBibitRepositoryInterface::class)->give(LaporanBibitBibitRepository::class);
+        $this->app->when(LaporanBibitApiService::class)->needs(LaporanBibitRepositoryInterface::class)->give(LaporanBibitRepository::class);
         // User
         $this->app->bind(UserServiceInterface::class, UserService::class);
         //Penyuluh
