@@ -53,13 +53,14 @@ class AdminRepository implements BaseRepositoryInterface
     /**
      * @inheritDoc
      * @param string|int $id
-     * @return Model|null
+     * @return Model
      * @throws DataAccessException
+     * @throws ResourceNotFoundException
      */
-    public function getById(string|int $id): ?Model
+    public function getById(string|int $id): Model
     {
         try {
-            return Admin::with([
+            $admin = Admin::with([
                 'user' => function ($query) {
                     $query->select(['id', 'email']);
                 },
@@ -67,8 +68,16 @@ class AdminRepository implements BaseRepositoryInterface
                     $query->select(['id', 'name']);
                 },
             ])->find($id);
+
+            if (!$admin) {
+                throw new ResourceNotFoundException("Admin with ID {$id} not found.");
+            }
+
+            return $admin;
         } catch (QueryException $e) {
             $this->LogSqlException($e, ['id' => $id]);
+            throw $e;
+        } catch (ResourceNotFoundException $e) {
             throw $e;
         } catch (Throwable $e) {
             $this->LogGeneralException($e, ['id' => $id]);

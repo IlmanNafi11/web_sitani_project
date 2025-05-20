@@ -15,8 +15,8 @@
                 <div class="avatar cursor-pointer">
                     <div class="size-9.5 rounded-full">
                         <picture>
-                            <source srcset="{{ asset('storage/profile/profile.jpg') }}" type="image/jpeg"/>
-                            <img src="{{ asset('storage/profile/profile.webp') }}" alt="avatar profil" />
+                            <source srcset="{{ asset('storage/profile/profile-placeholder.png') }}" type="image/jpeg"/>
+                            <img src="{{ asset('storage/profile/profile-placeholder.webp') }}" alt="avatar profil" />
                         </picture>
                     </div>
                 </div>
@@ -27,8 +27,8 @@
                     <div class="avatar">
                         <div class="w-10 rounded-full">
                             <picture>
-                                <source srcset="{{ asset('storage/profile/profile.jpg') }}" type="image/jpeg" />
-                                <img src="{{ asset('storage/profile/profile.webp') }}" alt="avatar profil" />
+                                <source srcset="{{ asset('storage/profile/profile-placeholder.png') }}" type="image/jpeg" />
+                                <img src="{{ asset('storage/profile/profile-placeholder.webp') }}" alt="avatar profil" />
                             </picture>
                         </div>
                     </div>

@@ -12,6 +12,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\DB;
+use Spatie\Permission\Models\Role;
 use Throwable;
 
 class PenyuluhRepository implements PenyuluhRepositoryInterface
@@ -86,7 +87,8 @@ class PenyuluhRepository implements PenyuluhRepositoryInterface
                     'is_password_set' => true,
                 ]);
 
-                $user->assignRole('penyuluh');
+                $role = Role::where('name', 'penyuluh')->where('guard_name', 'api')->firstOrFail();
+                $user->assignRole($role);
 
                 $penyuluh = Penyuluh::create([
                     'user_id' => $user->id,

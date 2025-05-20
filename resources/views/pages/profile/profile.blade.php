@@ -8,7 +8,7 @@
             <x-ui.sub-title :title="'Data Pribadi Pengguna'" />
         </div>
         <div>
-            <form id="profil" action="{{ route('profile.update', $user->id) }}" method="post">
+            <form id="profil" action="{{ route('profile.update', $user->admin->id) }}" method="post">
                 @method('PUT')
                 @csrf
                 <div class="pt-0 grid grid-cols-2 gap-2.5 max-sm:grid-cols-1 mb-4">
