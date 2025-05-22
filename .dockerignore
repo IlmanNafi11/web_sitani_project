@@ -1,0 +1,10 @@
+.git
+.idea
+vendor/
+storage/framework/sessions/*
+storage/framework/cache/data/*
+storage/framework/views/*
+storage/logs/*.log
+Dockerfile
+.dockerignore
+docker-compose.yml
