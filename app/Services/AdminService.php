@@ -53,12 +53,7 @@ class AdminService implements AdminServiceInterface
     public function getById(string|int $id): Model
     {
         try {
-            $admin = $this->repository->getById($id);
-
-            if ($admin === null) {
-                throw new ResourceNotFoundException("Admin dengan id {$id} tidak ditemukan.");
-            }
-            return $admin;
+            return $this->repository->getById($id);
         } catch (ResourceNotFoundException $e) {
             throw $e;
         } catch (QueryException $e) {
@@ -66,6 +61,7 @@ class AdminService implements AdminServiceInterface
         } catch (Throwable $e) {
             throw new DataAccessException("Terjadi kesalahan tidak terduga saat fetch data admin dengan id {$id}.", 0, $e);
         }
+
     }
 
 

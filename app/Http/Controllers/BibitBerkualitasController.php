@@ -51,7 +51,7 @@ class BibitBerkualitasController extends Controller
             $this->bibitService->create($request->validated());
             return redirect()->route('bibit.index')->with('success', 'Data berhasil disimpan');
         } catch (DataAccessException $e) {
-            return redirect()->route('bibit.index')->with('error', 'Data gagal disimpan. Silakan coba lagi.');
+            return redirect()->route('bibit.index')->with('error', 'Data gagal disimpan. Silakan coba lagi.' . $e->getMessage());
         }
     }
 

@@ -87,7 +87,10 @@ class BibitService implements BibitServiceInterface
                 throw new DataAccessException('Gagal menyimpan data bibit di repository.');
             }
 
-            $users = User::role('penyuluh')->get();
+            $users = User::whereHas('roles', function ($query) {
+                $query->where('name', 'penyuluh')
+                    ->where('guard_name', 'api');
+            })->get();
             foreach ($users as $user) {
                 event(new NotifGenerated(
                     $user,
@@ -102,7 +105,7 @@ class BibitService implements BibitServiceInterface
         } catch (DataAccessException $e) {
             throw $e;
         } catch (Throwable $e) {
-            throw new DataAccessException('Terjadi kesalahan tak terduga saat menyimpan data bibit.', 500, $e);
+            throw new DataAccessException('Terjadi kesalahan tak terduga saat menyimpan data bibit.' . $e->getMessage(), 500, $e);
         }
     }
 

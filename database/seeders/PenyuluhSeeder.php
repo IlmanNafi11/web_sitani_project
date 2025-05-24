@@ -8,6 +8,7 @@ use App\Models\PenyuluhTerdaftar;
 use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Spatie\Permission\Models\Role;
 
 class PenyuluhSeeder extends Seeder
 {
@@ -35,7 +36,10 @@ class PenyuluhSeeder extends Seeder
             'kecamatan_id' => $kecamatan->id,
         ]);
 
-        $user->assignRole('penyuluh');
+        $rolePenyuluh = Role::where('name', 'penyuluh')->first();
+        if ($rolePenyuluh) {
+            $user->assignRole($rolePenyuluh);
+        }
 
         $penyuluh = Penyuluh::firstOrCreate([
             'user_id' => $user->id,

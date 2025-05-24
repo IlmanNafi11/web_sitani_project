@@ -12,6 +12,7 @@ use App\Http\Requests\OtpCodeRequest;
 use App\Http\Requests\PasswordRequest;
 use App\Http\Requests\PenyuluhRequest;
 use App\Http\Requests\PhonePenyuluhRequest;
+use App\Http\Resources\PenyuluhTerdaftarResource;
 use App\Http\Resources\UserLoginResource;
 use App\Services\Api\PenyuluhTerdaftarApiService;
 use App\Services\Interfaces\PenyuluhServiceInterface;
@@ -52,9 +53,8 @@ class AuthApiController extends Controller
                 return $this->errorResponse('Email atau password salah', Response::HTTP_UNAUTHORIZED);
             }
 
-            $user = Auth::user();
-
-            if (!$user || !$user->hasRole('penyuluh')) {
+            $user = JWTAuth::setToken($token)->toUser();
+            if (!$user || !$user->hasRole(['penyuluh', 'api'])) {
                 JWTAuth::invalidate($token);
                 return $this->errorResponse('Akun ini tidak memiliki izin untuk login sebagai penyuluh.', Response::HTTP_FORBIDDEN);
             }
@@ -62,7 +62,7 @@ class AuthApiController extends Controller
             return $this->respondWithToken($token, "Login Berhasil");
 
         } catch (Throwable $e) {
-            return $this->errorResponse('Terjadi kesalahan di server. Silakan coba lagi.', 500);
+            return $this->errorResponse('Terjadi kesalahan di server. Silakan coba lagi.' . $e->getMessage(), 500);
         }
     }
 
@@ -78,7 +78,7 @@ class AuthApiController extends Controller
                 return $this->errorResponse('Nomor telah terdaftar, silahkan login,',  Response::HTTP_CONFLICT);
             }
 
-            return $this->successResponse($penyuluhTerdaftar, 'Nomor HP terdaftar sebagai penyuluh.');
+            return $this->successResponse(new PenyuluhTerdaftarResource($penyuluhTerdaftar), 'Nomor HP terdaftar sebagai penyuluh.');
 
         } catch (ResourceNotFoundException $e) {
             return $this->errorResponse($e->getMessage(), $e->getCode() ?: Response::HTTP_NOT_FOUND);

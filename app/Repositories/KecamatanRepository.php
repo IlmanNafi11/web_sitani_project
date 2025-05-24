@@ -27,7 +27,9 @@ class KecamatanRepository implements BaseRepositoryInterface
         try {
             $query = Kecamatan::select(['id', 'nama']);
             if ($withRelations) {
-                $query->with(['desa:id,nama']);
+                $query->with(['desa' => function($query) {
+                    $query->select(['id', 'nama', 'kecamatan_id']);
+                }]);
             }
             return $query->get();
         } catch (QueryException $e) {
@@ -116,4 +118,3 @@ class KecamatanRepository implements BaseRepositoryInterface
         }
     }
 }
-

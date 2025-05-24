@@ -11,13 +11,13 @@
         <div id="file-action-container">
             <x-ui.dropdown-action :title="'File'" :color="'btn-secondary'">
                 <x-ui.button.export-button :title="'Unduh Template'" :style="'btn-soft'" :color="'btn-secondary'"
-                                           :routes="route('kecamatan.download')" :permission="'komoditas.lihat'"
+                                           :routes="route('kecamatan.download')" :permission="'kecamatan.lihat'"
                                            :extra-class-element="'w-full'" :icon="'icon-[line-md--file-download]'" />
                 <x-ui.button.export-button :title="'Export Excel'" :style="'btn-soft'" :color="'btn-success'"
-                                           :routes="route('kecamatan.export')" :permission="'komoditas.export'"
+                                           :routes="route('kecamatan.export')" :permission="'kecamatan.export'"
                                            :extra-class-element="'w-full'" :icon="'icon-[line-md--file-export]'" />
                 <x-ui.button.import-button :title="'Import Excel'" :style="'btn-soft'" :color="'btn-info'"
-                                           :permission="'komoditas.import'" :extra-class-element="'w-full'"
+                                           :permission="'kecamatan.import'" :extra-class-element="'w-full'"
                                            :keyId="'import-modal'" :icon="'icon-[line-md--file-import]'" />
             </x-ui.dropdown-action>
         </div>

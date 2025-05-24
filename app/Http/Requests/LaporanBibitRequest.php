@@ -27,7 +27,7 @@ class LaporanBibitRequest extends FormRequest
                 'kelompok_tani_id' => ['required', 'exists:kelompok_tanis,id'],
                 'komoditas_id' => ['required', 'exists:komoditas,id'],
                 'penyuluh_id' => ['required', 'exists:penyuluhs,id'],
-                'luas_lahan' => ['required', 'numeric', 'min:0'],
+                'luas_lahan' => ['required', 'numeric', 'between:0,999999.99'],
                 'estimasi_panen' => ['required', 'date_format:Y-m-d', 'after:today'],
                 'jenis_bibit' => ['required', 'string', 'max:255'],
                 'foto_bibit' => ['required', 'image', 'mimes:jpeg,png,jpg', 'max:2048'],
