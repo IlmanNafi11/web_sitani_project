@@ -2,7 +2,9 @@
 
 namespace App\Http\Requests;
 
+use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class KelompokTaniRequest extends FormRequest
 {
@@ -17,12 +19,18 @@ class KelompokTaniRequest extends FormRequest
     /**
      * Get the validation rules that apply to the request.
      *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
+     * @return array<string, ValidationRule|array|string>
      */
     public function rules(): array
     {
         return [
-            'nama' => 'required|min:3|max:255|regex:/^[A-Za-z\s\',.]+$/',
+            'nama' => [
+                'required',
+                'min:3',
+                'max:255',
+                'regex:/^[A-Za-z\s\',.]+$/',
+                Rule::unique('kelompok_tanis', 'nama')->ignore($this->kelompok_tani),
+            ],
             'desa_id' => 'required|exists:desas,id',
             'kecamatan_id' => 'required|exists:kecamatans,id',
             'penyuluh_terdaftar_id' => 'required|array',
@@ -37,6 +45,7 @@ class KelompokTaniRequest extends FormRequest
             'nama.min' => 'Nama minimal terdiri dari :min karakter.',
             'nama.max' => 'Nama maksimal terdiri dari :max karakter.',
             'nama.regex' => 'Nama hanya boleh terdiri dari huruf, tanda petik satu, koma, titik dan spasi.',
+            'nama.unique' => 'Nama kelompok tani tersebut sudah terdaftar.',
 
             // desa
             'desa_id.required' => 'Silakan pilih desa yang tersedia!',

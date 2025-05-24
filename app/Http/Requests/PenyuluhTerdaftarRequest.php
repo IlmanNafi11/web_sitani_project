@@ -2,7 +2,9 @@
 
 namespace App\Http\Requests;
 
+use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class PenyuluhTerdaftarRequest extends FormRequest
 {
@@ -17,13 +19,18 @@ class PenyuluhTerdaftarRequest extends FormRequest
     /**
      * Get the validation rules that apply to the request.
      *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
+     * @return array<string, ValidationRule|array|string>
      */
     public function rules(): array
     {
         return [
             'nama' => 'required|min:3|max:255|regex:/^[A-Za-z\s\',.]+$/',
-            'no_hp' => 'required|starts_with:08|digits_between:11,13',
+            'no_hp' => [
+                'required',
+                'starts_with:08',
+                'digits_between:11,13',
+                Rule::unique('penyuluh_terdaftars', 'no_hp')->ignore($this->penyuluh_terdaftar),
+            ],
             'alamat' => 'required|min:3|max:255',
             'kecamatan_id' => 'required|exists:kecamatans,id',
         ];
@@ -42,6 +49,7 @@ class PenyuluhTerdaftarRequest extends FormRequest
             'no_hp.required' => 'Nomor HP wajib diisi!',
             'no_hp.starts_with' => 'Nomor HP harus dimulai dengan angka 08.',
             'no_hp.digits_between' => 'Nomor HP harus terdiri dari 11 hingga 13 digit angka.',
+            'no_hp.unique' => 'Nomor HP sudah terdaftar, gunakan nomor lain.',
 
             // alamat
             'alamat.required' => 'Alamat wajib diisi!',
