@@ -107,7 +107,6 @@ Proyek ini menggunakan konfigurasi Docker dengan:
 1. **Pastikan Docker dan Docker Compose terinstal**
 ```bash
 docker --version
-docker-compose --version
 ```
 
 2. **Clone repository**
@@ -116,25 +115,27 @@ git clone https://github.com/IlmanNafi11/web_sitani_project.git
 cd sitani
 ```
 
-3. **Konfigurasi environment**
+3. **Konfigurasi environment dan build assets**
 ```bash
 cp .env.example .env
+php artisan key:generate
+php artisan jwt:secret
+npm run build
 ```
 
 4. **Build dan jalankan container**
 ```bash
-docker-compose up -d --build
+docker build -t nama-image:tag .
+docker run --name nama-kontainer -p 80:80 nama-image
 ```
 
-5. **Jalankan migrasi dan build assets**
+5. **Jalankan migrasi**
 ```bash
 # Masuk ke container PHP
-docker-compose exec app bash
+docker exec nama-container bash
 
 # Di dalam container
 php artisan migrate --seed
-npm install
-npm run build
 ```
 
 6. **Akses aplikasi**
@@ -159,6 +160,7 @@ npm install
 ```bash
 cp .env.example .env
 php artisan key:generate
+php artisan jwt:secret
 ```
 
 4. **Konfigurasi database**
@@ -201,7 +203,7 @@ php artisan test --filter=TestName
 1. Fork repository
 2. Clone repository fork Anda
 ```bash
-git clone https://github.com/IlmanNafi11/web_sitani_project.git sitani
+git clone url-hasil-fork sitani
 cd sitani
 ```
 
