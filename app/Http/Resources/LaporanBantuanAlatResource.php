@@ -19,6 +19,7 @@ class LaporanBantuanAlatResource extends JsonResource
             'status' => $this->status,
             'created_at' => $this->created_at,
             'alat_diminta' => $this->alat_diminta,
+            'path_proposal' => $this->path_proposal,
             'kelompok_tani' => new KelompokTaniResource($this->whenLoaded('kelompokTani')),
             'laporan_detail' => new LaporanBantuanAlatDetailResource($this->whenLoaded('LaporanBantuanAlatDetail')),
         ];
