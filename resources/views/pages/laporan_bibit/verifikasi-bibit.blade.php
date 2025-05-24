@@ -54,7 +54,7 @@
                                 <div class="skeleton skeleton-animated absolute inset-0" id="skeleton-image-bibit"></div>
                                 <a href="{{ asset('storage/' . $laporan->laporanKondisiDetail->foto_bibit)}}"
                                    data-fancybox="data-foto" data-caption="Foto Bibit">
-                                    <img src="{{ asset('storage/' . $laporan->laporanKondisiDetail->path_foto_lokasi)}}"
+                                    <img src="{{ asset('storage/' . $laporan->laporanKondisiDetail->foto_bibit)}}"
                                          alt="foto-bibit"
                                          class="image-bibit w-full h-full object-cover rounded-md shadow absolute cursor-pointer"
                                          onload="document.getElementById('skeleton-image-bibit').style.display='none';"/>
