@@ -2,7 +2,9 @@
 
 namespace App\Providers;
 
+use App\Models\BibitBerkualitas;
 use App\Models\LaporanBantuanAlat;
+use App\Observers\BibitBerkualitasObserver;
 use App\Observers\LaporanBantuanAlatObserver;
 use App\Repositories\AdminRepository;
 use App\Repositories\BibitRepository;
@@ -142,5 +144,6 @@ class AppServiceProvider extends ServiceProvider
             \URL::forceScheme('https');
         }
         LaporanBantuanAlat::observe(LaporanBantuanAlatObserver::class);
+        BibitBerkualitas::observe(BibitBerkualitasObserver::class);
     }
 }

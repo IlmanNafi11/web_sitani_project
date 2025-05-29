@@ -3,16 +3,12 @@
 namespace App\Notifications;
 
 use Google\Client;
-use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Notification;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
-class StatusNotification extends Notification implements ShouldQueue
+class StatusNotification extends Notification
 {
-    use Queueable;
-
     public string $title;
     public string $pesan;
     public string $type;

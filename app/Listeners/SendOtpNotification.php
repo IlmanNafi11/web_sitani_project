@@ -4,10 +4,8 @@ namespace App\Listeners;
 
 use App\Events\OtpGenerated;
 use App\Notifications\OtpCodeNotification;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Queue\InteractsWithQueue;
 
-class SendOtpNotification  implements ShouldQueue
+class SendOtpNotification
 {
     /**
      * Create the event listener.

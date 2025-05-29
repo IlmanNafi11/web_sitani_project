@@ -2,11 +2,9 @@
 
 namespace App\Services;
 
-use App\Events\NotifGenerated;
 use App\Exceptions\DataAccessException;
 use App\Exceptions\ResourceNotFoundException;
 use App\Exports\LaporanBantuanAlatExport;
-use App\Models\User;
 use App\Repositories\Interfaces\PermintaanBantuanAlatRepositoryInterface;
 use App\Services\Api\PermintaanBantuanAlatApiService;
 use App\Services\Interfaces\LaporanBantuanAlatServiceInterface;
@@ -73,6 +71,7 @@ class LaporanBantuanAlatService implements LaporanBantuanAlatServiceInterface
     }
 
     /**
+     * @inheritDoc
      * @throws DataAccessException
      */
     public function update(int|string $id, array $data): bool
@@ -91,8 +90,6 @@ class LaporanBantuanAlatService implements LaporanBantuanAlatServiceInterface
                 throw new DataAccessException("Gagal memperbarui laporan bantuan alat dengan id " . $id . ".");
             }
 
-            $this->handleStatusChange($laporanBantuanAlat, $data['status'] ?? null);
-
             DB::commit();
             return true;
         } catch (QueryException $e) {
@@ -108,6 +105,7 @@ class LaporanBantuanAlatService implements LaporanBantuanAlatServiceInterface
     }
 
     /**
+     * @inheritDoc
      * @throws DataAccessException
      */
     public function delete(int|string $id): bool
@@ -127,43 +125,10 @@ class LaporanBantuanAlatService implements LaporanBantuanAlatServiceInterface
         }
     }
 
-    private function handleStatusChange(Model $laporanBantuanAlat, ?int $status): void
-    {
-        if ($status === null) {
-            return;
-        }
-
-        $penyuluh = $laporanBantuanAlat->penyuluh()->first();
-        if (!$penyuluh) {
-            return;
-        }
-
-        $user = User::find($penyuluh->user_id);
-        if (!$user) {
-            return;
-        }
-
-        $judulNotifikasi = '';
-        $pesanNotifikasi = '';
-
-        if ($status == 1) {
-            $judulNotifikasi = 'Pengajuan Disetujui';
-            $pesanNotifikasi = 'Pengajuan bantuan alat Anda telah disetujui.';
-        } elseif ($status == 0) {
-            $judulNotifikasi = 'Pengajuan Ditolak';
-            $pesanNotifikasi = 'Pengajuan bantuan alat Anda ditolak.';
-        }
-
-        if ($judulNotifikasi && $pesanNotifikasi) {
-            event(new NotifGenerated(
-                $user,
-                $judulNotifikasi,
-                $pesanNotifikasi,
-                'laporan_bantuan_alat_status'
-            ));
-        }
-    }
-
+    /**
+     * @inheritDoc
+     * @throws DataAccessException
+     */
     public function export()
     {
         try {

@@ -87,18 +87,6 @@ class BibitService implements BibitServiceInterface
                 throw new DataAccessException('Gagal menyimpan data bibit di repository.');
             }
 
-            $users = User::whereHas('roles', function ($query) {
-                $query->where('name', 'penyuluh')
-                    ->where('guard_name', 'api');
-            })->get();
-            foreach ($users as $user) {
-                event(new NotifGenerated(
-                    $user,
-                    'Bibit Baru Tersedia',
-                    'Admin menambahkan bibit baru: ' . ($bibit->nama ?? 'bibit'),
-                    'bibit_baru'
-                ));
-            }
             return $bibit;
         } catch (QueryException $e) {
             throw new DataAccessException('Database error saat menyimpan data bibit.', 500, $e);
