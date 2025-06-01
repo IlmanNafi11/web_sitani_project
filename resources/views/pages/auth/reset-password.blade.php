@@ -11,9 +11,9 @@
             </div>
             <div class="card-body">
                 <x-form.password-input :name="'password'" :keyId="'password'" :placeholder="'Masukan kata sandi baru'" :label="'Kata Sandi'"
-                    :helperText="'Pastikan anda pengikut jokowi'" />
+                    :helperText="'Pastikan kata sandi mudah diingat'" />
                 <x-form.password-input :name="'password_confirmation'" :keyId="'password_confirmation'" :placeholder="'Ulangi kata sandi'" :label="'Konfirmasi Kata Sandi'"
-                                       :helperText="'Pastikan anda pengikut gibran'" />
+                                       :helperText="'Pastikan masukan sama dengan kata sandi baru'" />
                 <button type="submit" id="verif-button" class="btn w-full btn-soft btn-accent">
                     <span class="icon-[radix-icons--update] size-4.5 shrink-0"></span>Perbarui
                 </button>

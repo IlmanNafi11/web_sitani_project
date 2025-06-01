@@ -246,6 +246,7 @@
 
     </style>
 </head>
+<body>
 
 <!-- NAVBAR -->
 <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm px-4 sticky-top">
@@ -395,7 +396,9 @@
 <script>
   async function loadGrafikKomoditas() {
     try {
-      const response = await fetch('https://websitaniproject-production-ab46.up.railway.app/api/komoditas/musim');
+        const baseUrl = window.location.origin;
+        const endpointMusim = `${baseUrl}/api/komoditas/musim`;
+      const response = await fetch(endpointMusim);
       const result = await response.json();
 
       console.log("Respon API:", result); // Debug
@@ -522,7 +525,9 @@ const warnaBorderKomoditasManual = {
 <script>
   async function loadGrafikLuasLahan() {
     try {
-      const response = await fetch('https://websitaniproject-production-ab46.up.railway.app/api/laporan-kondisi/total-luas-lahan');
+        const baseUrl = window.location.origin;
+        const endpointTotalLuas = `${baseUrl}/api/laporan-kondisi/total-luas-lahan`;
+      const response = await fetch(endpointTotalLuas);
       const result = await response.json();
 
       if (!Array.isArray(result.data) || result.data.length === 0) {
@@ -798,7 +803,9 @@ const warnaBorderKomoditasManual = {
             });
         }
 
-        fetch('https://websitaniproject-production-ab46.up.railway.app/api/komoditas/musim', {
+        const baseUrl = window.location.origin;
+        const endpointMusim = `${baseUrl}/api/komoditas/musim`;
+        fetch(endpointMusim, {
                 headers: {
                 'Accept': 'application/json'
             }

@@ -11,9 +11,9 @@
             </div>
             <div class="card-body">
                 <x-form.password-input :name="'password'" :keyId="'password'" :placeholder="'Masukan kata sandi baru'" :label="'Kata Sandi'"
-                                       :helperText="'Pastikan anda pengikut jokowi'" />
+                                       :helperText="'Pastikan kata sandi mudah diingat'" />
                 <x-form.password-input :name="'password_confirmation'" :keyId="'password_confirmation'" :placeholder="'Masukan kembali kata sandi baru'" :label="'Ulangi Kata Sandi'"
-                                       :helperText="'Pastikan anda pengikut gibran'" />
+                                       :helperText="'Pastikan masukan sama dengan kata sandi baru'" />
                 <x-ui.button.save-button :formId="'setup-password'" :title="'Simpan'" :style="'btn-soft'" :icon="'icon-[radix-icons--update]'" :titleAlert="'Simpan Kata Sandi?'" :messageAlert="'Pastikan anda mengingat kata sandi baru anda!'" />
             </div>
             <div class="card-footer">
